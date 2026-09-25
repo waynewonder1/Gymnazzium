@@ -3,7 +3,7 @@
 // even when the site is closed.
 import { backendEnabled, supabase } from './supabase';
 
-const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY?.trim();
 
 export const pushAvailable = () =>
   backendEnabled &&
