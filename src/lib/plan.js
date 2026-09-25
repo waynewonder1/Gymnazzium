@@ -56,9 +56,13 @@ function getRotation(profile) {
 }
 
 const isGym = (profile) => profile.lookingFor === 'Gym work';
+// A member's own routine (built in the routine editor) replaces the generated plan.
+export const usesRoutine = (profile) => profile.planMode === 'custom' && Boolean(profile.routine);
 const variantFor = (profile) => (profile.lookingFor === 'Calisthenics' ? 'calisthenics' : 'home');
-const trainingDaysPerWeek = (profile) =>
-  (isGym(profile) ? gymWeek.days[profile.schedule] : SCHEDULE_OFFSETS[profile.schedule])?.length ?? 3;
+const trainingDaysPerWeek = (profile) => {
+  if (usesRoutine(profile)) return Object.values(profile.routine.days).filter((d) => d?.groups?.some((g) => g.items.length)).length;
+  return (isGym(profile) ? gymWeek.days[profile.schedule] : SCHEDULE_OFFSETS[profile.schedule])?.length ?? 3;
+};
 
 // ---------- nutrition ----------
 export function nutrition(profile) {
@@ -203,6 +207,10 @@ function gymSessionFor(profile, date, index) {
 }
 
 export function phaseInfo(profile, index) {
+  if (usesRoutine(profile)) {
+    const n = trainingDaysPerWeek(profile);
+    return { label: 'Your routine', value: `${n} day${n === 1 ? '' : 's'} a week`, note: 'Edit it any time' };
+  }
   if (isGym(profile)) {
     const from = heavyFrom(profile);
     const left = from - index;
@@ -249,6 +257,95 @@ function gymDay(profile, index, base) {
   };
 }
 
+// ---------- custom routine ----------
+// profile.routine = {
+//   days: { 0–6 (Sunday–Saturday): null (rest) | { title, groups: [{ name, items: [{ id, sets, reps }] }] } },
+//   customExercises: { [id]: { name, cue } },
+// }
+export function exerciseInfo(profile, id) {
+  return exercises[id] ?? profile.routine?.customExercises?.[id] ?? { name: id, cue: '' };
+}
+
+function routineDay(profile, base) {
+  const plan = profile.routine.days[base.date.getDay()];
+  const groups = (plan?.groups ?? []).filter((g) => g.items.length > 0);
+  if (groups.length === 0) {
+    return {
+      ...base,
+      type: 'rest',
+      title: 'Rest & recovery',
+      focus: 'Sleep 8 hours, drink 2–3 L of water, eat your protein. Recovery is when the muscle grows.',
+    };
+  }
+  const named = groups.length > 1 || Boolean(groups[0].name);
+  const items = groups.flatMap((group) =>
+    group.items.map((item) => {
+      const ex = exerciseInfo(profile, item.id);
+      return { id: item.id, name: ex.name, cue: ex.cue, dose: `${item.sets} × ${item.reps}`, note: null, group: named ? group.name || 'Exercises' : undefined };
+    })
+  );
+  return {
+    ...base,
+    type: 'train',
+    sessionKey: 'routine',
+    title: plan.title || 'Training day',
+    focus: groups.map((g) => g.name).filter(Boolean).join(', ') || `${items.length} exercises`,
+    warmup: '5–10 min warm-up: light cardio, then one light set of your first exercise.',
+    items,
+    cooldown: '5 min cool-down: stretch what you trained, then drink water.',
+    minutes: 10 + items.length * 5,
+  };
+}
+
+// Default sets × reps for an exercise newly added in the routine editor.
+export function defaultsFor(id) {
+  const kind = exercises[id]?.kind;
+  if (kind === 'hold') return { sets: 3, reps: '30 s' };
+  if (kind === 'minutes') return { sets: 1, reps: '10 min' };
+  if (kind === 'reps') return { sets: 3, reps: '10' };
+  return { sets: 3, reps: '8–12' };
+}
+
+// Turns "3 × 8–12 reps" into { sets: 3, reps: '8–12' } for the routine editor.
+export function parseDose(dose) {
+  const m = dose.match(/^(\d+)\s*×\s*(.+)$/);
+  if (!m) return { sets: 1, reps: dose.replace(/\s*(reps|sprints)$/, '') };
+  return { sets: Number(m[1]), reps: m[2].replace(/\s+(reps|light|heavy)$/, '') };
+}
+
+// A starting routine: one week of the member's current plan, or the Gymnazzium gym split.
+export function routineTemplate(profile, source) {
+  const days = { 0: null, 1: null, 2: null, 3: null, 4: null, 5: null, 6: null };
+  if (source === 'gym') {
+    for (const [weekday, key] of Object.entries(gymWeek.byDay)) {
+      const session = gymSplit[key];
+      days[weekday] = {
+        title: session.title,
+        groups: session.groups.map((g) => ({
+          name: g.name,
+          items: g.ids.map((id) => ({ id, sets: exercises[id].kind === 'warmup' ? 2 : 3, reps: exercises[id].kind === 'warmup' ? '12–15' : '8–12' })),
+        })),
+      };
+    }
+  } else if (source === 'current') {
+    const plain = { ...profile, planMode: undefined };
+    const start = Math.max(0, todayIndex(profile));
+    for (let i = start; i < start + 7; i++) {
+      const day = getDay(plain, i);
+      if (day.type !== 'train') continue;
+      const groups = [];
+      for (const item of day.items) {
+        const name = item.group ?? '';
+        let group = groups.at(-1);
+        if (!group || group.name !== name) groups.push((group = { name, items: [] }));
+        group.items.push({ id: item.id, ...parseDose(item.dose) });
+      }
+      days[day.date.getDay()] = { title: day.title, groups };
+    }
+  }
+  return { days, customExercises: { ...(profile.routine?.customExercises ?? {}) } };
+}
+
 export function getDay(profile, index) {
   const offsets = SCHEDULE_OFFSETS[profile.schedule] ?? [0, 2, 4];
   const week = Math.floor(index / 7);
@@ -263,6 +360,7 @@ export function getDay(profile, index) {
     obstacle: obstacleFor(profile, index),
   };
 
+  if (usesRoutine(profile)) return routineDay(profile, base);
   if (isGym(profile)) return gymDay(profile, index, base);
 
   if (!offsets.includes(dow)) {

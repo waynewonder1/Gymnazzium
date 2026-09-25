@@ -1,9 +1,11 @@
 import WorkoutTimer from '../WorkoutTimer';
+import LiftLog from './LiftLog';
+import { isLoggable, lastLog } from '../../lib/lifts';
 
 const formatDate = (date) => date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
 
 // relation: 'past' | 'today' | 'future'
-function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggleMission }) {
+function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggleMission, onLog }) {
   const done = Boolean(progress.done[day.index]);
   const locked = relation === 'future';
   const missionDone = Boolean(progress.missions[day.index]);
@@ -53,6 +55,15 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
                       </span>
                     </span>
                   </label>
+                  {!locked && isLoggable(item.id) && (
+                    <LiftLog
+                      key={`${day.index}-${j}`}
+                      dose={item.dose}
+                      logged={progress.lifts?.[item.id]?.[day.index]}
+                      last={lastLog(progress.lifts, item.id, day.index)}
+                      onSave={(sets) => onLog(j, item.id, sets)}
+                    />
+                  )}
                 </li>
               );
             })}

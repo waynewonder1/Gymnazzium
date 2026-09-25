@@ -3,7 +3,7 @@
 const PROFILE_KEY = 'gymnazzium-profile';
 const PROGRESS_KEY = 'gymnazzium-progress';
 
-export const emptyProgress = { done: {}, checks: {}, missions: {} };
+export const emptyProgress = { done: {}, checks: {}, missions: {}, lifts: {} };
 
 function read(key) {
   try {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { products } from '../data/shop';
-import { addDays, getDay, parseDate, phaseInfo, streak, todayIndex, totalDays } from '../lib/plan';
+import { addDays, getDay, parseDate, phaseInfo, streak, todayIndex, totalDays, usesRoutine } from '../lib/plan';
 import { useMember } from '../context/member';
 import DayCard from '../components/plan/DayCard';
 import WeekStrip from '../components/plan/WeekStrip';
@@ -64,6 +64,27 @@ function PlanView({ profile }) {
     // Ticking every exercise completes the workout.
     if (day.items.every((_, k) => checks[`${selected}:${k}`])) done[selected] = true;
     commit({ ...progress, checks, done });
+  };
+
+  // Logged sets for one exercise. Logging reps on every set ticks the exercise off too.
+  const logLift = (j, id, sets) => {
+    const forExercise = { ...progress.lifts?.[id] };
+    const hasAny = sets.some((s) => s.r > 0 || s.w > 0);
+    if (hasAny) forExercise[selected] = sets;
+    else delete forExercise[selected];
+    const lifts = { ...progress.lifts, [id]: forExercise };
+    const checks = { ...progress.checks };
+    const done = { ...progress.done };
+    if (sets.length > 0 && sets.every((s) => s.r > 0)) {
+      checks[`${selected}:${j}`] = true;
+      if (day.items.every((_, k) => checks[`${selected}:${k}`])) done[selected] = true;
+    }
+    commit({ ...progress, lifts, checks, done });
+  };
+
+  const switchToRecommended = () => {
+    if (!window.confirm('Switch back to the recommended plan? Your routine stays saved, so you can switch back any time.')) return;
+    saveProfile({ ...profile, planMode: undefined });
   };
 
   const toggleIn = (field) => () => {
@@ -135,7 +156,22 @@ function PlanView({ profile }) {
           <div className="stat"><span className="stat-label">{phase.label}</span><strong className="stat-value">{phase.value}</strong><span className="stat-note">{phase.note}</span></div>
         </div>
 
+        {usesRoutine(profile) ? (
+          <p className="banner routine-banner">
+            You're following <strong>your own routine</strong>. <Link to="/plan/routine">Edit it</Link> · <button type="button" className="link-btn" onClick={switchToRecommended}>Switch back to the recommended plan</button>
+          </p>
+        ) : (
+          <div className="customize-cta">
+            <div>
+              <strong>Want it your way?</strong>
+              <span className="muted small">Build your own weekly routine: pick your days, exercises, sets and reps.</span>
+            </div>
+            <Link to="/plan/routine" className="btn btn-sm">{profile.routine ? 'Use my routine' : 'Customize my plan'}</Link>
+          </div>
+        )}
+
         <div className="chips plan-nav">
+          <Link className="chip" to="/progress">My progress</Link>
           <a className="chip" href="#today">Day by day</a>
           <a className="chip" href="#reminders">Reminders</a>
           <a className="chip" href="#obstacles">Obstacles</a>
@@ -162,6 +198,7 @@ function PlanView({ profile }) {
           onToggleCheck={toggleCheck}
           onToggleDone={toggleIn('done')}
           onToggleMission={toggleIn('missions')}
+          onLog={logLift}
         />
         {selected !== current && (
           <button className="btn btn-ghost back-today" onClick={() => select(current)}>Back to today</button>

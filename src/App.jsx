@@ -8,6 +8,8 @@ import Topic from './pages/Topic';
 import Exercises from './pages/Exercises';
 import Login from './pages/Login';
 import Account from './pages/Account';
+import RoutineEditor from './pages/RoutineEditor';
+import Progress from './pages/Progress';
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
       <Route element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="plan" element={<Plan />} />
+        <Route path="plan/routine" element={<RoutineEditor />} />
+        <Route path="progress" element={<Progress />} />
         <Route path="shop" element={<Shop />} />
         <Route path="exercises" element={<Exercises />} />
         <Route path="paths/:slug" element={<Topic kind="paths" />} />
