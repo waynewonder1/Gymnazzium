@@ -1,0 +1,323 @@
+// Turns a member's profile into a day-by-day plan.
+// Everything is computed from the profile, so the same profile always gives the same plan.
+import { exercises, gymSplit, gymWeek, sessions } from '../data/workouts.js';
+import { challenges, milestones, missions, weeklyMission } from '../data/coaching.js';
+
+export const TIMELINE_DAYS = { '1 month': 28, '3 months': 84, '6 months': 182, '1 year+': 364 };
+
+// Which days of each 7-day cycle are training days.
+const SCHEDULE_OFFSETS = {
+  '2 days a week': [0, 3],
+  '3 days a week': [0, 2, 4],
+  '4 days a week': [0, 1, 3, 4],
+  '5+ days a week': [0, 1, 2, 3, 4],
+};
+const ACTIVITY_FACTOR = { '2 days a week': 1.375, '3 days a week': 1.45, '4 days a week': 1.55, '5+ days a week': 1.65 };
+const LEVEL_FACTOR = { Beginner: 1, Intermediate: 1.5, Advanced: 2 };
+
+// Gym plans: build strength and form first, then go heavy (2 × 6–10) from this day on.
+const HEAVY_FROM = { Beginner: 182, Intermediate: 91, Advanced: 0 };
+
+const FAT_GOALS = ['Lose fat', 'Improve stamina'];
+const MUSCLE_GOALS = ['Build muscle', 'Get stronger', 'Get toned / defined'];
+
+// ---------- dates ----------
+export const parseDate = (iso) => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d);
+};
+export const toISO = (date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+export const addDays = (date, n) => {
+  const d = new Date(date);
+  d.setDate(d.getDate() + n);
+  return d;
+};
+const startOfToday = () => {
+  const d = new Date();
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+};
+export const todayIndex = (profile) =>
+  Math.round((startOfToday() - parseDate(profile.startDate)) / 86400000);
+
+export const totalDays = (profile) => TIMELINE_DAYS[profile.timeline] ?? 84;
+
+// ---------- goals ----------
+const hasAny = (profile, list) => profile.goals.some((g) => list.includes(g));
+
+function getRotation(profile) {
+  if (profile.lookingFor === 'Overall cardio') return ['cardio', 'core', 'cardio', 'fullbody'];
+  const fat = hasAny(profile, FAT_GOALS);
+  const muscle = hasAny(profile, MUSCLE_GOALS);
+  if (fat && muscle) return ['push', 'cardio', 'pull', 'core'];
+  if (muscle) return ['push', 'pull', 'core'];
+  if (fat) return ['cardio', 'fullbody', 'core'];
+  return ['fullbody', 'cardio', 'core'];
+}
+
+const isGym = (profile) => profile.lookingFor === 'Gym work';
+const variantFor = (profile) => (profile.lookingFor === 'Calisthenics' ? 'calisthenics' : 'home');
+const trainingDaysPerWeek = (profile) =>
+  (isGym(profile) ? gymWeek.days[profile.schedule] : SCHEDULE_OFFSETS[profile.schedule])?.length ?? 3;
+
+// ---------- nutrition ----------
+export function nutrition(profile) {
+  const w = Number(profile.weight);
+  const h = Number(profile.height);
+  const a = Number(profile.age);
+  const sexOffset = profile.gender === 'Male' ? 5 : profile.gender === 'Female' ? -161 : -78;
+  const bmr = 10 * w + 6.25 * h - 5 * a + sexOffset; // Mifflin–St Jeor
+  const tdee = bmr * (ACTIVITY_FACTOR[profile.schedule] ?? 1.45);
+
+  const fat = hasAny(profile, ['Lose fat']);
+  const muscle = hasAny(profile, ['Build muscle', 'Get stronger']);
+  const toned = profile.goals.includes('Get toned / defined');
+  let adjustment = 0;
+  if (fat && muscle) adjustment = -300;
+  else if (fat) adjustment = -500;
+  else if (toned) adjustment = -250;
+  else if (muscle) adjustment = 250;
+
+  // Never recommend starving: keep a sensible floor.
+  const floor = profile.gender === 'Female' ? 1200 : profile.gender === 'Male' ? 1500 : 1350;
+  const round10 = (n) => Math.round(n / 10) * 10;
+
+  return {
+    bmr: round10(bmr),
+    maintenance: round10(tdee),
+    target: round10(Math.max(tdee + adjustment, floor)),
+    adjustment,
+    protein: Math.round(w * (muscle || toned ? 2 : 1.6)),
+    // 35 ml per kg, kept within the 2–3 L a day we recommend.
+    water: Math.min(3, Math.max(2, Math.round(w * 0.035 * 10) / 10)),
+    bmi: Math.round((w / (h / 100) ** 2) * 10) / 10,
+  };
+}
+
+// What's realistic in the chosen timeline. Deliberately conservative.
+export function expectations(profile) {
+  const days = totalDays(profile);
+  const weeks = days / 7;
+  const months = days / 30;
+  const w = Number(profile.weight);
+  const h = Number(profile.height) / 100;
+  const out = [];
+
+  if (hasAny(profile, ['Lose fat', 'Get toned / defined'])) {
+    const roomToLose = Math.max(0, w - 22 * h * h); // distance to a mid-healthy BMI
+    const lo = Math.min(roomToLose, weeks * 0.25);
+    const hi = Math.min(roomToLose, weeks * 0.75);
+    out.push(
+      roomToLose < 1
+        ? { label: 'Fat loss', value: 'Focus on definition', note: "Your weight is already in a healthy range. Aim to lose fat and gain muscle at the same time, and don't chase the scale." }
+        : { label: 'Fat loss', value: `${lo.toFixed(0)}–${hi.toFixed(0)} kg`, note: '0.25–0.75 kg a week is a safe pace you can keep up.' }
+    );
+  }
+  if (hasAny(profile, ['Build muscle', 'Get stronger'])) {
+    const rate = { Beginner: [0.5, 1], Intermediate: [0.25, 0.5], Advanced: [0.1, 0.25] }[profile.level] ?? [0.5, 1];
+    out.push({
+      label: 'Muscle gained',
+      value: `${(months * rate[0]).toFixed(1)}–${(months * rate[1]).toFixed(1)} kg`,
+      note: `A realistic rate at ${(profile.level || 'beginner').toLowerCase()} level with good protein and sleep.`,
+    });
+  }
+  if (hasAny(profile, ['Improve stamina', 'General health'])) {
+    out.push({
+      label: 'Stamina',
+      value: weeks >= 8 ? '30 min non-stop jog' : '15–20 min jog',
+      note: 'If you train consistently. Most people notice easier stairs within 2–3 weeks.',
+    });
+  }
+  out.push({
+    label: 'Sessions',
+    value: `${Math.round(weeks * trainingDaysPerWeek(profile))}`,
+    note: 'Total workouts in your timeline if you never miss one.',
+  });
+  return out;
+}
+
+// ---------- daily plan ----------
+function prescribe(ex, phase, level) {
+  const sets = ex.sets ?? 3;
+  if (ex.kind === 'warmup') return { dose: '2 × 12–15 light', note: null };
+  if (ex.kind === 'weight') {
+    return { dose: '3 × 8–12 reps', note: 'Pick a weight that makes rep 12 hard. When you can do 12 on every set, go heavier.' };
+  }
+  const start = ex.kind === 'minutes' ? ex.base : Math.round(ex.base * (LEVEL_FACTOR[level] ?? 1));
+  const raw = start + ex.step * phase;
+  const value = Math.min(raw, ex.max);
+  const capped = raw > ex.max;
+  const unit = ex.unit ?? { reps: 'reps', hold: 's hold', minutes: 'min' }[ex.kind];
+  return {
+    dose: sets > 1 ? `${sets} × ${value} ${unit}` : `${value} ${unit}`,
+    note: capped ? 'Too easy now? Move to a harder variation.' : null,
+  };
+}
+
+function pickExercise(id, level, phase) {
+  const ex = exercises[id];
+  if (level === 'Beginner' && phase === 0 && ex.beginner) return ex.beginner;
+  if (level === 'Advanced' && ex.advanced) return ex.advanced;
+  return id;
+}
+
+function fill(text, profile) {
+  const n = nutrition(profile);
+  return text.replace('{water}', n.water).replace('{protein}', n.protein);
+}
+
+function missionFor(profile, index) {
+  if (index % 7 === 6) return weeklyMission;
+  const list = missions.filter((m) => !m.for || hasAny(profile, m.for));
+  return fill(list[index % list.length].text, profile);
+}
+
+function obstacleFor(profile, index) {
+  if (isGym(profile) && index > 0 && index === heavyFrom(profile) - 1) {
+    return { title: 'Heavy phase starts tomorrow', text: 'Your form is solid now. From tomorrow: 2 heavy sets of 6–10 reps per exercise. Warm up well and keep the reps clean.' };
+  }
+  const milestone = milestones.find((m) => m.day === index && !(m.levelUp && isGym(profile)));
+  if (milestone) return milestone;
+  // Once a week, remind them of one of their own challenges.
+  const own = profile.challenges ?? [];
+  if (index % 7 === 3 && own.length) {
+    const name = own[Math.floor(index / 7) % own.length];
+    return { title: name, text: challenges[name] };
+  }
+  return null;
+}
+
+// ---------- gym split ----------
+const heavyFrom = (profile) => HEAVY_FROM[profile.level] ?? HEAVY_FROM.Beginner;
+
+// Which split session falls on this date, or null for a rest day.
+function gymSessionFor(profile, date, index) {
+  const days = gymWeek.days[profile.schedule] ?? gymWeek.days['4 days a week'];
+  if (!days.includes(date.getDay())) return null;
+  if (days.length === 5) return gymWeek.byDay[date.getDay()];
+  // Fewer training days: work through the split in order so every session comes round.
+  const start = parseDate(profile.startDate);
+  let count = 0;
+  for (let i = 0; i < index; i++) if (days.includes(addDays(start, i).getDay())) count++;
+  return gymWeek.order[count % gymWeek.order.length];
+}
+
+export function phaseInfo(profile, index) {
+  if (isGym(profile)) {
+    const from = heavyFrom(profile);
+    const left = from - index;
+    return index < from
+      ? { label: 'Strength & form', value: `${left} day${left === 1 ? '' : 's'}`, note: 'Until your heavy phase (2 × 6–10)' }
+      : { label: 'Heavy phase', value: '2 × 6–10', note: 'Heavy, clean reps. Only 2 sets.' };
+  }
+  const i = Math.max(0, index);
+  return { label: `Phase ${Math.floor(i / 21) + 1}`, value: `${21 - (i % 21)} days`, note: 'Until your reps go up' };
+}
+
+function gymDay(profile, index, base) {
+  const key = gymSessionFor(profile, base.date, index);
+  if (!key) {
+    return {
+      ...base,
+      type: 'rest',
+      title: 'Rest & recovery',
+      focus: 'Sleep 8 hours, drink 2–3 L of water, eat your protein. Recovery is when the muscle grows.',
+    };
+  }
+  const session = gymSplit[key];
+  const heavy = index >= heavyFrom(profile);
+  const items = session.groups.flatMap((group) =>
+    group.ids.map((id) => {
+      const ex = exercises[id];
+      const dose = ex.kind === 'warmup' ? '2 × 12–15 light' : heavy ? '2 × 6–10 heavy' : '3 × 8–12 reps';
+      return { id, name: ex.name, cue: ex.cue, dose, note: null, group: group.name };
+    })
+  );
+  return {
+    ...base,
+    type: 'train',
+    sessionKey: key,
+    title: session.title,
+    focus: session.focus,
+    warmup: session.warmup,
+    phaseNote: heavy
+      ? 'Heavy phase: 2 sets of 6–10. Pick a weight where the last rep is a real grind with clean form.'
+      : 'Strength & form phase: 3 sets of 8–12. Nail the form first. When every set hits 12, add weight.',
+    items,
+    cooldown: '5 min cool-down: stretch what you trained, then drink water.',
+    minutes: 10 + items.length * 5,
+  };
+}
+
+export function getDay(profile, index) {
+  const offsets = SCHEDULE_OFFSETS[profile.schedule] ?? [0, 2, 4];
+  const week = Math.floor(index / 7);
+  const dow = index % 7;
+  const phase = Math.floor(week / 3);
+  const base = {
+    index,
+    date: addDays(parseDate(profile.startDate), index),
+    week,
+    phase,
+    mission: missionFor(profile, index),
+    obstacle: obstacleFor(profile, index),
+  };
+
+  if (isGym(profile)) return gymDay(profile, index, base);
+
+  if (!offsets.includes(dow)) {
+    const active = hasAny(profile, FAT_GOALS) || profile.lookingFor === 'Overall cardio';
+    return {
+      ...base,
+      type: 'rest',
+      title: active ? 'Active recovery' : 'Rest day',
+      focus: active
+        ? 'Walk 6,000 steps (about 180–300 kcal) and stretch for 10 minutes.'
+        : 'Rest, stretch and eat well. Muscle grows on rest days.',
+    };
+  }
+
+  const sessionNumber = week * offsets.length + offsets.filter((o) => o < dow).length;
+  const rotation = getRotation(profile);
+  const key = rotation[sessionNumber % rotation.length];
+  const session = sessions[key];
+  const ids = session[variantFor(profile)] ?? session.home;
+
+  const items = ids.map((rawId) => {
+    const id = pickExercise(rawId, profile.level, phase);
+    const ex = exercises[id];
+    return { id, name: ex.name, cue: ex.cue, ...prescribe(ex, phase, profile.level) };
+  });
+
+  return {
+    ...base,
+    type: 'train',
+    sessionKey: key,
+    title: session.title,
+    focus: session.focus,
+    warmup: '5 min warm-up: easy jump rope or jog, arm circles, leg swings.',
+    items,
+    cooldown: '5 min cool-down: walk it off and stretch what you trained.',
+    minutes: 10 + items.length * 5,
+  };
+}
+
+// Streak = consecutive completed training days, counting back from today.
+// Rest days don't break it. Today only counts once it's done.
+export function streak(profile, done) {
+  let count = 0;
+  let i = todayIndex(profile);
+  if (!done[i]) i -= 1;
+  for (; i >= 0; i--) {
+    const day = getDay(profile, i);
+    if (day.type === 'rest') continue;
+    if (!done[i]) break;
+    count++;
+  }
+  return count;
+}
+
+// Starting dose for one exercise, e.g. for exercise cards outside a plan.
+export function doseFor(id, level = 'Beginner', phase = 0) {
+  return prescribe(exercises[id], phase, level);
+}
