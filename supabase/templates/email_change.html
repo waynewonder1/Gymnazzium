@@ -1,0 +1,17 @@
+<!doctype html>
+<html><body style="margin:0;padding:0;background:#f2f4f3;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f2f4f3;padding:24px 12px;">
+<tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:10px;overflow:hidden;font-family:Arial,Helvetica,sans-serif;color:#1c2320;">
+<tr><td style="background:#0A0E0C;padding:22px 28px;font-size:22px;font-weight:bold;letter-spacing:1px;color:#ECEFEC;">GYMNAZZIUM<span style="color:#FF4B3E;">.</span></td></tr>
+<tr><td style="padding:32px 28px 8px;">
+<h1 style="margin:0 0 14px;font-size:24px;line-height:1.25;color:#0A0E0C;">Confirm your new email</h1>
+<p style="margin:0 0 24px;font-size:16px;line-height:1.6;color:#3d4642;">Tap the button to confirm {{ .NewEmail }} as the email for your Gymnazzium account.</p>
+<table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="border-radius:4px;background:#FF4B3E;">
+<a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#0A0E0C;text-decoration:none;">Confirm new email</a>
+</td></tr></table>
+<p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#6b7470;">Didn't ask for this? Ignore this email.</p>
+<p style="margin:16px 0 0;font-size:12px;line-height:1.6;color:#8a928e;word-break:break-all;">Button not working? Copy this link into your browser:<br><a href="{{ .ConfirmationURL }}" style="color:#FF4B3E;">{{ .ConfirmationURL }}</a></p>
+</td></tr>
+<tr><td style="padding:24px 28px;font-size:12px;color:#8a928e;border-top:1px solid #eceeed;">Discipline · Consistency · Commitment<br><a href="https://gymnazzium.vercel.app" style="color:#8a928e;">gymnazzium.vercel.app</a></td></tr>
+</table></td></tr></table></body></html>
