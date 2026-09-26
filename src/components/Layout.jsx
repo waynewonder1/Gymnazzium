@@ -4,11 +4,31 @@ import { useCart } from '../context/cart';
 import { useMember } from '../context/member';
 import { checkReminder } from '../lib/reminders';
 import CartDrawer from './CartDrawer';
+import { pagesByKind } from '../data/content';
+
+const SITE = 'Gymnazzium';
+const PAGE_TITLES = {
+  '/plan': 'My plan',
+  '/plan/routine': 'My routine',
+  '/progress': 'My progress',
+  '/shop': 'Shop',
+  '/exercises': 'Exercise library',
+  '/login': 'Log in',
+  '/account': 'Account',
+  '/admin': 'Admin',
+};
+
+// Browser-tab title for each page, e.g. "Gym work · Gymnazzium".
+function titleFor(pathname) {
+  const topic = pathname.match(/^\/(paths|body-types|learn)\/([^/]+)/);
+  const name = topic ? pagesByKind[topic[1]]?.find((p) => p.slug === topic[2])?.title : PAGE_TITLES[pathname];
+  return name ? `${name} · ${SITE}` : `${SITE}: get in shape your way`;
+}
 
 function Layout() {
   const { pathname, hash } = useLocation();
   const { count, setOpen } = useCart();
-  const { backendEnabled, user, profile } = useMember();
+  const { backendEnabled, user, isAdmin, profile } = useMember();
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
 
@@ -18,6 +38,10 @@ function Layout() {
     if (target) target.scrollIntoView();
     else window.scrollTo({ top: 0, behavior: 'instant' });
   }, [pathname, hash]);
+
+  useEffect(() => {
+    document.title = titleFor(pathname);
+  }, [pathname]);
 
   // Scroll-reveal effect, re-run for each page.
   useEffect(() => {
@@ -50,6 +74,7 @@ function Layout() {
           <NavLink to="/learn/nutrition" onClick={closeMenu}>Nutrition</NavLink>
           <NavLink to="/shop" onClick={closeMenu}>Shop</NavLink>
           {profile ? <NavLink to="/plan" onClick={closeMenu}>My plan</NavLink> : <Link to="/#register" onClick={closeMenu}>Register</Link>}
+          {isAdmin && <NavLink to="/admin" onClick={closeMenu}>Admin</NavLink>}
           {backendEnabled && (user ? <NavLink to="/account" onClick={closeMenu}>Account</NavLink> : <NavLink to="/login" onClick={closeMenu}>Log in</NavLink>)}
         </div>
         <div className="nav-actions">

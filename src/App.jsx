@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import Account from './pages/Account';
 import RoutineEditor from './pages/RoutineEditor';
 import Progress from './pages/Progress';
+import Admin from './pages/Admin';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="learn/:slug" element={<Topic kind="learn" />} />
         <Route path="login" element={<Login />} />
         <Route path="account" element={<Account />} />
+        <Route path="admin" element={<Admin />} />
         <Route path="*" element={<Home />} />
       </Route>
     </Routes>

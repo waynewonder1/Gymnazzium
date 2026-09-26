@@ -13,6 +13,7 @@ function MemberProvider({ children }) {
   const [progress, setProgress] = useState(loadProgress);
   const [syncing, setSyncing] = useState(false);
   const [syncError, setSyncError] = useState(null);
+  const [adminFor, setAdminFor] = useState(null); // user id we confirmed is an admin
   const user = session?.user ?? null;
   const userId = user?.id;
 
@@ -25,6 +26,18 @@ function MemberProvider({ children }) {
     const { data } = supabase.auth.onAuthStateChange((_event, next) => setSession(next));
     return () => data.subscription.unsubscribe();
   }, []);
+
+  // Staff check for the /admin page. The database enforces it; this only shows or hides the link.
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    supabase.rpc('is_admin').then(({ data }) => {
+      if (!cancelled && data === true) setAdminFor(userId);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
 
   // On sign-in: load the account's plan, or upload the one made before signing in.
   useEffect(() => {
@@ -113,6 +126,7 @@ function MemberProvider({ children }) {
     backendEnabled,
     authReady,
     user,
+    isAdmin: Boolean(userId) && adminFor === userId,
     profile,
     progress,
     syncing,

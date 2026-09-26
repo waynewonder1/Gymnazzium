@@ -741,3 +741,30 @@
   .rt-name{ flex-basis:100%; font-weight:600; }
   .rt-item-actions{ margin-left:auto; }
   @media(max-width:600px){ .rt-item > .muted{ display:inline; } .rt-item-actions{ grid-column:auto; } }
+
+  /* ================= ADMIN ================= */
+  .admin-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; }
+  .admin-stats{ max-width:none; margin-top:10px; }
+  .admin-filters{ margin-bottom:18px; }
+  .admin-filters .chip{ cursor:pointer; }
+  .admin-orders{ display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:14px; }
+  @media(max-width:400px){ .admin-orders{ grid-template-columns:1fr; } }
+  .admin-order{ background:var(--bg-raise); border:1px solid rgba(255,255,255,0.06); border-left:3px solid rgba(255,255,255,0.2); border-radius:8px; padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .status-border-new{ border-left-color:#ffbe50; }
+  .status-border-confirmed{ border-left-color:var(--accent); }
+  .status-border-paid, .status-border-delivered{ border-left-color:var(--steel); }
+  .admin-order-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .admin-order-head > div{ display:flex; flex-direction:column; gap:2px; }
+  .admin-order select{ font:inherit; font-size:0.85rem; background:var(--bg); color:var(--text); border:1px solid rgba(255,255,255,0.15); border-radius:4px; padding:6px 8px; }
+  .admin-customer{ display:flex; flex-direction:column; gap:2px; font-size:0.9rem; }
+  .admin-contact{ display:flex; gap:14px; margin-top:4px; }
+  .admin-contact a{ font-weight:600; text-decoration:none; }
+  .admin-items{ list-style:none; font-size:0.88rem; display:flex; flex-direction:column; gap:4px; border-top:1px solid rgba(255,255,255,0.06); padding-top:10px; }
+  .admin-items li{ display:flex; justify-content:space-between; gap:10px; }
+  .admin-total{ display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.06); padding-top:10px; }
+  .admin-lower{ margin-top:36px; }
+  .admin-lower h3{ margin-top:0; }
+  .admin-table{ width:100%; border-collapse:collapse; font-size:0.85rem; margin-top:10px; }
+  .admin-table th, .admin-table td{ text-align:left; padding:7px 4px; border-bottom:1px solid rgba(255,255,255,0.06); }
+  .admin-table th{ color:var(--text-dim); font-weight:600; }
+  .admin-email{ overflow-wrap:anywhere; }
