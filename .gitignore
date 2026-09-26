@@ -31,3 +31,4 @@ supabase/.temp
 supabase/functions/.env
 supabase/cron.filled.sql
 supabase/.vapid-keys.json
+.smtp-brevo
