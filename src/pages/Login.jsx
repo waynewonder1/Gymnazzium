@@ -39,6 +39,10 @@ function Login() {
 
   const submit = async (e) => {
     e.preventDefault();
+    if (!navigator.onLine) {
+      setError("You're offline. Connect to the internet to log in or sign up. Your plan still works offline.");
+      return;
+    }
     setBusy(true);
     setError('');
     setMessage('');

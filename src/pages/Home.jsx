@@ -8,6 +8,8 @@ import { useMember } from '../context/member';
 import Registration from '../components/Registration';
 import ProductCard from '../components/ProductCard';
 import CountUp from '../components/CountUp';
+import InstallButton from '../components/InstallButton';
+import { isIOS, isStandalone } from '../lib/install';
 
 const steps = [
   { title: 'Register', text: 'Tell us your stats, goals, schedule and what usually stops you.' },
@@ -129,6 +131,39 @@ function Home() {
         <h2 className="section-title reveal">Tell us about you. We’ll build the plan.</h2>
         <Registration key={profile?.startDate ?? 'new'} />
       </section>
+
+      {!isStandalone() && (
+        <section id="get-the-app" className="app-teaser">
+          <div>
+            <div className="section-label">Get the app</div>
+            <h2 className="section-title reveal">No Wi-Fi at your gym? No problem.</h2>
+            <ul className="app-points">
+              <li>Opens straight from your home screen, like any app</li>
+              <li>Works offline: today's workout, ticking sets, logging weights, the timer</li>
+              <li>Syncs to your account when you're back online</li>
+              <li>Workout reminders on your phone</li>
+            </ul>
+          </div>
+          <div className="app-install card flat">
+            {isIOS() ? (
+              <>
+                <h3>On iPhone</h3>
+                <ol>
+                  <li>Open this site in <strong>Safari</strong></li>
+                  <li>Tap <strong>Share</strong> (the square with an arrow)</li>
+                  <li>Tap <strong>Add to Home Screen</strong></li>
+                </ol>
+              </>
+            ) : (
+              <>
+                <h3>Install Gymnazzium</h3>
+                <InstallButton className="btn" label="Install the app" />
+                <p className="muted small">No button? In Chrome, tap <strong>⋮</strong> then <strong>Add to Home screen</strong> or <strong>Install app</strong>.</p>
+              </>
+            )}
+          </div>
+        </section>
+      )}
 
       <section id="library-teaser" className="teaser">
         <div>

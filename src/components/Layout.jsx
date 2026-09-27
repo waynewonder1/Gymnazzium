@@ -4,6 +4,7 @@ import { useCart } from '../context/cart';
 import { useMember } from '../context/member';
 import { checkReminder } from '../lib/reminders';
 import CartDrawer from './CartDrawer';
+import InstallButton from './InstallButton';
 import { pagesByKind } from '../data/content';
 
 const SITE = 'Gymnazzium';
@@ -28,7 +29,7 @@ function titleFor(pathname) {
 function Layout() {
   const { pathname, hash } = useLocation();
   const { count, setOpen } = useCart();
-  const { backendEnabled, user, isAdmin, profile } = useMember();
+  const { backendEnabled, user, isAdmin, profile, online, pendingSync } = useMember();
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
 
@@ -78,6 +79,13 @@ function Layout() {
           {backendEnabled && (user ? <NavLink to="/account" onClick={closeMenu}>Account</NavLink> : <NavLink to="/login" onClick={closeMenu}>Log in</NavLink>)}
         </div>
         <div className="nav-actions">
+          {!online && (
+            <span className="offline-pill" role="status" title="No internet. Your workouts and logs are saved on this device and sync when you're back online.">
+              Offline
+            </span>
+          )}
+          {online && pendingSync && user && <span className="offline-pill syncing" role="status">Syncing…</span>}
+          <InstallButton />
           <button className="cart-btn" onClick={() => setOpen(true)} aria-label={`Open cart, ${count} items`}>
             Cart<span className="cart-count">{count}</span>
           </button>

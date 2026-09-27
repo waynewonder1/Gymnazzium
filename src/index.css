@@ -768,3 +768,17 @@
   .admin-table th, .admin-table td{ text-align:left; padding:7px 4px; border-bottom:1px solid rgba(255,255,255,0.06); }
   .admin-table th{ color:var(--text-dim); font-weight:600; }
   .admin-email{ overflow-wrap:anywhere; }
+
+  /* ================= OFFLINE & INSTALL ================= */
+  .offline-pill{ font-size:0.72rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:6px 10px; border-radius:999px; background:rgba(255,190,80,0.15); color:#ffbe50; white-space:nowrap; }
+  .offline-pill.syncing{ background:rgba(111,168,163,0.15); color:var(--steel); }
+  .install-btn{ font:inherit; font-size:0.75rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; cursor:pointer; background:var(--accent); color:#0A0E0C; border:none; border-radius:999px; padding:8px 14px; white-space:nowrap; }
+  @media(max-width:420px){ .nav-actions .install-btn{ display:none; } }
+  .app-teaser{ display:grid; grid-template-columns:1.3fr 1fr; gap:40px; align-items:center; }
+  @media(max-width:800px){ .app-teaser{ grid-template-columns:1fr; } }
+  .app-teaser .section-title{ margin-bottom:20px; }
+  .app-points{ list-style:none; display:flex; flex-direction:column; gap:10px; color:var(--text-dim); }
+  .app-points li::before{ content:'✓'; color:var(--accent); font-weight:700; margin-right:10px; }
+  .app-install h3{ margin-top:0; }
+  .app-install ol{ padding-left:20px; line-height:1.9; color:var(--text-dim); }
+  .app-install .btn{ margin:6px 0 14px; }

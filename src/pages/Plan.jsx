@@ -46,7 +46,7 @@ function recommendedGear(profile) {
 
 function PlanView({ profile }) {
   const navigate = useNavigate();
-  const { backendEnabled, user, progress, saveProfile, saveProgress, clearPlan, syncError } = useMember();
+  const { backendEnabled, user, progress, saveProfile, saveProgress, clearPlan, syncError, online } = useMember();
   const total = totalDays(profile);
   const today = todayIndex(profile);
   const clamp = (i) => Math.min(Math.max(i, 0), total - 1);
@@ -141,7 +141,12 @@ function PlanView({ profile }) {
             This plan is only saved on this device. <Link to="/login" state={{ next: '/plan' }}>Create a free account</Link> to keep it safe, use it on your phone and laptop, and get push reminders.
           </p>
         )}
-        {syncError && <p className="banner warn">Couldn't save to your account ({syncError}). Your changes are kept on this device. We'll try again on your next change.</p>}
+        {!online && (
+          <p className="banner">
+            You're offline. Tick exercises, log your sets and use the timer as normal: everything is saved on this phone{user ? ' and syncs to your account when you\'re back online' : ''}.
+          </p>
+        )}
+        {online && syncError && <p className="banner warn">Couldn't save to your account ({syncError}). Your changes are kept on this device. We'll try again on your next change.</p>}
         {today < 0 && <p className="banner">Your plan starts on {dateOf(0).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}. Here's a preview of day one.</p>}
         {today >= total && <p className="banner">You finished your {profile.timeline} plan. Update your details to set the next target.</p>}
 

@@ -34,6 +34,10 @@ function CartDrawer() {
 
   const placeOrder = async (e) => {
     e.preventDefault();
+    if (!navigator.onLine) {
+      setError("You're offline. Connect to the internet to place your order; your cart is saved.");
+      return;
+    }
     setBusy(true);
     setError('');
     const reference = makeReference();
