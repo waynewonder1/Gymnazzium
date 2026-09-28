@@ -782,3 +782,52 @@
   .app-install h3{ margin-top:0; }
   .app-install ol{ padding-left:20px; line-height:1.9; color:var(--text-dim); }
   .app-install .btn{ margin:6px 0 14px; }
+
+  /* ================= PRs, REST TIMER, WEEK ================= */
+  .lift-pr{ margin-top:6px; color:#0A0E0C; background:#ffbe50; font-weight:700; padding:6px 10px; border-radius:4px; display:inline-block; }
+  .lc-pr{ fill:var(--bg-raise); stroke:#ffbe50; stroke-width:2.5; }
+
+  .confetti{ position:fixed; left:50%; bottom:20vh; width:0; height:0; z-index:400; pointer-events:none; }
+  .confetti span{ position:absolute; left:0; top:0; border-radius:2px; opacity:0; animation:confetti-burst 1.6s cubic-bezier(.2,.7,.3,1) forwards; }
+  @keyframes confetti-burst{
+    0%{ opacity:1; transform:translate(0,0) rotate(0); }
+    60%{ opacity:1; transform:translate(var(--x), var(--rise)) rotate(var(--spin)); }
+    100%{ opacity:0; transform:translate(var(--x), calc(var(--rise) + 25vh)) rotate(calc(var(--spin) * 1.5)); }
+  }
+
+  .rest-bar{ position:fixed; left:50%; bottom:16px; transform:translateX(-50%); z-index:250; width:min(520px, calc(100% - 32px)); background:var(--bg-raise); border:1px solid rgba(255,255,255,0.15); border-radius:12px; overflow:hidden; box-shadow:0 10px 40px rgba(0,0,0,0.5); animation:riseIn 0.3s ease; }
+  .rest-bar.done{ border-color:var(--accent); }
+  .rest-fill{ position:absolute; inset:0 auto 0 0; background:rgba(111,168,163,0.18); transition:width 0.25s linear; }
+  .rest-bar.done .rest-fill{ background:var(--accent-soft); }
+  .rest-content{ position:relative; display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 16px; }
+  .rest-content > div:first-child{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .rest-content strong{ font-family:'Anton',sans-serif; font-weight:400; font-size:1.4rem; letter-spacing:0.5px; font-variant-numeric:tabular-nums; }
+  .rest-label{ font-size:0.78rem; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rest-actions{ display:flex; gap:8px; flex-shrink:0; }
+  .rest-actions button{ font:inherit; font-size:0.8rem; font-weight:700; cursor:pointer; border-radius:999px; padding:8px 14px; background:none; color:var(--text); border:1px solid rgba(255,255,255,0.2); }
+  .rest-actions button:last-child{ background:var(--accent); border-color:var(--accent); color:#0A0E0C; }
+  .rest-settings{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; }
+  .rest-settings .chip{ cursor:pointer; font-size:0.78rem; padding:6px 12px; }
+
+  .week-summary{ max-width:960px; margin:14px 0 6px; background:var(--bg-raise); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:16px 18px; display:flex; flex-direction:column; gap:14px; }
+  .ws-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .ws-days{ display:flex; gap:6px; }
+  .ws-day{ width:28px; height:28px; border-radius:50%; display:grid; place-items:center; font-size:0.72rem; font-weight:700; color:var(--text-dim); background:rgba(255,255,255,0.04); }
+  .ws-day.done{ background:var(--accent); color:#0A0E0C; }
+  .ws-day.missed{ background:transparent; border:1.5px dashed var(--text-dim); }
+  .ws-day.todo{ background:rgba(111,168,163,0.25); color:var(--text); }
+  .ws-day.today{ background:transparent; border:2px solid var(--steel); color:var(--text); }
+  .ws-day.rest, .ws-day.none{ background:transparent; opacity:0.5; }
+  .ws-day.rest\ today{ opacity:1; border:2px solid rgba(255,255,255,0.2); background:transparent; }
+  .ws-stats{ display:grid; grid-template-columns:repeat(5, 1fr); gap:10px; }
+  @media(max-width:600px){ .ws-stats{ grid-template-columns:repeat(3, 1fr); } }
+  .ws-stats > div{ display:flex; flex-direction:column; gap:2px; }
+  .ws-stats strong{ font-family:'Anton',sans-serif; font-weight:400; font-size:1.35rem; letter-spacing:0.5px; }
+  .ws-stats span{ font-size:0.75rem; color:var(--text-dim); }
+
+  /* Set rows: one line even on small phones (weight and reps boxes share the space). */
+  .lift-row{ display:grid; grid-template-columns:44px minmax(0,1fr) 14px minmax(0,1fr); align-items:center; gap:8px; max-width:420px; }
+  .lift-row > .muted:first-child{ width:auto; }
+  .lift-row label{ display:flex; align-items:center; gap:6px; min-width:0; }
+  .lift-row input{ flex:1 1 auto; width:auto; min-width:0; }
+  .lift-row label > span{ flex-shrink:0; }

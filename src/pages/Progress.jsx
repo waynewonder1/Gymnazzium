@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useMember } from '../context/member';
 import { addDays, exerciseInfo, parseDate } from '../lib/plan';
-import { formatSets, history } from '../lib/lifts';
+import { formatSets, history, prFor } from '../lib/lifts';
 import LiftChart from '../components/LiftChart';
 
 const fmtDate = (d) => d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
@@ -59,13 +59,14 @@ function Progress() {
               const first = value(l.sessions[0]);
               const latest = value(l.sessions.at(-1));
               const change = Math.round((latest - first) * 10) / 10;
-              const points = l.sessions.map((s) => ({ x: addDays(start, s.index), y: value(s), label: formatSets(s.sets) }));
+              const points = l.sessions.map((s) => ({ x: addDays(start, s.index), y: value(s), label: formatSets(s.sets), pr: Boolean(prFor(progress.lifts, l.id, s.index)) }));
+              const prCount = points.filter((p) => p.pr).length;
               return (
                 <article className="lift-card" key={l.id}>
                   <div className="lift-card-head">
                     <div>
                       <h3>{l.name}</h3>
-                      <span className="muted small">{weighted ? 'Heaviest set' : 'Best set (reps)'} · {l.sessions.length} session{l.sessions.length === 1 ? '' : 's'}</span>
+                      <span className="muted small">{weighted ? 'Heaviest set' : 'Best set (reps)'} · {l.sessions.length} session{l.sessions.length === 1 ? '' : 's'}{prCount > 0 ? ` · ${prCount} PR${prCount === 1 ? '' : 's'} 🏆` : ''}</span>
                     </div>
                     {l.sessions.length > 1 && (
                       <span className={`lift-change ${change > 0 ? 'up' : change < 0 ? 'down' : ''}`}>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { beep } from '../lib/sound';
 
 const presets = {
   rest: [
@@ -13,23 +14,6 @@ const presets = {
     { label: 'Jump rope 60/45 × 5', work: 60, rest: 45, rounds: 5 },
   ],
 };
-
-let audio;
-function beep(freq = 880, ms = 150) {
-  try {
-    audio ??= new (window.AudioContext || window.webkitAudioContext)();
-    const osc = audio.createOscillator();
-    const gain = audio.createGain();
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0.15, audio.currentTime);
-    osc.connect(gain).connect(audio.destination);
-    osc.start();
-    osc.stop(audio.currentTime + ms / 1000);
-    navigator.vibrate?.(ms);
-  } catch {
-    // No audio available — the timer still works silently.
-  }
-}
 
 const fmt = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 const idle = { phase: 'idle', round: 1, endsAt: 0, remaining: 0, paused: false };

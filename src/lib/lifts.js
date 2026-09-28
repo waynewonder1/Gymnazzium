@@ -66,3 +66,33 @@ export function history(lifts, id) {
     .filter(Boolean)
     .sort((a, b) => a.index - b.index);
 }
+
+// ---------- Personal records ----------
+// A session is a PR when it beats every earlier session of the same exercise:
+//   weighted moves → heaviest weight ever, or else strongest set (estimated max);
+//   bodyweight moves → most reps ever.
+// The first session only sets the baseline, so it's never a PR.
+export function prFor(lifts, id, index, sets = lifts?.[id]?.[index]) {
+  const done = (sets ?? []).filter((s) => s.r > 0);
+  if (done.length === 0) return null;
+  const earlier = Object.entries(lifts?.[id] ?? {})
+    .filter(([i]) => Number(i) < index)
+    .flatMap(([, s]) => s.filter((x) => x.r > 0));
+  if (earlier.length === 0) return null;
+
+  if (done.some((s) => s.w) || earlier.some((s) => s.w)) {
+    const topWeight = Math.max(...done.map((s) => s.w || 0));
+    if (topWeight > Math.max(...earlier.map((s) => s.w || 0))) {
+      const reps = Math.max(...done.filter((s) => s.w === topWeight).map((s) => s.r));
+      return { type: 'weight', text: `Heaviest ever: ${topWeight} kg × ${reps}` };
+    }
+    const best = done.reduce((a, b) => (estimatedMax(b.w, b.r) > estimatedMax(a.w, a.r) ? b : a));
+    if (estimatedMax(best.w, best.r) > Math.max(...earlier.map((s) => estimatedMax(s.w, s.r)))) {
+      return { type: 'strength', text: `Strongest set ever: ${best.w} kg × ${best.r}` };
+    }
+    return null;
+  }
+
+  const topReps = Math.max(...done.map((s) => s.r));
+  return topReps > Math.max(...earlier.map((s) => s.r)) ? { type: 'reps', text: `Most reps ever: ${topReps}` } : null;
+}

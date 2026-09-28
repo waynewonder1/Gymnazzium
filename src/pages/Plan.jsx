@@ -5,6 +5,7 @@ import { addDays, getDay, parseDate, phaseInfo, streak, todayIndex, totalDays, u
 import { useMember } from '../context/member';
 import DayCard from '../components/plan/DayCard';
 import WeekStrip from '../components/plan/WeekStrip';
+import WeekSummary from '../components/plan/WeekSummary';
 import PlanOverview from '../components/plan/PlanOverview';
 import Reminders from '../components/plan/Reminders';
 import Obstacles from '../components/plan/Obstacles';
@@ -187,6 +188,7 @@ function PlanView({ profile }) {
 
       <section id="today" className="plan-section">
         <div className="section-label">Day by day</div>
+        {today >= 0 && today < total && <WeekSummary profile={profile} progress={progress} today={today} />}
         <WeekStrip
           week={week}
           totalDays={total}

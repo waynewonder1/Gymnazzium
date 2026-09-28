@@ -1,5 +1,6 @@
 import WorkoutTimer from '../WorkoutTimer';
 import LiftLog from './LiftLog';
+import RestSettings from './RestSettings';
 import { isLoggable, lastLog } from '../../lib/lifts';
 
 const formatDate = (date) => date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -58,8 +59,11 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
                   {!locked && isLoggable(item.id) && (
                     <LiftLog
                       key={`${day.index}-${j}`}
+                      id={item.id}
+                      index={day.index}
+                      name={item.name}
                       dose={item.dose}
-                      logged={progress.lifts?.[item.id]?.[day.index]}
+                      lifts={progress.lifts}
                       last={lastLog(progress.lifts, item.id, day.index)}
                       onSave={(sets) => onLog(j, item.id, sets)}
                     />
@@ -69,6 +73,7 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
             })}
           </ul>
           <p className="bookend">{day.cooldown}</p>
+          {!locked && <RestSettings />}
           {!locked && (
             <details className="day-timer">
               <summary>Rest & interval timer</summary>

@@ -5,6 +5,7 @@ import { useMember } from '../context/member';
 import { checkReminder } from '../lib/reminders';
 import CartDrawer from './CartDrawer';
 import InstallButton from './InstallButton';
+import RestBar from './RestBar';
 import { pagesByKind } from '../data/content';
 
 const SITE = 'Gymnazzium';
@@ -100,6 +101,7 @@ function Layout() {
       </main>
 
       <CartDrawer />
+      <RestBar />
 
       <footer>
         <div className="footer-grid">

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 // One exercise over time: a 2px line with end dot, hover crosshair + tooltip.
-// points: [{ x: Date, y: number, label: string }]
+// points: [{ x: Date, y: number, label: string, pr?: boolean }] — PR sessions get a ring marker
 const H = 180;
 const PAD = { top: 16, right: 56, bottom: 28, left: 40 };
 
@@ -84,6 +84,7 @@ function LiftChart({ points, unit }) {
 
           <path className="lc-line" d={path} />
           {hp && <line className="lc-cross" x1={x(hover)} x2={x(hover)} y1={PAD.top} y2={PAD.top + innerH} />}
+          {points.map((p, i) => p.pr && <circle key={i} className="lc-pr" cx={x(i)} cy={y(p.y)} r="5" />)}
           <circle className="lc-dot" cx={x(points.length - 1)} cy={y(last.y)} r="5" />
           {hp && <circle className="lc-dot" cx={x(hover)} cy={y(hp.y)} r="5" />}
           <text className="lc-end" x={x(points.length - 1) + 10} y={y(last.y)} dy="0.32em">{last.y} {unit}</text>
@@ -91,7 +92,7 @@ function LiftChart({ points, unit }) {
       )}
       {hp && (
         <div className="lc-tip" style={{ left: Math.min(Math.max(x(hover), 70), width - 70), top: 0 }}>
-          <strong>{hp.y} {unit}</strong>
+          <strong>{hp.y} {unit}{hp.pr ? ' 🏆 PR' : ''}</strong>
           <span>{hp.label}</span>
           <span className="muted">{shortDate(hp.x)}</span>
         </div>
