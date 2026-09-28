@@ -41,6 +41,12 @@ function LiftLog({ id, index, name, dose, lifts, last, onSave }) {
     savedReps.current[i] = reps || null;
     save();
   };
+  const removeSet = (i) => {
+    const next = rows.filter((_, k) => k !== i);
+    savedReps.current = savedReps.current.filter((_, k) => k !== i);
+    setRows(next);
+    save(next);
+  };
   const copyLast = () => {
     const next = toRows(last.sets, n);
     setRows(next);
@@ -73,6 +79,11 @@ function LiftLog({ id, index, name, dose, lifts, last, onSave }) {
                 <input type="number" inputMode="numeric" min="0" step="1" placeholder={last?.sets[i]?.r ?? 'reps'} value={row.r} onChange={(e) => update(i, 'r', e.target.value)} onBlur={() => finishSet(i)} aria-label={`Set ${i + 1} reps`} />
                 <span className="muted small">reps</span>
               </label>
+              {rows.length > 1 ? (
+                <button type="button" className="icon-btn small-btn set-remove" onClick={() => removeSet(i)} aria-label={`Remove set ${i + 1}`} title="Remove this set">✕</button>
+              ) : (
+                <span />
+              )}
             </div>
           ))}
           <div className="lift-actions">

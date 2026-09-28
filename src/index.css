@@ -826,19 +826,21 @@
   .ws-stats span{ font-size:0.75rem; color:var(--text-dim); }
 
   /* Set rows: one line even on small phones (weight and reps boxes share the space). */
-  .lift-row{ display:grid; grid-template-columns:44px minmax(0,1fr) 14px minmax(0,1fr); align-items:center; gap:8px; max-width:420px; }
+  .lift-row{ display:grid; grid-template-columns:44px minmax(0,1fr) 14px minmax(0,1fr) 28px; align-items:center; gap:8px; max-width:460px; }
+  .set-remove{ color:var(--text-dim); }
+  .set-remove:hover{ color:var(--accent); border-color:var(--accent); }
   .lift-row > .muted:first-child{ width:auto; }
   .lift-row label{ display:flex; align-items:center; gap:6px; min-width:0; }
   .lift-row input{ flex:1 1 auto; width:auto; min-width:0; }
   .lift-row label > span{ flex-shrink:0; }
   /* On phones the boxes' own "kg" / "reps" hints are enough; give the numbers the room. */
   @media(max-width:480px){
-    .lift-row{ grid-template-columns:40px minmax(0,1fr) 12px minmax(0,1fr); }
+    .lift-row{ grid-template-columns:40px minmax(0,1fr) 12px minmax(0,1fr) 28px; }
     .lift-row label > span{ display:none; }
   }
   @media(max-width:380px){
     .checklist li > .lift-log{ padding-left:10px; padding-right:10px; }
-    .lift-row{ grid-template-columns:34px minmax(0,1fr) 10px minmax(0,1fr); gap:6px; }
+    .lift-row{ grid-template-columns:34px minmax(0,1fr) 10px minmax(0,1fr) 28px; gap:6px; }
     .lift-row input{ padding:8px 6px; }
     .day-card{ padding:14px; }
   }
