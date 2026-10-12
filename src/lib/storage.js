@@ -4,7 +4,7 @@ const PROFILE_KEY = 'gymnazzium-profile';
 const PROGRESS_KEY = 'gymnazzium-progress';
 const PENDING_KEY = 'gymnazzium-pending';
 
-export const emptyProgress = { done: {}, checks: {}, missions: {}, lifts: {} };
+export const emptyProgress = { done: {}, checks: {}, missions: {}, lifts: {}, badges: {} };
 
 function read(key) {
   try {
@@ -41,7 +41,7 @@ export const savePending = (pending) => write(PENDING_KEY, pending);
 // both is kept; where both have the same entry, this device's version wins.
 export function mergeProgress(remote, local) {
   const merged = { ...emptyProgress };
-  for (const field of ['done', 'checks', 'missions']) merged[field] = { ...remote?.[field], ...local?.[field] };
+  for (const field of ['done', 'checks', 'missions', 'badges']) merged[field] = { ...remote?.[field], ...local?.[field] };
   merged.lifts = { ...remote?.lifts };
   for (const [id, days] of Object.entries(local?.lifts ?? {})) merged.lifts[id] = { ...merged.lifts[id], ...days };
   return merged;

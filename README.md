@@ -14,6 +14,7 @@ Built with React + Vite. Accounts, synced plans, orders and push notifications r
 - **Your own routine** (`/plan/routine`): members build their own week (days, sections, exercises, sets, reps, custom exercises), starting from their plan, the gym split or a blank week. Plans, reminders and the calendar follow it; they can switch back any time.
 - **Weight logging** (on each exercise in the plan): weight × reps per set, "last time", and an *add weight* tip when every set hit the top of the rep range.
 - **Progress** (`/progress`): a chart and session table for every logged lift.
+- **Challenges** (`/challenges`): four monthly challenges sized to each member's plan (workouts, a run without a miss, sets, PRs), milestone badges with a confetti banner when earned, and an opt-in monthly leaderboard under a display name (ranked by workouts, then sets).
 - **Reminders:** web push at the member's workout time (even with the site closed), plus an `.ics` calendar download.
 - **Content:** paths, body types, nutrition, supplements (with sources), an exercise library with a rest/interval timer.
 - **Shop** (`/shop`): cart and checkout; orders are saved to Supabase and can be sent over WhatsApp.
@@ -50,7 +51,7 @@ You need a free Supabase account. Allow about 20 minutes.
 ### 1. Create the project and database
 
 1. Create a new project at [supabase.com/dashboard](https://supabase.com/dashboard) (region: closest to Kenya, e.g. Frankfurt or Mumbai).
-2. Open **SQL Editor**, paste all of `supabase/migrations/20260924000000_init.sql`, and run it.
+2. Open **SQL Editor** and run each file in `supabase/migrations/` in order (oldest first): paste all of it, then **Run**.
 3. **Authentication → URL Configuration**: set **Site URL** to your live site (`https://gymnazzium.vercel.app`) and add `https://gymnazzium.vercel.app/**` and `http://localhost:5173/**` under **Redirect URLs**.
 
 ### 2. Connect the website

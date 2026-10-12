@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import Account from './pages/Account';
 import RoutineEditor from './pages/RoutineEditor';
 import Progress from './pages/Progress';
+import Challenges from './pages/Challenges';
 import Admin from './pages/Admin';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
         <Route path="plan" element={<Plan />} />
         <Route path="plan/routine" element={<RoutineEditor />} />
         <Route path="progress" element={<Progress />} />
+        <Route path="challenges" element={<Challenges />} />
         <Route path="shop" element={<Shop />} />
         <Route path="exercises" element={<Exercises />} />
         <Route path="paths/:slug" element={<Topic kind="paths" />} />

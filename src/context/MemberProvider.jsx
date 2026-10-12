@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { MemberContext } from './member';
 import { backendEnabled, supabase } from '../lib/supabase';
 import {
@@ -13,6 +13,8 @@ import {
   saveProgress as saveLocalProgress,
 } from '../lib/storage';
 import { disablePush, renewStalePush } from '../lib/push';
+import { newBadges } from '../lib/challenges';
+import { toISO } from '../lib/plan';
 
 const now = () => new Date().toISOString();
 const isOffline = () => typeof navigator !== 'undefined' && navigator.onLine === false;
@@ -51,6 +53,8 @@ function MemberProvider({ children }) {
   const [syncing, setSyncing] = useState(false);
   const [syncError, setSyncError] = useState(null);
   const [adminFor, setAdminFor] = useState(null); // user id we confirmed is an admin
+  const [celebration, setCelebration] = useState(null); // { keys: newly earned badge keys, at }
+  const dismissCelebration = useCallback(() => setCelebration(null), []);
   const [online, setOnline] = useState(() => !isOffline());
   const [pendingSync, setPendingSync] = useState(() => {
     const p = loadPending();
@@ -202,6 +206,13 @@ function MemberProvider({ children }) {
   };
 
   const saveProgress = (next) => {
+    // Award any badges this change earned (they're kept even if the progress is later undone).
+    const earned = profile ? newBadges(profile, next) : [];
+    if (earned.length > 0) {
+      const today = toISO(new Date());
+      next = { ...next, badges: { ...next.badges, ...Object.fromEntries(earned.map((key) => [key, today])) } };
+      setCelebration({ keys: earned, at: Date.now() });
+    }
     saveLocalProgress(next);
     setProgress(next);
     return remoteSave('progress', next);
@@ -244,6 +255,8 @@ function MemberProvider({ children }) {
     saveProgress,
     clearPlan,
     signOut,
+    celebration,
+    dismissCelebration,
   };
   return <MemberContext.Provider value={value}>{children}</MemberContext.Provider>;
 }

@@ -44,7 +44,7 @@ function Chips({ options, selected, onToggle }) {
 function Registration() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { profile: saved, saveProfile, saveProgress, clearPlan } = useMember();
+  const { profile: saved, progress, saveProfile, saveProgress, clearPlan } = useMember();
   // Pages like /paths/home-workout link here with some answers already picked.
   const prefill = location.state?.prefill ?? {};
   const [profile, setProfile] = useState(() => ({ ...emptyProfile(), ...saved, ...prefill }));
@@ -63,8 +63,8 @@ function Registration() {
     setError('');
     if (profile.goals.length === 0) return setError('Pick at least one goal.');
     if (!profile.lookingFor) return setError('Pick how you want to train.');
-    // A fresh plan (or a new start date) starts fresh progress.
-    if (!saved || saved.startDate !== profile.startDate) saveProgress(emptyProgress);
+    // A fresh plan (or a new start date) starts fresh progress; earned badges stay.
+    if (!saved || saved.startDate !== profile.startDate) saveProgress({ ...emptyProgress, badges: progress.badges ?? {} });
     saveProfile(profile);
     navigate('/plan');
   };

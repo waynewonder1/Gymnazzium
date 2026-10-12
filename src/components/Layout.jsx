@@ -6,6 +6,7 @@ import { checkReminder } from '../lib/reminders';
 import CartDrawer from './CartDrawer';
 import InstallButton from './InstallButton';
 import RestBar from './RestBar';
+import BadgeToast from './BadgeToast';
 import { pagesByKind } from '../data/content';
 
 const SITE = 'Gymnazzium';
@@ -13,6 +14,7 @@ const PAGE_TITLES = {
   '/plan': 'My plan',
   '/plan/routine': 'My routine',
   '/progress': 'My progress',
+  '/challenges': 'Challenges',
   '/shop': 'Shop',
   '/exercises': 'Exercise library',
   '/login': 'Log in',
@@ -76,6 +78,7 @@ function Layout() {
           <NavLink to="/learn/nutrition" onClick={closeMenu}>Nutrition</NavLink>
           <NavLink to="/shop" onClick={closeMenu}>Shop</NavLink>
           {profile ? <NavLink to="/plan" onClick={closeMenu}>My plan</NavLink> : <Link to="/#register" onClick={closeMenu}>Register</Link>}
+          {profile && <NavLink to="/challenges" onClick={closeMenu}>Challenges</NavLink>}
           {isAdmin && <NavLink to="/admin" onClick={closeMenu}>Admin</NavLink>}
           {backendEnabled && (user ? <NavLink to="/account" onClick={closeMenu}>Account</NavLink> : <NavLink to="/login" onClick={closeMenu}>Log in</NavLink>)}
         </div>
@@ -102,6 +105,7 @@ function Layout() {
 
       <CartDrawer />
       <RestBar />
+      <BadgeToast />
 
       <footer>
         <div className="footer-grid">
