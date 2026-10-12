@@ -1,5 +1,5 @@
 -- Runs the send-reminders Edge Function every 5 minutes.
--- Run this ONCE in the Supabase SQL editor after deploying the function.
+-- Run this in the Supabase SQL editor after deploying the function (safe to run again after a redeploy).
 -- Replace the two placeholders first:
 --   <PROJECT_REF>  your project ref (from the project URL: https://<PROJECT_REF>.supabase.co)
 --   <CRON_SECRET>  the same value you set with: supabase secrets set CRON_SECRET=...
@@ -7,8 +7,18 @@
 create extension if not exists pg_cron;
 create extension if not exists pg_net;
 
--- Keep the secret out of the job text by storing it in Vault.
-select vault.create_secret('<CRON_SECRET>', 'reminders_cron_secret');
+-- Keep the secret out of the job text by storing it in Vault (replacing the old one on a redeploy).
+do $do$
+declare
+  existing uuid := (select id from vault.secrets where name = 'reminders_cron_secret');
+begin
+  if existing is null then
+    perform vault.create_secret('<CRON_SECRET>', 'reminders_cron_secret');
+  else
+    perform vault.update_secret(existing, '<CRON_SECRET>');
+  end if;
+end
+$do$;
 
 select cron.schedule(
   'send-reminders',
