@@ -16,7 +16,10 @@ const vapid = {
 };
 const CRON_SECRET = Deno.env.get('CRON_SECRET');
 
-type Subscription = { user_id: string; endpoint: string; p256dh: string; auth: string };
+type Subscription = { user_id: string; endpoint: string; p256dh: string; auth: string; failures: number };
+
+// A device that rejects this many reminders in a row (e.g. it was subscribed with an old key) is removed.
+const MAX_FAILURES = 3;
 
 // Encrypt + sign with web-push, send with fetch (works reliably in the Edge runtime).
 async function push(sub: Subscription, payload: string) {
@@ -40,7 +43,7 @@ Deno.serve(async (req) => {
 
   const { data: subs, error: subsError } = await supabase
     .from('push_subscriptions')
-    .select('user_id, endpoint, p256dh, auth');
+    .select('user_id, endpoint, p256dh, auth, failures');
   if (subsError) return Response.json({ error: subsError.message }, { status: 500 });
 
   const byUser = new Map<string, Subscription[]>();
@@ -79,8 +82,18 @@ Deno.serve(async (req) => {
           removed++;
         } else if (status >= 200 && status < 300) {
           sent++;
+          if (sub.failures > 0) await supabase.from('push_subscriptions').update({ failures: 0 }).eq('endpoint', sub.endpoint);
         } else {
           failed++;
+          // Push service errors (5xx) and rate limits (429) aren't the device's fault, so they don't count.
+          if (status >= 400 && status < 500 && status !== 429) {
+            if (sub.failures + 1 >= MAX_FAILURES) {
+              await supabase.from('push_subscriptions').delete().eq('endpoint', sub.endpoint);
+              removed++;
+            } else {
+              await supabase.from('push_subscriptions').update({ failures: sub.failures + 1 }).eq('endpoint', sub.endpoint);
+            }
+          }
         }
       } catch {
         failed++;
