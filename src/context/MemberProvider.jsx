@@ -12,7 +12,7 @@ import {
   saveProfile as saveLocalProfile,
   saveProgress as saveLocalProgress,
 } from '../lib/storage';
-import { disablePush } from '../lib/push';
+import { disablePush, renewStalePush } from '../lib/push';
 
 const now = () => new Date().toISOString();
 const isOffline = () => typeof navigator !== 'undefined' && navigator.onLine === false;
@@ -79,6 +79,12 @@ function MemberProvider({ children }) {
     return () => {
       cancelled = true;
     };
+  }, [userId, online]);
+
+  // Reminders keep working after a push key change: swap any old-key subscription for a new one.
+  useEffect(() => {
+    if (!userId || !online) return;
+    renewStalePush(userId).catch(() => {});
   }, [userId, online]);
 
   // On sign-in: load the account's plan, or upload the one made before signing in.
