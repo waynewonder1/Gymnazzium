@@ -99,6 +99,7 @@ export const exercises = {
 
   // Cardio & legs
   jumpRope: { name: 'Jump rope', cue: 'Balls of your feet, knees soft, turn from the wrists. 45 s rest between rounds.', kind: 'minutes', base: 1, step: 0.5, max: 3, sets: 5, unit: 'min rounds' },
+  run: { name: 'Distance run', cue: 'Run tall, relaxed shoulders, short quick steps landing under your hips. Steady pace, not a sprint.', kind: 'distance' },
   jog: { name: 'Jog', cue: 'Easy pace — you should be able to talk.', kind: 'minutes', base: 15, step: 5, max: 40, sets: 1 },
   sprints: { name: 'Sprints', cue: 'Full sprint for 15–20 s, then at least 45 s rest.', kind: 'reps', base: 5, step: 1, max: 10, sets: 1, unit: 'sprints' },
   burpees: { name: 'Burpees', cue: 'Squat, jump back to a push-up, jump up. Steady rhythm.', kind: 'reps', base: 8, step: 2, max: 20 },
@@ -251,4 +252,30 @@ export const homeWeek = {
   byDay: { 1: 'chestBack', 2: 'legsAbs', 4: 'chestShouldersArms', 5: 'legsGlutes', 6: 'backArms' },
   order: ['chestBack', 'legsAbs', 'chestShouldersArms', 'legsGlutes', 'backArms'],
   days: gymWeek.days,
+};
+
+// The "Run 1–10 km" goal. Members pick their running level at sign-up; runs go on rest days.
+// steps: distance and rule for each 3-week phase, the last one repeats until the plan ends.
+export const RUN_GOAL = 'Run 1–10 km';
+export const runLevels = {
+  Beginner: {
+    hint: 'New to running, or under 1 km without stopping',
+    target: '1–3 km, walk breaks allowed',
+    steps: [{ km: 1, rule: 'breaks' }, { km: 2, rule: 'breaks' }, { km: 3, rule: 'breaks' }],
+  },
+  Intermediate: {
+    hint: 'Can run a few km, with a break or two',
+    target: '5 km, one break at most',
+    steps: [{ km: 3, rule: 'oneBreak' }, { km: 4, rule: 'oneBreak' }, { km: 5, rule: 'oneBreak' }, { km: 5, rule: 'nonStop' }],
+  },
+  Experienced: {
+    hint: 'Run 5 km or more regularly',
+    target: '10 km without stopping',
+    steps: [{ km: 6, rule: 'nonStop' }, { km: 8, rule: 'nonStop' }, { km: 10, rule: 'nonStop' }],
+  },
+};
+export const runRules = {
+  breaks: { label: 'walk breaks OK', note: 'Take walk breaks whenever you need them: walk 1 minute, then run again. Finish the distance.' },
+  oneBreak: { label: 'one break max', note: 'Run the whole distance, or take one short walk break (2 minutes at most).' },
+  nonStop: { label: 'non-stop', note: 'No stopping. Pick a pace you can hold the whole way; you should still be able to say a few words.' },
 };

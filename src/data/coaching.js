@@ -53,6 +53,17 @@ export const goalDetails = {
     ],
     topics: ['chest', 'shoulders', 'forearms'],
   },
+  'Run 1–10 km': {
+    headline: 'Run your distance, built up a little every 3 weeks.',
+    points: [
+      'Beginners: run 1–3 km and take walk breaks whenever you need them. Finishing the distance is the win.',
+      'Intermediate: run 5 km with one short break at most, or the whole thing.',
+      'Experienced: run 10 km without stopping.',
+      'Your runs sit on your rest days and get longer every 3 weeks. Running too far too soon is how shin and knee pain starts, so stick to the plan even on good days.',
+      'Run at a pace where you could still say a few words. Speed comes later; distance first.',
+    ],
+    topics: ['basics'],
+  },
   'General health': {
     headline: 'Move most days, eat real food, sleep well.',
     points: [

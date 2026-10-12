@@ -72,6 +72,8 @@ export const exerciseMeta = {
   burpees: { muscles: ['Cardio', 'Chest', 'Legs'], equipment: 'None', level: 2 },
   squat: { muscles: ['Legs'], equipment: 'None', level: 1 },
 
+  run: { muscles: ['Cardio', 'Legs'], equipment: 'Running shoes', level: 1 },
+
   // Home split
   declinePushup: { muscles: ['Chest', 'Shoulders', 'Triceps'], equipment: 'Bed or chair', level: 2 },
   bottleLateralRaise: { muscles: ['Shoulders'], equipment: 'Water bottles or jerricans', level: 1 },

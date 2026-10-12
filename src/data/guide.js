@@ -43,7 +43,7 @@ export const offers = [
 
 // Options for the registration form.
 export const registration = {
-  goals: ['Lose fat', 'Build muscle', 'Get toned / defined', 'Improve stamina', 'Get stronger', 'General health'],
+  goals: ['Lose fat', 'Build muscle', 'Get toned / defined', 'Improve stamina', 'Get stronger', 'General health', 'Run 1–10 km'],
   lookingFor: ['Home workout', 'Gym work', 'Calisthenics', 'Overall cardio'],
   timelines: ['1 month', '3 months', '6 months', '1 year+'],
   schedules: ['2 days a week', '3 days a week', '4 days a week', '5+ days a week'],

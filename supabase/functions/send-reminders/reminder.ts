@@ -10,7 +10,7 @@ type Profile = {
   [key: string]: unknown;
 };
 type Progress = { done?: Record<string, boolean> };
-type Day = { type: 'train' | 'rest'; title: string; focus: string; mission: string; minutes?: number; items?: unknown[] };
+type Day = { type: 'train' | 'rest'; title: string; focus: string; mission: string; minutes?: number; items?: unknown[]; sessionKey?: string };
 
 export type Reminder = {
   localDate: string;
@@ -60,7 +60,9 @@ export function buildReminder(profile: Profile, progress: Progress | null, now: 
       localDate: local.date,
       payload: {
         title: `Time for ${day.title}`,
-        body: `${day.focus}. ${day.items?.length ?? 0} exercises, about ${day.minutes} min.`,
+        body: day.sessionKey === 'run'
+          ? `${day.focus}. About ${day.minutes} min with warm-up and cool-down.`
+          : `${day.focus}. ${day.items?.length ?? 0} exercises, about ${day.minutes} min.`,
         url: '/plan',
         tag,
       },

@@ -1,6 +1,6 @@
 // Turns a member's profile into a day-by-day plan.
 // Everything is computed from the profile, so the same profile always gives the same plan.
-import { exercises, gymSplit, gymWeek, homeNotes, homeSplit, homeWeek, sessions } from '../data/workouts.js';
+import { RUN_GOAL, exercises, gymSplit, gymWeek, homeNotes, homeSplit, homeWeek, runLevels, runRules, sessions } from '../data/workouts.js';
 import { challenges, milestones, missions, weeklyMission } from '../data/coaching.js';
 
 export const TIMELINE_DAYS = { '1 month': 28, '3 months': 84, '6 months': 182, '1 year+': 364 };
@@ -62,8 +62,63 @@ export const usesRoutine = (profile) => profile.planMode === 'custom' && Boolean
 const variantFor = (profile) => (profile.lookingFor === 'Calisthenics' ? 'calisthenics' : 'home');
 const trainingDaysPerWeek = (profile) => {
   if (usesRoutine(profile)) return Object.values(profile.routine.days).filter((d) => d?.groups?.some((g) => g.items.length)).length;
-  return (isGym(profile) || isHome(profile) ? gymWeek.days[profile.schedule] : SCHEDULE_OFFSETS[profile.schedule])?.length ?? 3;
+  const sessions = (isGym(profile) || isHome(profile) ? gymWeek.days[profile.schedule] : SCHEDULE_OFFSETS[profile.schedule])?.length ?? 3;
+  return sessions + runsPerWeek(profile, 7 - sessions);
 };
+
+// ---------- running goal ----------
+const wantsRuns = (profile) => profile.goals.includes(RUN_GOAL) && Boolean(runLevels[profile.runLevel]);
+// 1 run a week when there are only 2 rest days, otherwise 2; at least one full rest day always stays.
+const runsPerWeek = (profile, restDays) => (wantsRuns(profile) ? Math.max(0, Math.min(restDays <= 2 ? 1 : 2, restDays - 1)) : 0);
+// Rest days that become runs, best first: Wednesday, Saturday, Tuesday, Thursday, Monday, Friday, Sunday.
+const RUN_WEEKDAYS = [3, 6, 2, 4, 1, 5, 0];
+
+// Whether the plan's own sessions (before any runs) train on this day.
+function trainsOn(profile, index) {
+  if (isGym(profile) || isHome(profile)) {
+    const days = gymWeek.days[profile.schedule] ?? gymWeek.days['4 days a week'];
+    return days.includes(addDays(parseDate(profile.startDate), index).getDay());
+  }
+  return (SCHEDULE_OFFSETS[profile.schedule] ?? [0, 2, 4]).includes(index % 7);
+}
+
+function isRunDay(profile, index) {
+  if (!wantsRuns(profile)) return false;
+  if (trainsOn(profile, index)) return false;
+  // Look at the whole Monday–Sunday week this day sits in, inside the plan.
+  const weekday = addDays(parseDate(profile.startDate), index).getDay();
+  const monday = index - ((weekday + 6) % 7);
+  const total = totalDays(profile);
+  const rest = [];
+  for (let i = Math.max(0, monday); i < Math.min(monday + 7, total); i++) if (!trainsOn(profile, i)) rest.push(i);
+  const weekdayOf = (i) => (i - monday + 1) % 7;
+  const runs = rest
+    .sort((a, b) => RUN_WEEKDAYS.indexOf(weekdayOf(a)) - RUN_WEEKDAYS.indexOf(weekdayOf(b)))
+    .slice(0, runsPerWeek(profile, rest.length));
+  return runs.includes(index);
+}
+
+// Distance for this phase of the plan; the last step repeats once it's reached.
+export function runStep(profile, phase) {
+  const steps = runLevels[profile.runLevel].steps;
+  return steps[Math.min(phase, steps.length - 1)];
+}
+
+function runDay(profile, base) {
+  const { km, rule } = runStep(profile, base.phase);
+  const ex = exercises.run;
+  return {
+    ...base,
+    type: 'train',
+    sessionKey: 'run',
+    title: `Run day: ${km} km`,
+    focus: `${km} km, ${runRules[rule].label}, working towards ${runLevels[profile.runLevel].target}`,
+    warmup: '5 min brisk walk, then leg swings and 1 minute of very easy jogging.',
+    items: [{ id: 'run', name: ex.name, cue: ex.cue, dose: `${km} km · ${runRules[rule].label}`, note: runRules[rule].note }],
+    cooldown: '5 min walk, then stretch your calves, hamstrings and quads. Drink water.',
+    minutes: 15 + km * 7,
+  };
+}
 
 // ---------- nutrition ----------
 export function nutrition(profile) {
@@ -133,6 +188,17 @@ export function expectations(profile) {
       note: 'If you train consistently. Most people notice easier stairs within 2–3 weeks.',
     });
   }
+  if (wantsRuns(profile)) {
+    const lastPhase = Math.floor((days - 1) / 21);
+    const { km, rule } = runStep(profile, lastPhase);
+    const level = runLevels[profile.runLevel];
+    const reached = lastPhase >= level.steps.length - 1;
+    out.push({
+      label: 'Running',
+      value: `${km} km, ${runRules[rule].label}`,
+      note: reached ? `Your target: ${level.target}. Your runs build up to it every 3 weeks.` : `On the way to ${level.target}. A longer timeline gets you all the way there.`,
+    });
+  }
   out.push({
     label: 'Sessions',
     value: `${Math.round(weeks * trainingDaysPerWeek(profile))}`,
@@ -145,6 +211,7 @@ export function expectations(profile) {
 function prescribe(ex, phase, level) {
   const sets = ex.sets ?? 3;
   if (ex.kind === 'warmup') return { dose: '2 × 12–15 light', note: null };
+  if (ex.kind === 'distance') return { dose: '1–10 km', note: 'Build up slowly: run too far too soon and your shins and knees pay for it.' };
   if (ex.kind === 'weight') {
     return { dose: '3 × 8–12 reps', note: 'Pick a weight that makes rep 12 hard. When you can do 12 on every set, go heavier.' };
   }
@@ -345,6 +412,7 @@ export function defaultsFor(id) {
   const kind = exercises[id]?.kind;
   if (kind === 'hold') return { sets: 3, reps: '30 s' };
   if (kind === 'minutes') return { sets: 1, reps: '10 min' };
+  if (kind === 'distance') return { sets: 1, reps: '3 km' };
   if (kind === 'reps') return { sets: 3, reps: '10' };
   return { sets: 3, reps: '8–12' };
 }
@@ -415,6 +483,7 @@ export function getDay(profile, index) {
   };
 
   if (usesRoutine(profile)) return routineDay(profile, base);
+  if (isRunDay(profile, index)) return runDay(profile, base);
   if (isGym(profile)) return gymDay(profile, index, base);
   if (isHome(profile)) return homeDay(profile, index, base);
 

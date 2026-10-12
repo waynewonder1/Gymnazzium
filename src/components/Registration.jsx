@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { registration } from '../data/guide';
 import { challenges } from '../data/coaching';
+import { RUN_GOAL, runLevels } from '../data/workouts';
 import { useMember } from '../context/member';
 import { emptyProgress } from '../lib/storage';
 import { toISO, todayIndex, totalDays } from '../lib/plan';
@@ -20,6 +21,7 @@ const emptyProfile = () => ({
   gender: '',
   level: 'Beginner',
   goals: [],
+  runLevel: '',
   lookingFor: '',
   timeline: '3 months',
   schedule: '3 days a week',
@@ -62,6 +64,7 @@ function Registration() {
     e.preventDefault();
     setError('');
     if (profile.goals.length === 0) return setError('Pick at least one goal.');
+    if (profile.goals.includes(RUN_GOAL) && !runLevels[profile.runLevel]) return setError('Pick how much you run now, so we can set your distance.');
     if (!profile.lookingFor) return setError('Pick how you want to train.');
     // A fresh plan (or a new start date) starts fresh progress; earned badges stay.
     if (!saved || saved.startDate !== profile.startDate) saveProgress({ ...emptyProgress, badges: progress.badges ?? {} });
@@ -125,6 +128,20 @@ function Registration() {
       <fieldset>
         <legend>2. What are your goals?</legend>
         <Chips options={registration.goals} selected={profile.goals} onToggle={toggle('goals')} />
+        {profile.goals.includes(RUN_GOAL) && (
+          <div className="run-level">
+            <p className="muted small form-hint">How much do you run now? Your runs go on your rest days and build up every 3 weeks.</p>
+            <div className="levels">
+              {Object.entries(runLevels).map(([value, l]) => (
+                <label key={value} className={`level ${profile.runLevel === value ? 'active' : ''}`}>
+                  <input type="radio" name="runLevel" value={value} checked={profile.runLevel === value} onChange={update('runLevel')} />
+                  <strong>{value}</strong>
+                  <span>{l.hint}. Goal: {l.target}.</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
       </fieldset>
 
       <fieldset>
