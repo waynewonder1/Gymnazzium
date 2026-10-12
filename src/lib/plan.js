@@ -391,7 +391,8 @@ function routineDay(profile, base) {
   const items = groups.flatMap((group) =>
     group.items.map((item) => {
       const ex = exerciseInfo(profile, item.id);
-      return { id: item.id, name: ex.name, cue: ex.cue, dose: `${item.sets} × ${item.reps}`, note: null, group: named ? group.name || 'Exercises' : undefined };
+      const dose = exercises[item.id]?.kind === 'distance' ? item.reps : `${item.sets} × ${item.reps}`;
+      return { id: item.id, name: ex.name, cue: ex.cue, dose, note: null, group: named ? group.name || 'Exercises' : undefined };
     })
   );
   return {
@@ -420,7 +421,7 @@ export function defaultsFor(id) {
 // Turns "3 × 8–12 reps" into { sets: 3, reps: '8–12' } for the routine editor.
 export function parseDose(dose) {
   const m = dose.match(/^(\d+)\s*×\s*(.+)$/);
-  if (!m) return { sets: 1, reps: dose.replace(/\s*(reps|sprints)$/, '') };
+  if (!m) return { sets: 1, reps: dose.split(' · ')[0].replace(/\s*(reps|sprints)$/, '') };
   return { sets: Number(m[1]), reps: m[2].replace(/\s+(reps|light|heavy)$/, '') };
 }
 

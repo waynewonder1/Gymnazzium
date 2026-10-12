@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useMember } from '../context/member';
 import { defaultsFor, exerciseInfo, routineTemplate } from '../lib/plan';
 import ExercisePicker from '../components/routine/ExercisePicker';
+import { exercises } from '../data/workouts';
 
 const WEEK = [1, 2, 3, 4, 5, 6, 0]; // Monday first
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -45,7 +46,7 @@ function problemsIn(routine) {
     const items = day.groups.flatMap((g) => g.items);
     if (items.length === 0) problems.push(`${DAY_NAMES[d]} has no exercises. Add some or set it to rest.`);
     if (items.some((i) => !(Number(i.sets) >= 1 && Number(i.sets) <= 10 && Number.isInteger(Number(i.sets))))) problems.push(`${DAY_NAMES[d]}: sets must be a whole number from 1 to 10.`);
-    if (items.some((i) => !String(i.reps).trim())) problems.push(`${DAY_NAMES[d]}: every exercise needs reps (e.g. 8–12, 10, 30 s).`);
+    if (items.some((i) => !String(i.reps).trim())) problems.push(`${DAY_NAMES[d]}: every exercise needs reps (e.g. 8–12, 10, 30 s), and every run a distance (e.g. 3 km).`);
   }
   return problems;
 }
@@ -190,15 +191,25 @@ function Editor({ profile }) {
                           {g.items.map((item, i) => (
                             <div className="rt-item" key={item.key}>
                               <span className="rt-name">{nameOf(item.id)}</span>
-                              <label className="rt-num">
-                                <input type="number" min="1" max="10" value={item.sets} onChange={(e) => setGroup(d, g.key, (x) => ({ ...x, items: x.items.map((y) => (y.key === item.key ? { ...y, sets: e.target.value } : y)) }))} aria-label="Sets" />
-                                <span className="muted small">sets</span>
-                              </label>
-                              <span className="muted">×</span>
-                              <label className="rt-num rt-reps">
-                                <input value={item.reps} maxLength={12} placeholder="8–12" onChange={(e) => setGroup(d, g.key, (x) => ({ ...x, items: x.items.map((y) => (y.key === item.key ? { ...y, reps: e.target.value } : y)) }))} aria-label="Reps" />
-                                <span className="muted small">reps</span>
-                              </label>
+                              {exercises[item.id]?.kind === 'distance' ? (
+                                // A run is one distance, not sets × reps (sets stays 1 behind the scenes).
+                                <label className="rt-num rt-reps">
+                                  <input value={item.reps} maxLength={12} placeholder="3 km" onChange={(e) => setGroup(d, g.key, (x) => ({ ...x, items: x.items.map((y) => (y.key === item.key ? { ...y, reps: e.target.value } : y)) }))} aria-label="Distance" />
+                                  <span className="muted small">distance</span>
+                                </label>
+                              ) : (
+                                <>
+                                  <label className="rt-num">
+                                    <input type="number" min="1" max="10" value={item.sets} onChange={(e) => setGroup(d, g.key, (x) => ({ ...x, items: x.items.map((y) => (y.key === item.key ? { ...y, sets: e.target.value } : y)) }))} aria-label="Sets" />
+                                    <span className="muted small">sets</span>
+                                  </label>
+                                  <span className="muted">×</span>
+                                  <label className="rt-num rt-reps">
+                                    <input value={item.reps} maxLength={12} placeholder="8–12" onChange={(e) => setGroup(d, g.key, (x) => ({ ...x, items: x.items.map((y) => (y.key === item.key ? { ...y, reps: e.target.value } : y)) }))} aria-label="Reps" />
+                                    <span className="muted small">reps</span>
+                                  </label>
+                                </>
+                              )}
                               <div className="rt-item-actions">
                                 <button type="button" className="icon-btn small-btn" aria-label="Move up" disabled={i === 0} onClick={() => moveItem(d, g.key, i, -1)}>↑</button>
                                 <button type="button" className="icon-btn small-btn" aria-label="Move down" disabled={i === g.items.length - 1} onClick={() => moveItem(d, g.key, i, 1)}>↓</button>
