@@ -154,8 +154,8 @@ function Registration() {
           <label>Workout time<input type="time" required value={profile.workoutTime} onChange={update('workoutTime')} /></label>
           <label>Start date<input type="date" required value={profile.startDate} onChange={update('startDate')} /></label>
         </div>
-        {profile.lookingFor === 'Gym work' && ['2 days a week', '3 days a week'].includes(profile.schedule) && (
-          <p className="muted small form-hint">Tip: the gym split is built for 4–5 days a week. With fewer days, your plan rotates through the sessions more slowly.</p>
+        {['Gym work', 'Home workout'].includes(profile.lookingFor) && ['2 days a week', '3 days a week'].includes(profile.schedule) && (
+          <p className="muted small form-hint">Tip: the {profile.lookingFor === 'Gym work' ? 'gym' : 'home'} split is built for 4–5 days a week. With fewer days, your plan rotates through the sessions more slowly.</p>
         )}
       </fieldset>
 

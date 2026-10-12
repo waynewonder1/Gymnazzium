@@ -71,6 +71,19 @@ export const exerciseMeta = {
   sprints: { muscles: ['Cardio', 'Legs'], equipment: 'None', level: 2 },
   burpees: { muscles: ['Cardio', 'Chest', 'Legs'], equipment: 'None', level: 2 },
   squat: { muscles: ['Legs'], equipment: 'None', level: 1 },
+
+  // Home split
+  declinePushup: { muscles: ['Chest', 'Shoulders', 'Triceps'], equipment: 'Bed or chair', level: 2 },
+  bottleLateralRaise: { muscles: ['Shoulders'], equipment: 'Water bottles or jerricans', level: 1 },
+  bodyTricepsExtension: { muscles: ['Triceps'], equipment: 'Sturdy table', level: 3 },
+  homeCurl: { muscles: ['Biceps', 'Forearms'], equipment: 'Backpack, jerrican or books', level: 1 },
+  scapProtraction: { muscles: ['Abs', 'Shoulders'], equipment: 'None', level: 1 },
+  hangingLegRaise: { muscles: ['Abs'], equipment: 'Pull-up bar', level: 2 },
+  homeCalfRaise: { muscles: ['Legs'], equipment: 'A step', level: 1 },
+  bwLunge: { muscles: ['Legs'], equipment: 'None', level: 1 },
+  splitSquat: { muscles: ['Legs'], equipment: 'Chair', level: 2 },
+  gluteBridge: { muscles: ['Legs'], equipment: 'None', level: 1 },
+  wallSit: { muscles: ['Legs'], equipment: 'A wall', level: 1 },
 };
 
 export const levelName = { 1: 'Beginner', 2: 'Intermediate', 3: 'Advanced' };

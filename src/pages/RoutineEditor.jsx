@@ -10,6 +10,7 @@ const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Frid
 const starts = [
   { id: 'current', title: 'My current plan', text: 'Start from one week of the plan you have now, then tweak it.' },
   { id: 'gym', title: 'The Gymnazzium split', text: 'Chest & back, legs, chest/shoulders/arms, legs, back & arms.' },
+  { id: 'home', title: 'The Gymnazzium home split', text: 'The same week with no gym: push-ups, pull-ups, squats and household weights.' },
   { id: 'blank', title: 'A blank week', text: 'Build every day from scratch.' },
 ];
 

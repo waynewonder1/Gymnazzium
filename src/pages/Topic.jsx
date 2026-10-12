@@ -1,7 +1,7 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { pagesByKind } from '../data/content';
 import { products } from '../data/shop';
-import { exercises, gymSplit, gymWeek } from '../data/workouts';
+import { exercises, gymSplit, gymWeek, homeSplit, homeWeek } from '../data/workouts';
 import CountUp from '../components/CountUp';
 import ExerciseCard from '../components/ExerciseCard';
 import WorkoutTimer from '../components/WorkoutTimer';
@@ -85,8 +85,8 @@ function Section({ section }) {
         <>
           {section.note && <p className="muted section-note">{section.note}</p>}
           <div className="split-grid">
-            {Object.entries(gymWeek.byDay).map(([weekday, key]) => {
-              const session = gymSplit[key];
+            {Object.entries((section.split === 'home' ? homeWeek : gymWeek).byDay).map(([weekday, key]) => {
+              const session = (section.split === 'home' ? homeSplit : gymSplit)[key];
               return (
                 <div className="split-day" key={key}>
                   <span className="wday-name">{weekdayName[weekday]}</span>

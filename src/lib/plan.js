@@ -1,6 +1,6 @@
 // Turns a member's profile into a day-by-day plan.
 // Everything is computed from the profile, so the same profile always gives the same plan.
-import { exercises, gymSplit, gymWeek, sessions } from '../data/workouts.js';
+import { exercises, gymSplit, gymWeek, homeNotes, homeSplit, homeWeek, sessions } from '../data/workouts.js';
 import { challenges, milestones, missions, weeklyMission } from '../data/coaching.js';
 
 export const TIMELINE_DAYS = { '1 month': 28, '3 months': 84, '6 months': 182, '1 year+': 364 };
@@ -56,12 +56,13 @@ function getRotation(profile) {
 }
 
 const isGym = (profile) => profile.lookingFor === 'Gym work';
+const isHome = (profile) => profile.lookingFor === 'Home workout';
 // A member's own routine (built in the routine editor) replaces the generated plan.
 export const usesRoutine = (profile) => profile.planMode === 'custom' && Boolean(profile.routine);
 const variantFor = (profile) => (profile.lookingFor === 'Calisthenics' ? 'calisthenics' : 'home');
 const trainingDaysPerWeek = (profile) => {
   if (usesRoutine(profile)) return Object.values(profile.routine.days).filter((d) => d?.groups?.some((g) => g.items.length)).length;
-  return (isGym(profile) ? gymWeek.days[profile.schedule] : SCHEDULE_OFFSETS[profile.schedule])?.length ?? 3;
+  return (isGym(profile) || isHome(profile) ? gymWeek.days[profile.schedule] : SCHEDULE_OFFSETS[profile.schedule])?.length ?? 3;
 };
 
 // ---------- nutrition ----------
@@ -194,16 +195,16 @@ function obstacleFor(profile, index) {
 // ---------- gym split ----------
 const heavyFrom = (profile) => HEAVY_FROM[profile.level] ?? HEAVY_FROM.Beginner;
 
-// Which split session falls on this date, or null for a rest day.
-function gymSessionFor(profile, date, index) {
-  const days = gymWeek.days[profile.schedule] ?? gymWeek.days['4 days a week'];
+// Which split session falls on this date, or null for a rest day (gymWeek or homeWeek).
+function splitSessionFor(week, profile, date, index) {
+  const days = week.days[profile.schedule] ?? week.days['4 days a week'];
   if (!days.includes(date.getDay())) return null;
-  if (days.length === 5) return gymWeek.byDay[date.getDay()];
+  if (days.length === 5) return week.byDay[date.getDay()];
   // Fewer training days: work through the split in order so every session comes round.
   const start = parseDate(profile.startDate);
   let count = 0;
   for (let i = 0; i < index; i++) if (days.includes(addDays(start, i).getDay())) count++;
-  return gymWeek.order[count % gymWeek.order.length];
+  return week.order[count % week.order.length];
 }
 
 export function phaseInfo(profile, index) {
@@ -223,7 +224,7 @@ export function phaseInfo(profile, index) {
 }
 
 function gymDay(profile, index, base) {
-  const key = gymSessionFor(profile, base.date, index);
+  const key = splitSessionFor(gymWeek, profile, base.date, index);
   if (!key) {
     return {
       ...base,
@@ -254,6 +255,48 @@ function gymDay(profile, index, base) {
     items,
     cooldown: '5 min cool-down: stretch what you trained, then drink water.',
     minutes: 10 + items.length * 5,
+  };
+}
+
+// ---------- home split ----------
+// Same weekdays as the gym split; doses climb every 3 weeks like the other bodyweight plans.
+function homeDay(profile, index, base) {
+  const key = splitSessionFor(homeWeek, profile, base.date, index);
+  if (!key) return restDay(profile, base);
+  const session = homeSplit[key];
+  const dayIds = session.groups.flatMap((g) => g.ids);
+  const items = session.groups.flatMap((group) =>
+    group.ids.map((rawId) => {
+      // Easier/harder swaps for the member's level, unless that move is already in today's session.
+      const swapped = pickExercise(rawId, profile.level, base.phase);
+      const id = swapped !== rawId && dayIds.includes(swapped) ? rawId : swapped;
+      const ex = exercises[id];
+      const { dose, note } = prescribe(ex, base.phase, profile.level);
+      return { id, name: ex.name, cue: ex.cue, dose, note: homeNotes[id] ?? note, group: group.name };
+    })
+  );
+  return {
+    ...base,
+    type: 'train',
+    sessionKey: key,
+    title: session.title,
+    focus: session.focus,
+    warmup: session.warmup,
+    items,
+    cooldown: '5 min cool-down: stretch what you trained, then drink water.',
+    minutes: 10 + items.length * 4,
+  };
+}
+
+function restDay(profile, base) {
+  const active = hasAny(profile, FAT_GOALS) || profile.lookingFor === 'Overall cardio';
+  return {
+    ...base,
+    type: 'rest',
+    title: active ? 'Active recovery' : 'Rest day',
+    focus: active
+      ? 'Walk 6,000 steps (about 180–300 kcal) and stretch for 10 minutes.'
+      : 'Rest, stretch and eat well. Muscle grows on rest days.',
   };
 }
 
@@ -313,10 +356,21 @@ export function parseDose(dose) {
   return { sets: Number(m[1]), reps: m[2].replace(/\s+(reps|light|heavy)$/, '') };
 }
 
-// A starting routine: one week of the member's current plan, or the Gymnazzium gym split.
+// A starting routine: one week of the member's current plan, or the Gymnazzium gym or home split.
 export function routineTemplate(profile, source) {
   const days = { 0: null, 1: null, 2: null, 3: null, 4: null, 5: null, 6: null };
-  if (source === 'gym') {
+  if (source === 'home') {
+    for (const [weekday, key] of Object.entries(homeWeek.byDay)) {
+      const session = homeSplit[key];
+      days[weekday] = {
+        title: session.title,
+        groups: session.groups.map((g) => ({
+          name: g.name,
+          items: g.ids.map((id) => ({ id, ...parseDose(prescribe(exercises[id], 0, profile.level).dose) })),
+        })),
+      };
+    }
+  } else if (source === 'gym') {
     for (const [weekday, key] of Object.entries(gymWeek.byDay)) {
       const session = gymSplit[key];
       days[weekday] = {
@@ -362,18 +416,9 @@ export function getDay(profile, index) {
 
   if (usesRoutine(profile)) return routineDay(profile, base);
   if (isGym(profile)) return gymDay(profile, index, base);
+  if (isHome(profile)) return homeDay(profile, index, base);
 
-  if (!offsets.includes(dow)) {
-    const active = hasAny(profile, FAT_GOALS) || profile.lookingFor === 'Overall cardio';
-    return {
-      ...base,
-      type: 'rest',
-      title: active ? 'Active recovery' : 'Rest day',
-      focus: active
-        ? 'Walk 6,000 steps (about 180–300 kcal) and stretch for 10 minutes.'
-        : 'Rest, stretch and eat well. Muscle grows on rest days.',
-    };
-  }
+  if (!offsets.includes(dow)) return restDay(profile, base);
 
   const sessionNumber = week * offsets.length + offsets.filter((o) => o < dow).length;
   const rotation = getRotation(profile);

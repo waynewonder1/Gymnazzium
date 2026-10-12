@@ -10,7 +10,7 @@ Built with React + Vite. Accounts, synced plans, orders and push notifications r
 
 ## What it does
 
-- **Personal plan** (`/plan`): answers from the registration form become a day-by-day plan with a streak, daily missions, heads-ups for hard weeks, nutrition targets and a deep dive on each goal. Gym members get the Gymnazzium 5-day split (strength & form first, then heavy 2 × 6–10).
+- **Personal plan** (`/plan`): answers from the registration form become a day-by-day plan with a streak, daily missions, heads-ups for hard weeks, nutrition targets and a deep dive on each goal. Gym members get the Gymnazzium 5-day split (strength & form first, then heavy 2 × 6–10); home members get the matching home split (push-up variations, pull-ups or table rows, bodyweight legs, household-object curls), with reps rising every 3 weeks.
 - **Your own routine** (`/plan/routine`): members build their own week (days, sections, exercises, sets, reps, custom exercises), starting from their plan, the gym split or a blank week. Plans, reminders and the calendar follow it; they can switch back any time.
 - **Weight logging** (on each exercise in the plan): weight × reps per set, "last time", and an *add weight* tip when every set hit the top of the rep range.
 - **Progress** (`/progress`): a chart and session table for every logged lift.

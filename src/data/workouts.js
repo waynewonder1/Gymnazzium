@@ -74,6 +74,19 @@ export const exercises = {
   narrowPulldown: { name: 'Narrow-grip pull-down', cue: 'Close grip handle, pull to your chest, squeeze the lats.', kind: 'weight' },
   machineRow: { name: 'Machine rows (optional)', cue: 'Chest on the pad, pull to your ribs, squeeze the shoulder blades.', kind: 'weight' },
 
+  // Home split (bodyweight and household objects)
+  declinePushup: { name: 'Decline push-ups', cue: 'Feet up on a bed or chair, hands on the floor. Upper chest and shoulders.', kind: 'reps', base: 5, step: 2, max: 20 },
+  bottleLateralRaise: { name: 'Lateral raises (bottles)', cue: 'Full water bottles or small jerricans. Raise them out to your sides, to shoulder height, then lower slowly.', kind: 'weight' },
+  bodyTricepsExtension: { name: 'Bodyweight triceps extensions', cue: 'Hands on a sturdy table edge, body straight. Bend only your elbows to lower your head below your hands, then press back up. Hard to keep steady: the higher your hands, the easier.', kind: 'reps', base: 5, step: 2, max: 15 },
+  homeCurl: { name: 'Curls (any heavy object)', cue: 'A full backpack, a jerrican or a bag of books. Elbows pinned to your sides, no swinging.', kind: 'weight' },
+  scapProtraction: { name: 'Scapular protractions', cue: 'Push-up position, arms straight. Let your chest sink between your shoulder blades, then push the floor away and round your upper back. Small and slow.', kind: 'reps', base: 10, step: 2, max: 20 },
+  hangingLegRaise: { name: 'Hanging leg raises', cue: 'Hang from the bar and raise your legs without swinging. Start with bent knees.', kind: 'reps', base: 5, step: 2, max: 15 },
+  homeCalfRaise: { name: 'Calf raises', cue: 'On the edge of a step, heels hanging. Full stretch at the bottom, rise onto your toes, pause. One leg at a time when it gets easy.', kind: 'reps', base: 15, step: 5, max: 40 },
+  bwLunge: { name: 'Lunges', cue: 'Long step, back knee towards the floor, push through the front heel.', kind: 'reps', base: 8, step: 2, max: 20, unit: 'reps each leg' },
+  splitSquat: { name: 'Bulgarian split squats', cue: 'Back foot on a chair, sink straight down until your front thigh is parallel, drive up through the front heel.', kind: 'reps', base: 6, step: 2, max: 15, unit: 'reps each leg', beginner: 'bwLunge' },
+  gluteBridge: { name: 'Glute bridges', cue: 'Lie on your back, knees bent. Drive through your heels to lift your hips, squeeze at the top.', kind: 'reps', base: 12, step: 3, max: 30 },
+  wallSit: { name: 'Wall sit', cue: 'Back flat on a wall, thighs parallel to the floor, knees over ankles. Hold.', kind: 'hold', base: 30, step: 15, max: 120 },
+
   // Abs
   crunch: { name: 'Crunches', cue: 'On a mat, knees bent, hands at your temples. Upper abs.', kind: 'reps', base: 20, step: 5, max: 40 },
   legRaise: { name: 'Leg raises', cue: 'Lie flat, raise both legs together. Lower abs.', kind: 'reps', base: 5, step: 3, max: 20 },
@@ -178,4 +191,64 @@ export const gymWeek = {
     '4 days a week': [1, 2, 4, 5],
     '5+ days a week': [1, 2, 4, 5, 6],
   },
+};
+
+// The Gymnazzium home split, used for everyone who picks "Home workout".
+// Same rhythm as the gym split, built from bodyweight moves and household objects.
+const homeTriceps = { name: 'Triceps', ids: ['diamondPushup', 'bodyTricepsExtension'] };
+const homeBiceps = { name: 'Biceps', ids: ['homeCurl'] };
+const homeAbs = { name: 'Abs', ids: ['crunch', 'hangingLegRaise', 'scapProtraction'] };
+
+export const homeSplit = {
+  chestBack: {
+    title: 'Chest & back',
+    focus: 'Push-up variations, then pull-ups',
+    warmup: 'Warm up: arm circles, then 1 easy set of incline push-ups and a 20-second hang from the bar.',
+    groups: [
+      { name: 'Chest', ids: ['pushup', 'widePushup', 'inclinePushup', 'declinePushup'] },
+      { name: 'Back', ids: ['pullup'] },
+    ],
+  },
+  legsAbs: {
+    title: 'Legs & abs',
+    focus: 'Squats and lunges, then abs',
+    warmup: '5 min of marching on the spot or skipping, then 1 slow set of squats.',
+    groups: [{ name: 'Legs', ids: ['squat', 'bwLunge', 'splitSquat', 'homeCalfRaise'] }, homeAbs],
+  },
+  chestShouldersArms: {
+    title: 'Chest, shoulders & arms',
+    focus: 'Chest, shoulders, triceps and biceps',
+    warmup: 'Warm up: arm circles, then 1 easy set of push-ups and pike push-ups.',
+    groups: [
+      { name: 'Chest', ids: ['pushup', 'declinePushup'] },
+      { name: 'Shoulders', ids: ['pikePushup', 'bottleLateralRaise', 'tysonPushup'] },
+      homeTriceps,
+      homeBiceps,
+    ],
+  },
+  legsGlutes: {
+    title: 'Legs & abs',
+    focus: 'Squats, glutes and a wall sit, then abs',
+    warmup: '5 min of marching on the spot or skipping, then 1 slow set of glute bridges.',
+    groups: [{ name: 'Legs', ids: ['squat', 'gluteBridge', 'wallSit', 'homeCalfRaise'] }, homeAbs],
+  },
+  backArms: {
+    title: 'Back & arms',
+    focus: 'Pull-ups, then triceps and biceps',
+    warmup: 'Warm up: a 20-second hang from the bar, then 1 easy set of pull-ups or table rows.',
+    groups: [{ name: 'Back', ids: ['pullup'] }, homeTriceps, homeBiceps],
+  },
+};
+
+// Stand-ins shown under exercises that need a bar.
+export const homeNotes = {
+  pullup: 'No bar? Do table rows instead: lie under a sturdy table, grip the edge and pull your chest up to it.',
+  hangingLegRaise: 'No bar? Do lying leg raises instead.',
+};
+
+// Same weekdays and schedules as the gym split.
+export const homeWeek = {
+  byDay: { 1: 'chestBack', 2: 'legsAbs', 4: 'chestShouldersArms', 5: 'legsGlutes', 6: 'backArms' },
+  order: ['chestBack', 'legsAbs', 'chestShouldersArms', 'legsGlutes', 'backArms'],
+  days: gymWeek.days,
 };
