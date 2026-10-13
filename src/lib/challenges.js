@@ -4,6 +4,7 @@
 //   challenge badges: '2026-10:show-up' (month : challenge id)
 import { getDay, parseDate, streak, toISO, todayIndex, totalDays } from './plan.js';
 import { isLoggable, prFor } from './lifts.js';
+import { runTotals } from './runs.js';
 
 export const monthKey = (date) => toISO(date).slice(0, 7);
 export const monthLabel = (key) => {
@@ -95,6 +96,9 @@ export const MILESTONES = [
   { id: 'streak-30', icon: '☄️', title: '30 in a row', how: 'Reach a streak of 30 workouts.', test: (t) => t.streak >= 30 },
   { id: 'first-pr', icon: '🏆', title: 'First PR', how: 'Beat one of your own bests.', test: (t) => t.prs >= 1 },
   { id: 'prs-10', icon: '🥇', title: '10 PRs', how: 'Hit 10 personal records.', test: (t) => t.prs >= 10 },
+  { id: 'first-run', icon: '🏃', title: 'First run', how: 'Log your first run.', test: (t) => t.runs.count >= 1 },
+  { id: 'run-5k', icon: '🎽', title: '5 km run', how: 'Log a run of 5 km or more.', test: (t) => t.runs.longest >= 5 },
+  { id: 'run-10k', icon: '🏅', title: '10 km run', how: 'Log a run of 10 km or more.', test: (t) => t.runs.longest >= 10 },
 ];
 
 function totals(profile, progress) {
@@ -102,7 +106,7 @@ function totals(profile, progress) {
   for (const [id, byDay] of Object.entries(progress.lifts ?? {})) {
     for (const index of Object.keys(byDay)) if (prFor(progress.lifts, id, Number(index))) prs++;
   }
-  return { workouts: Object.keys(progress.done).length, streak: streak(profile, progress.done), prs };
+  return { workouts: Object.keys(progress.done).length, streak: streak(profile, progress.done), prs, runs: runTotals(progress.runs) };
 }
 
 // Badges this progress qualifies for that haven't been awarded yet.

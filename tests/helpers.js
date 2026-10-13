@@ -25,6 +25,6 @@ export const profileFor = (overrides = {}) => ({
   ...overrides,
 });
 
-export const emptyProgress = () => ({ done: {}, checks: {}, missions: {}, lifts: {}, badges: {} });
+export const emptyProgress = () => ({ done: {}, checks: {}, missions: {}, lifts: {}, badges: {}, runs: {} });
 
 export const WEEKDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

@@ -892,3 +892,12 @@
   .badge-toast span{ font-size:0.88rem; }
   .badge-toast a{ color:var(--steel); font-size:0.85rem; font-weight:600; }
   .badge-toast .icon-btn{ flex-shrink:0; }
+
+  /* ================= RUN LOGGING ================= */
+  .run-form{ display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px 18px; margin-top:10px; }
+  .run-form > label{ display:flex; flex-direction:column; gap:4px; }
+  .run-input{ display:flex; align-items:center; gap:6px; }
+  .run-input input{ width:76px; font:inherit; background:var(--bg-raise); color:var(--text); border:1px solid rgba(255,255,255,0.15); border-radius:4px; padding:8px 10px; }
+  .run-input input:focus{ outline:none; border-color:var(--accent); }
+  .run-actions{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; flex-basis:100%; }
+  .run-grid{ grid-template-columns:minmax(0, 1fr); max-width:620px; }

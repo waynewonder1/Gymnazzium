@@ -83,6 +83,20 @@ function PlanView({ profile }) {
     commit({ ...progress, lifts, checks, done });
   };
 
+  // A logged run (distance + time). Logging it ticks the run off; clearing it keeps the tick.
+  const logRun = (j, run) => {
+    const runs = { ...progress.runs };
+    if (run) runs[selected] = run;
+    else delete runs[selected];
+    const checks = { ...progress.checks };
+    const done = { ...progress.done };
+    if (run) {
+      checks[`${selected}:${j}`] = true;
+      if (day.items.every((_, k) => checks[`${selected}:${k}`])) done[selected] = true;
+    }
+    commit({ ...progress, runs, checks, done });
+  };
+
   const switchToRecommended = () => {
     if (!window.confirm('Switch back to the recommended plan? Your routine stays saved, so you can switch back any time.')) return;
     saveProfile({ ...profile, planMode: undefined });
@@ -206,6 +220,7 @@ function PlanView({ profile }) {
           onToggleDone={toggleIn('done')}
           onToggleMission={toggleIn('missions')}
           onLog={logLift}
+          onLogRun={logRun}
         />
         {selected !== current && (
           <button className="btn btn-ghost back-today" onClick={() => select(current)}>Back to today</button>

@@ -1,12 +1,13 @@
 import WorkoutTimer from '../WorkoutTimer';
 import LiftLog from './LiftLog';
+import RunLog from './RunLog';
 import RestSettings from './RestSettings';
 import { isLoggable, lastLog } from '../../lib/lifts';
 
 const formatDate = (date) => date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
 
 // relation: 'past' | 'today' | 'future'
-function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggleMission, onLog }) {
+function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggleMission, onLog, onLogRun }) {
   const done = Boolean(progress.done[day.index]);
   const locked = relation === 'future';
   const missionDone = Boolean(progress.missions[day.index]);
@@ -68,12 +69,15 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
                       onSave={(sets) => onLog(j, item.id, sets)}
                     />
                   )}
+                  {!locked && item.id === 'run' && (
+                    <RunLog key={`${day.index}-${j}`} index={day.index} dose={item.dose} runs={progress.runs} onSave={(run) => onLogRun(j, run)} />
+                  )}
                 </li>
               );
             })}
           </ul>
           <p className="bookend">{day.cooldown}</p>
-          {!locked && <RestSettings />}
+          {!locked && day.sessionKey !== 'run' && <RestSettings />}
           {!locked && (
             <details className="day-timer">
               <summary>Rest & interval timer</summary>

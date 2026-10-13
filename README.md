@@ -14,7 +14,7 @@ Built with React + Vite. Accounts, synced plans, orders and push notifications r
 - **Your own routine** (`/plan/routine`): members build their own week (days, sections, exercises, sets, reps, custom exercises), starting from their plan, the gym split or a blank week. Plans, reminders and the calendar follow it; they can switch back any time.
 - **Running goal** ("Run 1–10 km"): members pick a running level at sign-up; runs go on rest days (Wednesday first, at least one full rest day kept) and build up every 3 weeks to 1–3 km with walk breaks (beginner), 5 km with one break at most (intermediate) or 10 km non-stop (experienced).
 - **Weight logging** (on each exercise in the plan): weight × reps per set, "last time", and an *add weight* tip when every set hit the top of the rep range.
-- **Progress** (`/progress`): a chart and session table for every logged lift.
+- **Progress** (`/progress`): a chart and session table for every logged lift, plus a Running section (runs, total km, longest run, best pace, distance chart). Runs are logged with distance and time on run days; the pace is worked out, and longest-run and fastest-pace bests are celebrated.
 - **Challenges** (`/challenges`): four monthly challenges sized to each member's plan (workouts, a run without a miss, sets, PRs), milestone badges with a confetti banner when earned, and an opt-in monthly leaderboard under a display name (ranked by workouts, then sets).
 - **Reminders:** web push at the member's workout time (even with the site closed), plus an `.ics` calendar download.
 - **Content:** paths, body types, nutrition, supplements (with sources), an exercise library with a rest/interval timer.

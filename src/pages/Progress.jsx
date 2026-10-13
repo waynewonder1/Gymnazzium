@@ -3,6 +3,7 @@ import { useMember } from '../context/member';
 import { addDays, exerciseInfo, parseDate } from '../lib/plan';
 import { formatSets, history, prFor } from '../lib/lifts';
 import LiftChart from '../components/LiftChart';
+import { formatPace, formatTime, runHistory, runPrFor, runTotals } from '../lib/runs';
 
 const fmtDate = (d) => d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 
@@ -30,19 +31,25 @@ function Progress() {
 
   const totalSessions = new Set(lifts.flatMap((l) => l.sessions.map((s) => s.index))).size;
   const totalVolume = lifts.reduce((sum, l) => sum + l.sessions.reduce((v, s) => v + s.volume, 0), 0);
+  const runs = runHistory(progress.runs);
 
   return (
     <section className="page-top progress-page">
       <div className="section-label">Progress</div>
       <h1 className="page-title">Every rep counts.</h1>
-      <p className="page-lead">Your logged lifts over time. Log sets on any exercise in <Link to="/plan#today">your plan</Link> and they show up here.</p>
+      <p className="page-lead">Your logged lifts and runs over time. Log sets or a run on any exercise in <Link to="/plan#today">your plan</Link> and they show up here.</p>
+
+      {runs.length > 0 && <RunProgress runs={runs} all={progress.runs} start={start} />}
+      {runs.length > 0 && lifts.length > 0 && <h2 className="sub-title">Lifts</h2>}
 
       {lifts.length === 0 ? (
+        runs.length > 0 ? null : (
         <div className="card flat empty-progress">
           <h3>Nothing logged yet</h3>
-          <p>Open today's workout, tap <strong>Log sets</strong> under an exercise, and enter your weight and reps. Your first chart appears after that.</p>
+          <p>Open today's workout, tap <strong>Log sets</strong> under an exercise (or <strong>Log run</strong> on a run day), and fill it in. Your first chart appears after that.</p>
           <Link to="/plan#today" className="btn btn-sm">Go to today's workout</Link>
         </div>
+        )
       ) : (
         <>
           <div className="stat-grid">
@@ -93,6 +100,45 @@ function Progress() {
         </>
       )}
     </section>
+  );
+}
+
+// Running: totals, a distance chart (best runs ringed) and every run with its pace.
+function RunProgress({ runs, all, start }) {
+  const totals = runTotals(all);
+  const points = runs.map((r) => ({ x: addDays(start, r.index), y: r.km, label: `${formatTime(r.sec)} · ${formatPace(r.pace)}`, pr: Boolean(runPrFor(all, r.index)) }));
+  return (
+    <>
+      <h2 className="sub-title">Running</h2>
+      <div className="stat-grid">
+        <div className="stat"><span className="stat-label">Runs logged</span><strong className="stat-value">{totals.count}</strong></div>
+        <div className="stat"><span className="stat-label">Total distance</span><strong className="stat-value">{totals.km} km</strong></div>
+        <div className="stat"><span className="stat-label">Longest run</span><strong className="stat-value">{totals.longest} km</strong></div>
+        <div className="stat"><span className="stat-label">Best pace</span><strong className="stat-value">{totals.bestPace ? formatPace(totals.bestPace) : '–'}</strong><span className="stat-note">Runs of 1 km or more</span></div>
+      </div>
+      <div className="lift-grid run-grid">
+        <article className="lift-card">
+          <div className="lift-card-head">
+            <div>
+              <h3>Distance</h3>
+              <span className="muted small">{runs.length} run{runs.length === 1 ? '' : 's'}{points.some((p) => p.pr) ? ` · ${points.filter((p) => p.pr).length} new best${points.filter((p) => p.pr).length === 1 ? '' : 's'} 🏆` : ''}</span>
+            </div>
+          </div>
+          <LiftChart points={points} unit="km" />
+          <details className="lift-table">
+            <summary>All runs</summary>
+            <table>
+              <thead><tr><th scope="col">Date</th><th scope="col">Distance</th><th scope="col">Time</th><th scope="col">Pace</th></tr></thead>
+              <tbody>
+                {[...runs].reverse().map((r) => (
+                  <tr key={r.index}><td>{fmtDate(addDays(start, r.index))}</td><td>{r.km} km</td><td>{formatTime(r.sec)}</td><td>{formatPace(r.pace)}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </details>
+        </article>
+      </div>
+    </>
   );
 }
 
