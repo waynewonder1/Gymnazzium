@@ -45,6 +45,8 @@ Without a `.env` file the site runs in **device-only mode**: plans are saved in 
 
 After changing `src/lib/plan.js`, `src/data/workouts.js` or `src/data/coaching.js`, run `npm run functions:sync` so push reminders use the same plan.
 
+Run `npm test` before pushing. The tests (in `tests/`) build a full year of every kind of plan and check the gym and home splits, run days, challenges, badges and progress syncing. No extra install is needed; they use Node's built-in test runner.
+
 ## Backend setup (accounts, orders, push reminders)
 
 You need a free Supabase account. Allow about 20 minutes.
