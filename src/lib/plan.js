@@ -112,7 +112,7 @@ function runDay(profile, base) {
     type: 'train',
     sessionKey: 'run',
     title: `Run day: ${km} km`,
-    focus: `${km} km, ${runRules[rule].label}, working towards ${runLevels[profile.runLevel].target}`,
+    focus: `Working towards ${runLevels[profile.runLevel].target}`,
     warmup: '5 min brisk walk, then leg swings and 1 minute of very easy jogging.',
     items: [{ id: 'run', name: ex.name, cue: ex.cue, dose: `${km} km · ${runRules[rule].label}`, note: runRules[rule].note }],
     cooldown: '5 min walk, then stretch your calves, hamstrings and quads. Drink water.',
