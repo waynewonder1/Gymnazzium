@@ -11,7 +11,7 @@ const RUNTIME = 'gz-runtime-v1'; // Google Fonts
 // Look-ups ignore the Vary header: some servers send "Vary: Origin", which would stop a
 // file saved in the background from matching the page's own request for it.
 const MATCH = { ignoreVary: true };
-const CORE = ['/manifest.webmanifest', '/icon.svg', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png'];
+const CORE = ['/manifest.webmanifest', '/icon.svg', '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png', '/apple-touch-icon.png'];
 
 // Save index.html plus the app code it references, and drop code from older builds.
 async function cacheAppShell(response) {

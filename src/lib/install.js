@@ -8,7 +8,15 @@ export const isStandalone = () =>
   typeof window !== 'undefined' &&
   (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true);
 
-export const isIOS = () => typeof navigator !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent);
+// iPads on iPadOS 13+ say they're a Mac, so also check for a touch screen.
+export const isIOS = () =>
+  typeof navigator !== 'undefined' &&
+  (/iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1));
+
+// Links tapped inside Instagram, Facebook, TikTok and similar open in that app's own browser,
+// which can't install apps. (WhatsApp usually hands links to the real browser, but not always.)
+export const isInAppBrowser = () =>
+  typeof navigator !== 'undefined' && /Instagram|FBAN|FBAV|FB_IAB|TikTok|musical_ly|Snapchat|Line\/|WhatsApp|; wv\)/.test(navigator.userAgent);
 
 export function initInstall() {
   window.addEventListener('beforeinstallprompt', (e) => {

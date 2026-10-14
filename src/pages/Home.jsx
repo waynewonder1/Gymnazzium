@@ -8,8 +8,8 @@ import { useMember } from '../context/member';
 import Registration from '../components/Registration';
 import ProductCard from '../components/ProductCard';
 import CountUp from '../components/CountUp';
-import InstallButton from '../components/InstallButton';
-import { isIOS, isStandalone } from '../lib/install';
+import InstallHelp from '../components/InstallHelp';
+import { isStandalone } from '../lib/install';
 
 const steps = [
   { title: 'Register', text: 'Tell us your stats, goals, schedule and what usually stops you.' },
@@ -145,22 +145,7 @@ function Home() {
             </ul>
           </div>
           <div className="app-install card flat">
-            {isIOS() ? (
-              <>
-                <h3>On iPhone</h3>
-                <ol>
-                  <li>Open this site in <strong>Safari</strong></li>
-                  <li>Tap <strong>Share</strong> (the square with an arrow)</li>
-                  <li>Tap <strong>Add to Home Screen</strong></li>
-                </ol>
-              </>
-            ) : (
-              <>
-                <h3>Install Gymnazzium</h3>
-                <InstallButton className="btn" label="Install the app" />
-                <p className="muted small">No button? In Chrome, tap <strong>⋮</strong> then <strong>Add to Home screen</strong> or <strong>Install app</strong>.</p>
-              </>
-            )}
+            <InstallHelp />
           </div>
         </section>
       )}

@@ -5,6 +5,7 @@ import { useMember } from '../context/member';
 import { checkReminder } from '../lib/reminders';
 import CartDrawer from './CartDrawer';
 import InstallButton from './InstallButton';
+import { isStandalone } from '../lib/install';
 import RestBar from './RestBar';
 import BadgeToast from './BadgeToast';
 import { pagesByKind } from '../data/content';
@@ -81,6 +82,7 @@ function Layout() {
           {profile ? <NavLink to="/plan" onClick={closeMenu}>My plan</NavLink> : <Link to="/#register" onClick={closeMenu}>Register</Link>}
           {profile && <NavLink to="/challenges" onClick={closeMenu}>Challenges</NavLink>}
           {isAdmin && <NavLink to="/admin" onClick={closeMenu}>Admin</NavLink>}
+          {!isStandalone() && <Link to="/#get-the-app" className="nav-install-link" onClick={closeMenu}>Install app</Link>}
           {backendEnabled && (user ? <NavLink to="/account" onClick={closeMenu}>Account</NavLink> : <NavLink to="/login" onClick={closeMenu}>Log in</NavLink>)}
         </div>
         <div className="nav-actions">

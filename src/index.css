@@ -914,3 +914,7 @@
   .privacy strong{ color:var(--text); }
   .privacy ul{ padding-left:20px; display:flex; flex-direction:column; gap:6px; }
   .privacy a{ color:var(--steel); }
+
+  /* "Install app" in the phone menu (desktop has the button in the top bar instead). */
+  nav .nav-links a.nav-install-link{ display:none; }
+  @media(max-width:980px){ nav .nav-links a.nav-install-link{ display:block; color:var(--accent); } }
