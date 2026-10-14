@@ -64,6 +64,41 @@ function ChangePassword() {
   );
 }
 
+// Deletes the login and everything linked to it (see supabase/migrations/…_delete_account.sql).
+function DeleteAccount({ onDeleted }) {
+  const [open, setOpen] = useState(false);
+  const [typed, setTyped] = useState('');
+  const [state, setState] = useState({ busy: false, error: '' });
+
+  const remove = async (e) => {
+    e.preventDefault();
+    setState({ busy: true, error: '' });
+    const { error } = await supabase.rpc('delete_my_account');
+    if (error) return setState({ busy: false, error: `Couldn't delete your account: ${error.message}` });
+    await onDeleted();
+  };
+
+  return (
+    <div className="card flat danger-zone">
+      <h3>Delete my account</h3>
+      <p>
+        This permanently deletes your login, your plan, all your progress, badges, logged lifts and runs, your reminders and your leaderboard entry.
+        Shop orders you placed are kept for our records, but are no longer linked to you. This can't be undone.
+      </p>
+      {!open ? (
+        <button type="button" className="btn btn-sm btn-ghost danger" onClick={() => setOpen(true)}>Delete my account…</button>
+      ) : (
+        <form className="inline-form" onSubmit={remove}>
+          <input aria-label="Type DELETE to confirm" placeholder="Type DELETE to confirm" value={typed} onChange={(e) => setTyped(e.target.value)} autoFocus />
+          <button className="btn btn-sm danger-solid" disabled={typed.trim() !== 'DELETE' || state.busy}>{state.busy ? 'Deleting…' : 'Delete forever'}</button>
+          <button type="button" className="btn btn-sm btn-ghost" onClick={() => { setOpen(false); setTyped(''); }}>Cancel</button>
+        </form>
+      )}
+      {state.error && <p className="form-error small" role="alert">{state.error}</p>}
+    </div>
+  );
+}
+
 function Account() {
   const { backendEnabled, authReady, user, profile, clearPlan, signOut } = useMember();
   const navigate = useNavigate();
@@ -82,6 +117,12 @@ function Account() {
   const logOut = async () => {
     navigate('/', { replace: true });
     await signOut();
+  };
+
+  // The account is gone on the server; clear this browser too and say so on the home page.
+  const accountDeleted = async () => {
+    navigate('/', { replace: true, state: { notice: 'Your account and all its data have been deleted.' } });
+    await signOut().catch(() => {});
   };
 
   const day = profile ? todayIndex(profile) + 1 : null;
@@ -125,6 +166,9 @@ function Account() {
         <button className="btn btn-ghost" onClick={logOut}>Log out</button>
         {profile && <button className="btn btn-ghost danger" onClick={deletePlan}>Delete my plan data</button>}
       </div>
+
+      <DeleteAccount onDeleted={accountDeleted} />
+      <p className="muted small">How we handle your data: <Link to="/privacy">Privacy</Link>.</p>
     </section>
   );
 }

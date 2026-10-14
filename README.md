@@ -118,6 +118,7 @@ Push notifications need HTTPS, which both provide.
 
 - Every table has row-level security: members can only read and write their own plan, progress, subscriptions and orders.
 - Guests can place orders but can't read any back.
+- Members can delete their own account on /account (`delete_my_account()`); their plan, progress, push devices and leaderboard entry go with it, and their orders are kept unlinked. The privacy notice is at /privacy (`src/pages/Privacy.jsx`); keep it in step with what the app stores.
 - Order totals are calculated in the browser. Always confirm the amount when you take payment.
 - Never put the **service role key** or the **VAPID private key** in `.env` or any `VITE_` variable; those end up in the public website. They belong only in `supabase secrets`.
 - These files hold secrets and are git-ignored; keep them off GitHub: `.env`, `supabase/.vapid-keys.json`, `supabase/cron.filled.sql`.

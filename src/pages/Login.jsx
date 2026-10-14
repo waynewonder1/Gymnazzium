@@ -106,6 +106,7 @@ function Login() {
         </button>
         {mode === 'signin' && <button type="button" className="link-btn" onClick={() => switchTo('reset')}>Forgot your password?</button>}
         {mode === 'reset' && <button type="button" className="link-btn" onClick={() => switchTo('signin')}>Back to log in</button>}
+        {mode === 'signup' && <p className="muted small">By creating an account you agree to how we handle your data: <Link to="/privacy">Privacy</Link>.</p>}
       </form>
     </section>
   );

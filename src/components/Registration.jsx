@@ -192,6 +192,7 @@ function Registration() {
         <button type="submit" className="btn">{saved ? 'Update my plan' : 'Build my plan'}</button>
         {saved && <button type="button" className="btn btn-ghost" onClick={() => setEditing(false)}>Cancel</button>}
       </div>
+      <p className="muted small">Your answers are used only to build your plan. <Link to="/privacy">How we handle your data</Link>.</p>
     </form>
   );
 }

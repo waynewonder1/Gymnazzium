@@ -204,7 +204,66 @@ function Dashboard() {
           </table>
         </div>
       </div>
+
+      <LeaderboardMembers />
     </section>
+  );
+}
+
+// Everyone on the leaderboard, with a Remove button (e.g. for a rude display name).
+// Removing only takes them off the board; their account and progress are untouched, and they can rejoin.
+function LeaderboardMembers() {
+  const [members, setMembers] = useState(null);
+  const [error, setError] = useState('');
+
+  const load = useCallback(
+    () =>
+      supabase
+        .from('leaderboard_members')
+        .select('user_id, display_name, joined_at')
+        .order('joined_at', { ascending: false })
+        .then(({ data, error: e }) => {
+          setMembers(data ?? []);
+          setError(e?.message ?? '');
+        }),
+    []
+  );
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const remove = async (m) => {
+    if (!window.confirm(`Remove "${m.display_name}" from the leaderboard? Their account and progress stay; they can rejoin with a different name.`)) return;
+    const { error: e } = await supabase.from('leaderboard_members').delete().eq('user_id', m.user_id);
+    if (e) return setError(e.message);
+    load();
+  };
+
+  return (
+    <div className="card flat admin-lower">
+      <h3>Leaderboard</h3>
+      <p className="muted small">Members who joined the leaderboard and the name others see.</p>
+      {error && <p className="form-error small">{error}</p>}
+      {members === null ? (
+        <p className="muted small">Loading…</p>
+      ) : members.length === 0 ? (
+        <p className="muted small">Nobody has joined yet.</p>
+      ) : (
+        <table className="admin-table">
+          <thead><tr><th scope="col">Display name</th><th scope="col">Joined</th><th scope="col"><span className="sr-only">Actions</span></th></tr></thead>
+          <tbody>
+            {members.map((m) => (
+              <tr key={m.user_id}>
+                <td>{m.display_name}</td>
+                <td>{fmtDate(m.joined_at)}</td>
+                <td><button type="button" className="link-btn" onClick={() => remove(m)}>Remove</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
   );
 }
 

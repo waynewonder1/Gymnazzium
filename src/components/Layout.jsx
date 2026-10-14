@@ -15,6 +15,7 @@ const PAGE_TITLES = {
   '/plan/routine': 'My routine',
   '/progress': 'My progress',
   '/challenges': 'Challenges',
+  '/privacy': 'Privacy',
   '/shop': 'Shop',
   '/exercises': 'Exercise library',
   '/login': 'Log in',
@@ -30,7 +31,7 @@ function titleFor(pathname) {
 }
 
 function Layout() {
-  const { pathname, hash } = useLocation();
+  const { pathname, hash, state } = useLocation();
   const { count, setOpen } = useCart();
   const { backendEnabled, user, isAdmin, profile, online, pendingSync } = useMember();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -100,6 +101,7 @@ function Layout() {
       </nav>
 
       <main>
+        {state?.notice && <p className="notice-banner" role="status">{state.notice}</p>}
         <Outlet />
       </main>
 
@@ -130,8 +132,10 @@ function Layout() {
           <div>
             <strong>Gymnazzium</strong>
             <Link to={profile ? '/plan' : '/#register'}>{profile ? 'My plan' : 'Build my plan'}</Link>
+            {profile && <Link to="/challenges">Challenges</Link>}
             <Link to="/shop">Shop</Link>
             {backendEnabled && <Link to={user ? '/account' : '/login'}>{user ? 'Account' : 'Log in'}</Link>}
+            <Link to="/privacy">Privacy</Link>
           </div>
         </div>
         <p className="footer-note">This guide is general fitness information, not medical advice. Check with a doctor before starting a new training or diet programme.</p>
