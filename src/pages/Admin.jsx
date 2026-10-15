@@ -205,8 +205,81 @@ function Dashboard() {
         </div>
       </div>
 
+      <FeedbackInbox />
       <LeaderboardMembers />
     </section>
+  );
+}
+
+const FACES = { 1: '😞', 2: '😕', 3: '😐', 4: '🙂', 5: '🤩' };
+
+// Messages from the "Feedback" button, newest first.
+function FeedbackInbox() {
+  const [items, setItems] = useState(null);
+  const [error, setError] = useState('');
+
+  const load = useCallback(
+    () =>
+      supabase
+        .from('feedback')
+        .select('id, rating, message, contact, page, user_id, created_at')
+        .order('created_at', { ascending: false })
+        .limit(200)
+        .then(({ data, error: e }) => {
+          setItems(data ?? []);
+          setError(e?.message ?? '');
+        }),
+    []
+  );
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const remove = async (id) => {
+    if (!window.confirm('Delete this feedback?')) return;
+    const { error: e } = await supabase.from('feedback').delete().eq('id', id);
+    if (e) return setError(e.message);
+    load();
+  };
+
+  const rated = (items ?? []).filter((f) => f.rating);
+  const average = rated.length ? (rated.reduce((s, f) => s + f.rating, 0) / rated.length).toFixed(1) : null;
+
+  return (
+    <div className="card flat admin-lower">
+      <div className="admin-head">
+        <h3>Feedback</h3>
+        <span className="muted small">
+          {items ? `${items.length} message${items.length === 1 ? '' : 's'}` : ''}
+          {average ? ` · average ${average} / 5` : ''}
+        </span>
+      </div>
+      {error && <p className="form-error small">{error}</p>}
+      {items === null ? (
+        <p className="muted small">Loading…</p>
+      ) : items.length === 0 ? (
+        <p className="muted small">No feedback yet. It appears here when someone uses the 💬 Feedback button.</p>
+      ) : (
+        <ul className="feedback-list">
+          {items.map((f) => (
+            <li key={f.id}>
+              <div className="feedback-meta">
+                <span>{f.rating ? `${FACES[f.rating]} ${f.rating}/5` : 'No rating'}</span>
+                <span className="muted small">
+                  {fmtDateTime(f.created_at)} · {f.user_id ? 'member' : 'visitor'}{f.page ? ` · on ${f.page}` : ''}
+                </span>
+              </div>
+              <p>{f.message}</p>
+              <div className="feedback-meta">
+                <span className="muted small admin-email">{f.contact ? `Reply to: ${f.contact}` : 'No contact left'}</span>
+                <button type="button" className="link-btn" onClick={() => remove(f.id)}>Delete</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 

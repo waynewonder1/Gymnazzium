@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { weekSummary } from '../../lib/week';
+import InviteButton from '../InviteButton';
 
 const STATE_LABEL = { done: 'done', missed: 'missed', today: 'today', todo: 'coming up', rest: 'rest day', 'rest today': 'rest day (today)', none: 'outside your plan' };
 
@@ -25,7 +26,10 @@ function WeekSummary({ profile, progress, today }) {
         <div><strong>{w.prs}{w.prs > 0 ? ' 🏆' : ''}</strong><span>new PRs</span></div>
         <div><strong>{w.streak}{w.streak > 0 ? ' 🔥' : ''}</strong><span>streak</span></div>
       </div>
-      <Link to="/challenges" className="ws-link">This month's challenges & leaderboard →</Link>
+      <div className="ws-foot">
+        <Link to="/challenges" className="ws-link">This month's challenges & leaderboard →</Link>
+        <InviteButton className="link-btn ws-invite" label="Train with a friend" />
+      </div>
     </div>
   );
 }

@@ -19,7 +19,8 @@ Built with React + Vite. Accounts, synced plans, orders and push notifications r
 - **Reminders:** web push at the member's workout time (even with the site closed), plus an `.ics` calendar download.
 - **Content:** paths, body types, nutrition, supplements (with sources), an exercise library with a rest/interval timer.
 - **Shop** (`/shop`): cart and checkout; orders are saved to Supabase and can be sent over WhatsApp.
-- **Accounts** (`/login`, `/account`): sign-up, password reset, order history.
+- **Accounts** (`/login`, `/account`): sign-up, password reset, order history, invite a friend, delete account.
+- **Feedback:** a 💬 button on every page (rating + message + optional contact), read and deleted on `/admin`. First-time visitors get a one-time 3-step welcome on the home page.
 
 ## Run it locally
 

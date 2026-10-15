@@ -4,6 +4,7 @@ import { useMember } from '../context/member';
 import { supabase } from '../lib/supabase';
 import { toISO } from '../lib/plan';
 import { MILESTONES, badgeInfo, monthKey, monthLabel, monthlyChallenges } from '../lib/challenges';
+import InviteButton from '../components/InviteButton';
 
 const fmtDay = (iso) => new Date(`${iso}T00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -148,6 +149,7 @@ function Leaderboard() {
     <>
       <h2 className="sub-title">Leaderboard</h2>
       <p className="page-lead">See how your month stacks up against other Gymnazzium members. Ranked by workouts done, then sets logged.</p>
+      <p className="lb-invite"><InviteButton label="Invite friends to compete" /></p>
     </>
   );
 

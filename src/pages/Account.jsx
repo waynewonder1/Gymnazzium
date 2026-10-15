@@ -4,6 +4,7 @@ import { useMember } from '../context/member';
 import { supabase } from '../lib/supabase';
 import { formatPrice } from '../data/shop';
 import { todayIndex, totalDays } from '../lib/plan';
+import InviteButton from '../components/InviteButton';
 
 function Orders({ userId }) {
   const [orders, setOrders] = useState(null);
@@ -163,6 +164,7 @@ function Account() {
       <Orders userId={user.id} />
 
       <div className="plan-actions account-actions">
+        <InviteButton className="btn" />
         <button className="btn btn-ghost" onClick={logOut}>Log out</button>
         {profile && <button className="btn btn-ghost danger" onClick={deletePlan}>Delete my plan data</button>}
       </div>

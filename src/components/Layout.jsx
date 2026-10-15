@@ -8,6 +8,8 @@ import InstallButton from './InstallButton';
 import { isStandalone } from '../lib/install';
 import RestBar from './RestBar';
 import BadgeToast from './BadgeToast';
+import Feedback from './Feedback';
+import Welcome from './Welcome';
 import { pagesByKind } from '../data/content';
 
 const SITE = 'Gymnazzium';
@@ -110,6 +112,8 @@ function Layout() {
       <CartDrawer />
       <RestBar />
       <BadgeToast />
+      <Feedback />
+      <Welcome />
 
       <footer>
         <div className="footer-grid">
