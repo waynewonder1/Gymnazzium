@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { registration } from '../data/guide';
 import { challenges } from '../data/coaching';
@@ -12,6 +12,8 @@ const levels = [
   { value: 'Intermediate', hint: 'Train on and off, know the basics' },
   { value: 'Advanced', hint: 'Train consistently for a year or more' },
 ];
+
+const STEPS = ['About you', 'Your level', 'Your goals', 'How you train', 'When you train', 'What might get in your way'];
 
 const emptyProfile = () => ({
   name: '',
@@ -51,7 +53,9 @@ function Registration() {
   const prefill = location.state?.prefill ?? {};
   const [profile, setProfile] = useState(() => ({ ...emptyProfile(), ...saved, ...prefill }));
   const [editing, setEditing] = useState(() => !saved || location.state?.edit === true || Boolean(location.state?.prefill));
+  const [step, setStep] = useState(0);
   const [error, setError] = useState('');
+  const formRef = useRef(null);
 
   const update = (field) => (e) => setProfile({ ...profile, [field]: e.target.value });
   const toggle = (field) => (value) =>
@@ -60,16 +64,44 @@ function Registration() {
       [field]: profile[field].includes(value) ? profile[field].filter((v) => v !== value) : [...profile[field], value],
     });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  // What's still missing on a step (the browser also checks that step's required boxes).
+  const problemOn = (i) => {
+    if (i === 0 && !(profile.name.trim() && profile.age && profile.weight && profile.height && profile.gender)) return 'Fill in all the boxes about you.';
+    if (i === 2 && profile.goals.length === 0) return 'Pick at least one goal.';
+    if (i === 2 && profile.goals.includes(RUN_GOAL) && !runLevels[profile.runLevel]) return 'Pick how much you run now, so we can set your distance.';
+    if (i === 3 && !profile.lookingFor) return 'Pick how you want to train.';
+    if (i === 4 && !(profile.workoutTime && profile.startDate)) return 'Pick a workout time and a start date.';
+    return '';
+  };
+
+  const goTo = (i) => {
     setError('');
-    if (profile.goals.length === 0) return setError('Pick at least one goal.');
-    if (profile.goals.includes(RUN_GOAL) && !runLevels[profile.runLevel]) return setError('Pick how much you run now, so we can set your distance.');
-    if (!profile.lookingFor) return setError('Pick how you want to train.');
+    setStep(i);
+    formRef.current?.scrollIntoView({ block: 'start' });
+  };
+
+  const finish = () => {
+    // Check every step; jump to the first one that needs attention.
+    for (let i = 0; i < STEPS.length; i++) {
+      const problem = problemOn(i);
+      if (problem) {
+        goTo(i);
+        return setError(problem);
+      }
+    }
     // A fresh plan (or a new start date) starts fresh progress; earned badges stay.
     if (!saved || saved.startDate !== profile.startDate) saveProgress({ ...emptyProgress, badges: progress.badges ?? {} });
     saveProfile(profile);
     navigate('/plan');
+  };
+
+  // Enter or "Next" moves on a step; the last step builds the plan.
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const problem = problemOn(step);
+    if (problem) return setError(problem);
+    if (step < STEPS.length - 1) goTo(step + 1);
+    else finish();
   };
 
   const startOver = async () => {
@@ -96,10 +128,19 @@ function Registration() {
     );
   }
 
+  const last = step === STEPS.length - 1;
   return (
-    <form className="card reg-form" onSubmit={handleSubmit}>
+    <form ref={formRef} className="card reg-form reg-steps" onSubmit={handleSubmit}>
+      <div className="reg-progress">
+        <span className="muted small">Step {step + 1} of {STEPS.length} · {STEPS[step]}</span>
+        <div className="progress-bar" role="progressbar" aria-label="Plan builder progress" aria-valuenow={step + 1} aria-valuemin="1" aria-valuemax={STEPS.length}>
+          <div style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
+        </div>
+      </div>
+
+      {step === 0 && (
       <fieldset>
-        <legend>1. About you</legend>
+        <legend>About you</legend>
         <div className="field-grid">
           <label>Name<input required value={profile.name} onChange={update('name')} /></label>
           <label>Age<input required type="number" min="13" max="100" value={profile.age} onChange={update('age')} /></label>
@@ -114,6 +155,12 @@ function Registration() {
             </select>
           </label>
         </div>
+      </fieldset>
+      )}
+
+      {step === 1 && (
+      <fieldset>
+        <legend>How fit are you right now?</legend>
         <div className="levels">
           {levels.map((l) => (
             <label key={l.value} className={`level ${profile.level === l.value ? 'active' : ''}`}>
@@ -124,9 +171,12 @@ function Registration() {
           ))}
         </div>
       </fieldset>
+      )}
 
+      {step === 2 && (
       <fieldset>
-        <legend>2. What are your goals?</legend>
+        <legend>What are your goals?</legend>
+        <p className="muted small form-hint">Pick as many as you like.</p>
         <Chips options={registration.goals} selected={profile.goals} onToggle={toggle('goals')} />
         {profile.goals.includes(RUN_GOAL) && (
           <div className="run-level">
@@ -143,9 +193,11 @@ function Registration() {
           </div>
         )}
       </fieldset>
+      )}
 
+      {step === 3 && (
       <fieldset>
-        <legend>3. How do you want to train?</legend>
+        <legend>How do you want to train?</legend>
         <div className="chips">
           {registration.lookingFor.map((o) => (
             <button type="button" key={o} className={`chip ${profile.lookingFor === o ? 'active' : ''}`} aria-pressed={profile.lookingFor === o} onClick={() => setProfile({ ...profile, lookingFor: o })}>
@@ -154,9 +206,11 @@ function Registration() {
           ))}
         </div>
       </fieldset>
+      )}
 
+      {step === 4 && (
       <fieldset>
-        <legend>4–5. Timeline & schedule</legend>
+        <legend>When will you train?</legend>
         <div className="field-grid">
           <label>Timeline
             <select value={profile.timeline} onChange={update('timeline')}>
@@ -175,9 +229,12 @@ function Registration() {
           <p className="muted small form-hint">Tip: the {profile.lookingFor === 'Gym work' ? 'gym' : 'home'} split is built for 4–5 days a week. With fewer days, your plan rotates through the sessions more slowly.</p>
         )}
       </fieldset>
+      )}
 
+      {step === 5 && (
       <fieldset>
-        <legend>6. What might get in your way?</legend>
+        <legend>What might get in your way?</legend>
+        <p className="muted small form-hint">Optional. Your plan adds tips for whatever you pick.</p>
         <Chips options={Object.keys(challenges)} selected={profile.challenges} onToggle={toggle('challenges')} />
         <textarea
           rows="2"
@@ -186,11 +243,14 @@ function Registration() {
           onChange={update('challengesNote')}
         />
       </fieldset>
+      )}
 
       {error && <p className="form-error" role="alert">{error}</p>}
       <div className="form-actions">
-        <button type="submit" className="btn">{saved ? 'Update my plan' : 'Build my plan'}</button>
-        {saved && <button type="button" className="btn btn-ghost" onClick={() => setEditing(false)}>Cancel</button>}
+        {step > 0 && <button type="button" className="btn btn-ghost" onClick={() => goTo(step - 1)}>← Back</button>}
+        <button type="submit" className="btn">{last ? (saved ? 'Update my plan' : 'Build my plan') : 'Next →'}</button>
+        {saved && !last && <button type="button" className="btn btn-ghost" onClick={finish}>Save changes</button>}
+        {saved && <button type="button" className="link-btn" onClick={() => setEditing(false)}>Cancel</button>}
       </div>
       <p className="muted small">Your answers are used only to build your plan. <Link to="/privacy">How we handle your data</Link>.</p>
     </form>

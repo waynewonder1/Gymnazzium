@@ -946,3 +946,10 @@
   .welcome-steps p{ margin-top:2px; }
   /* Keep page content clear of the floating Feedback button. */
   footer{ padding-bottom:72px; }
+
+  /* ================= STEP-BY-STEP PLAN BUILDER ================= */
+  .reg-steps{ gap:22px; }
+  .reg-progress{ display:flex; flex-direction:column; gap:8px; }
+  .reg-progress .progress-bar{ margin:0; }
+  .reg-steps legend{ font-size:1.4rem; }
+  .reg-steps .form-actions{ align-items:center; }

@@ -11,6 +11,7 @@ import Reminders from '../components/plan/Reminders';
 import Obstacles from '../components/plan/Obstacles';
 import DeepDive from '../components/plan/DeepDive';
 import ProductCard from '../components/ProductCard';
+import Registration from '../components/Registration';
 
 function Plan() {
   const { profile, authReady, syncing } = useMember();
@@ -22,13 +23,14 @@ function Plan() {
       </section>
     );
   }
+  // No plan yet (e.g. just signed up): build it right here instead of sending them elsewhere.
   if (!profile) {
     return (
       <section className="page-top">
         <div className="section-label">Your plan</div>
-        <h1 className="page-title">No plan yet.</h1>
-        <p className="page-lead">Register first. It takes two minutes, and we'll build your day-by-day plan from your answers.</p>
-        <Link to="/#register" className="btn">Build my plan</Link>
+        <h1 className="page-title">Let's build your plan.</h1>
+        <p className="page-lead">A few quick questions, about 2 minutes. Then you get your day-by-day plan.</p>
+        <Registration />
       </section>
     );
   }
