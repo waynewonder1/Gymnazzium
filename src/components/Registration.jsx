@@ -54,6 +54,9 @@ function Registration() {
   const [profile, setProfile] = useState(() => ({ ...emptyProfile(), ...saved, ...prefill }));
   const [editing, setEditing] = useState(() => !saved || location.state?.edit === true || Boolean(location.state?.prefill));
   const [step, setStep] = useState(0);
+  // Members following their own routine (routine editor): their week ignores these answers.
+  const onRoutine = saved?.planMode === 'custom' && Boolean(saved?.routine);
+  const [useRecommended, setUseRecommended] = useState(true);
   const [error, setError] = useState('');
   const formRef = useRef(null);
 
@@ -91,7 +94,8 @@ function Registration() {
     }
     // A fresh plan (or a new start date) starts fresh progress; earned badges stay.
     if (!saved || saved.startDate !== profile.startDate) saveProgress({ ...emptyProgress, badges: progress.badges ?? {} });
-    saveProfile(profile);
+    // On their own routine, the answers only change the week if they switch back to the recommended plan.
+    saveProfile(onRoutine && useRecommended ? { ...profile, planMode: undefined } : profile);
     navigate('/plan');
   };
 
@@ -137,6 +141,19 @@ function Registration() {
           <div style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
         </div>
       </div>
+
+      {onRoutine && (
+        <div className="routine-notice">
+          <p>
+            <strong>You're following your own routine.</strong> Your week comes from the routine you built, so changes here
+            (how and when you train, your level) won't change your workouts unless you switch to the recommended plan.
+          </p>
+          <label className="routine-switch">
+            <input type="checkbox" checked={useRecommended} onChange={(e) => setUseRecommended(e.target.checked)} />
+            <span>Use the recommended plan with my new answers. My own routine stays saved, and I can switch back any time.</span>
+          </label>
+        </div>
+      )}
 
       {step === 0 && (
       <fieldset>

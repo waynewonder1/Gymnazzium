@@ -982,3 +982,7 @@
   .guided-finish{ text-align:center; align-items:stretch; }
   body.guided-open{ overflow:hidden; }
   body.guided-open .feedback-btn{ display:none; }
+  .routine-notice{ background:rgba(255,190,80,0.08); border:1px solid rgba(255,190,80,0.35); border-radius:8px; padding:14px 16px; display:flex; flex-direction:column; gap:10px; }
+  .routine-notice p{ color:var(--text); font-size:0.9rem; line-height:1.55; margin:0; }
+  .reg-form label.routine-switch{ flex-direction:row; align-items:flex-start; gap:10px; text-transform:none; letter-spacing:0; font-size:0.88rem; font-weight:600; color:var(--text); cursor:pointer; }
+  .reg-form label.routine-switch input{ width:auto; margin-top:3px; }
