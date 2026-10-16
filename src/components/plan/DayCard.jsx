@@ -7,7 +7,7 @@ import { isLoggable, lastLog } from '../../lib/lifts';
 const formatDate = (date) => date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
 
 // relation: 'past' | 'today' | 'future'
-function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggleMission, onLog, onLogRun }) {
+function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggleMission, onLog, onLogRun, onStartGuided }) {
   const done = Boolean(progress.done[day.index]);
   const locked = relation === 'future';
   const missionDone = Boolean(progress.missions[day.index]);
@@ -34,6 +34,12 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
 
       {day.type === 'train' && (
         <>
+          {!locked && onStartGuided && day.sessionKey !== 'run' && (
+            <button type="button" className="btn guided-start" onClick={onStartGuided}>
+              ▶ {done ? 'Do it again, guided' : 'Start workout'}
+              <span>One set at a time, with rest timer</span>
+            </button>
+          )}
           <p className="bookend">{day.warmup}</p>
           {day.phaseNote && <p className="phase-note">{day.phaseNote}</p>}
           <ul className="checklist">

@@ -12,6 +12,7 @@ import Obstacles from '../components/plan/Obstacles';
 import DeepDive from '../components/plan/DeepDive';
 import ProductCard from '../components/ProductCard';
 import Registration from '../components/Registration';
+import GuidedWorkout from '../components/plan/GuidedWorkout';
 
 function Plan() {
   const { profile, authReady, syncing } = useMember();
@@ -56,6 +57,7 @@ function PlanView({ profile }) {
 
   const [selected, setSelected] = useState(clamp(today));
   const [week, setWeek] = useState(Math.floor(clamp(today) / 7));
+  const [guided, setGuided] = useState(false); // guided workout mode open
   const day = getDay(profile, selected);
 
   const commit = saveProgress;
@@ -83,6 +85,25 @@ function PlanView({ profile }) {
       if (day.items.every((_, k) => checks[`${selected}:${k}`])) done[selected] = true;
     }
     commit({ ...progress, lifts, checks, done });
+  };
+
+  // One step of guided workout mode, saved in one go: this exercise's logged sets (if any),
+  // and, when its last set is done, the tick for the exercise (and the workout once all are ticked).
+  // endWorkout: this was the last set of the session, so the workout counts as done too.
+  const guidedStep = (j, id, sets, finished, endWorkout = false) => {
+    const lifts = sets ? { ...progress.lifts, [id]: { ...progress.lifts?.[id], [selected]: sets } } : progress.lifts;
+    const checks = { ...progress.checks };
+    const done = { ...progress.done };
+    if (finished) {
+      checks[`${selected}:${j}`] = true;
+      if (day.items.every((_, k) => checks[`${selected}:${k}`])) done[selected] = true;
+    }
+    if (endWorkout) done[selected] = true;
+    commit({ ...progress, lifts, checks, done });
+  };
+
+  const finishWorkout = () => {
+    if (!progress.done[selected]) commit({ ...progress, done: { ...progress.done, [selected]: true } });
   };
 
   // A logged run (distance + time). Logging it ticks the run off; clearing it keeps the tick.
@@ -223,7 +244,11 @@ function PlanView({ profile }) {
           onToggleMission={toggleIn('missions')}
           onLog={logLift}
           onLogRun={logRun}
+          onStartGuided={() => setGuided(true)}
         />
+        {guided && day.type === 'train' && (
+          <GuidedWorkout key={selected} day={day} progress={progress} onStep={guidedStep} onFinish={finishWorkout} onClose={() => setGuided(false)} />
+        )}
         {selected !== current && (
           <button className="btn btn-ghost back-today" onClick={() => select(current)}>Back to today</button>
         )}
