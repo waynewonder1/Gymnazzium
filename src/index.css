@@ -995,3 +995,7 @@
   .stepper-btn:active{ background:var(--accent-soft); border-color:var(--accent); }
   .stepper input{ font:inherit; font-family:'Anton',sans-serif; font-size:2.4rem; text-align:center; background:var(--bg-raise); color:var(--text); border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px; width:100%; min-width:0; }
   .stepper input:focus{ outline:none; border-color:var(--accent); }
+  .guided-reminder{ background:var(--bg-raise); border:1px solid rgba(111,168,163,0.4); border-radius:8px; padding:14px 16px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .guided-reminder p{ line-height:1.5; }
+  /* During a guided workout the badge banner sits at the bottom, clear of the "Great work!" stats. */
+  body.guided-open .badge-toast{ top:auto; bottom:calc(16px + env(safe-area-inset-bottom, 0px)); }

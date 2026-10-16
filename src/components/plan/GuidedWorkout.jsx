@@ -4,6 +4,8 @@ import { isLoggable, lastLog, setCount, topOfRange } from '../../lib/lifts';
 import { startRest, stopRest } from '../../lib/restTimer';
 import { beep } from '../../lib/sound';
 import Confetti from '../Confetti';
+import { useMember } from '../../context/member';
+import { currentSubscription, enablePush, needsHomeScreen, pushAvailable, testNotification } from '../../lib/push';
 
 const holdSeconds = (dose) => Number(String(dose).match(/(\d+)\s*s\b/)?.[1]) || 30;
 
@@ -21,6 +23,64 @@ function startEntry(lifts, item, dayIndex, s) {
   return { w: w ?? '', r };
 }
 const fmtClock = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+
+// "Turn on reminders?" on the finish screen: the best moment to ask is right after a workout.
+// Shows nothing if reminders are already on or this device can't get them.
+function ReminderPrompt() {
+  const { user } = useMember();
+  const [status, setStatus] = useState('checking'); // checking | off | on | busy | hidden
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!pushAvailable() || !user) return;
+    currentSubscription()
+      .then((sub) => !cancelled && setStatus(sub ? 'hidden' : 'off'))
+      .catch(() => !cancelled && setStatus('off'));
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  if (!pushAvailable() || !user || status === 'checking' || status === 'hidden') return null;
+
+  const turnOn = async () => {
+    setStatus('busy');
+    setError('');
+    try {
+      await enablePush(user.id);
+      await testNotification();
+      setStatus('on');
+    } catch (e) {
+      setStatus('off');
+      setError(
+        e.message === 'blocked'
+          ? "Notifications are blocked for this site. Allow them in your browser's site settings, then try again from My plan."
+          : e.message === 'dismissed'
+            ? 'No problem. You can turn them on any time from My plan.'
+            : `Couldn't turn on reminders: ${e.message}`
+      );
+    }
+  };
+
+  return (
+    <div className="guided-reminder">
+      {status === 'on' ? (
+        <p><strong>🔔 Reminders are on.</strong> See you at your workout time tomorrow!</p>
+      ) : needsHomeScreen() ? (
+        <p><strong>🔔 Want a reminder tomorrow?</strong> On iPhone, add Gymnazzium to your Home Screen first (Share → Add to Home Screen), then turn reminders on from My plan there.</p>
+      ) : (
+        <>
+          <p><strong>🔔 Want a reminder at your workout time tomorrow?</strong> It's what keeps a streak going.</p>
+          <button type="button" className="btn btn-ghost" onClick={turnOn} disabled={status === 'busy'}>
+            {status === 'busy' ? 'Turning on…' : 'Turn on reminders'}
+          </button>
+        </>
+      )}
+      {error && <p className="muted small">{error}</p>}
+    </div>
+  );
+}
 
 // A big number with − / + either side (and still typeable), so logging needs no keyboard.
 function Stepper({ label, value, step, decimal = false, onChange }) {
@@ -169,6 +229,7 @@ function GuidedWorkout({ day, progress, onStep, onFinish, onClose }) {
             <div><strong>{items.length}</strong><span>exercises</span></div>
           </div>
           {day.cooldown && <p className="guided-note"><strong>Cool down:</strong> {day.cooldown}</p>}
+          <ReminderPrompt />
           <button type="button" className="btn guided-main" onClick={close}>Done</button>
         </div>
       </div>
