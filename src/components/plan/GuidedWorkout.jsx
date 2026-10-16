@@ -1,12 +1,50 @@
 import { useEffect, useRef, useState } from 'react';
 import { exercises } from '../../data/workouts';
-import { isLoggable, lastLog, setCount } from '../../lib/lifts';
+import { isLoggable, lastLog, setCount, topOfRange } from '../../lib/lifts';
 import { startRest, stopRest } from '../../lib/restTimer';
 import { beep } from '../../lib/sound';
 import Confetti from '../Confetti';
 
 const holdSeconds = (dose) => Number(String(dose).match(/(\d+)\s*s\b/)?.[1]) || 30;
+
+// kg only matters for weighted moves (and custom exercises, which could be either). Push-ups don't need it.
+const usesKg = (id) => !exercises[id] || exercises[id].kind === 'weight';
+
+// Pre-filled set: what's already logged today, else last time, else the plan's target reps.
+// Doing what the plan says is then a single tap on "Set done".
+function startEntry(lifts, item, dayIndex, s) {
+  const today = lifts?.[item.id]?.[dayIndex]?.[s];
+  const last = lastLog(lifts, item.id, dayIndex)?.sets;
+  const prev = last?.[s] ?? last?.at(-1);
+  const r = today?.r ?? prev?.r ?? topOfRange(item.dose) ?? 10;
+  const w = usesKg(item.id) ? (today?.w ?? prev?.w ?? '') : '';
+  return { w: w ?? '', r };
+}
 const fmtClock = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+
+// A big number with − / + either side (and still typeable), so logging needs no keyboard.
+function Stepper({ label, value, step, decimal = false, onChange }) {
+  const n = Number(value) || 0;
+  const set = (v) => onChange(Math.max(0, Math.round(v * 10) / 10));
+  return (
+    <div className="stepper">
+      <span className="muted small">{label}</span>
+      <div className="stepper-row">
+        <button type="button" className="stepper-btn" onClick={() => set(n - step)} aria-label={`${label}: less`}>−</button>
+        <input
+          type="number"
+          inputMode={decimal ? 'decimal' : 'numeric'}
+          min="0"
+          step={decimal ? 0.5 : 1}
+          value={value}
+          aria-label={label}
+          onChange={(e) => onChange(e.target.value === '' ? '' : Number(e.target.value))}
+        />
+        <button type="button" className="stepper-btn" onClick={() => set(n + step)} aria-label={`${label}: more`}>+</button>
+      </div>
+    </div>
+  );
+}
 
 // Full-screen, one-set-at-a-time coach for a training day.
 // Saving goes through onStep(j, id, sets | null, finished) so lifts and ticks update together.
@@ -16,7 +54,7 @@ function GuidedWorkout({ day, progress, onStep, onFinish, onClose }) {
   const [phase, setPhase] = useState('intro'); // intro | set | done
   const [j, setJ] = useState(firstOpen === -1 ? 0 : firstOpen);
   const [s, setS] = useState(0);
-  const [entry, setEntry] = useState({ w: '', r: '' });
+  const [entry, setEntry] = useState(() => startEntry(progress.lifts, items[firstOpen === -1 ? 0 : firstOpen], day.index, 0));
   const [hold, setHold] = useState({ left: 0, running: false });
   const [setsDone, setSetsDone] = useState(0);
   const [minutes, setMinutes] = useState(0); // workout length, worked out when it ends
@@ -72,7 +110,7 @@ function GuidedWorkout({ day, progress, onStep, onFinish, onClose }) {
     }
     setJ(next);
     setS(0);
-    setEntry({ w: '', r: '' });
+    setEntry(startEntry(progress.lifts, items[next], day.index, 0));
     setHold({ left: 0, running: false });
   };
 
@@ -81,7 +119,7 @@ function GuidedWorkout({ day, progress, onStep, onFinish, onClose }) {
     let sets = null;
     if (loggable && Number(entry.r) > 0) {
       sets = [...(progress.lifts?.[item.id]?.[day.index] ?? [])];
-      sets[s] = { w: entry.w === '' ? null : Number(entry.w), r: Number(entry.r) };
+      sets[s] = { w: usesKg(item.id) && Number(entry.w) > 0 ? Number(entry.w) : null, r: Number(entry.r) };
       sets = Array.from(sets, (x) => x ?? { w: null, r: null });
     }
     const lastOfWorkout = lastSetOfExercise && j + 1 >= items.length;
@@ -92,8 +130,8 @@ function GuidedWorkout({ day, progress, onStep, onFinish, onClose }) {
     if (lastSetOfExercise) goToExercise(j + 1, true);
     else {
       setS(s + 1);
-      // Keep the weight for the next set; reps start fresh.
-      setEntry((e) => ({ w: e.w, r: '' }));
+      // Next set starts from last time / the plan again, but keeps today's weight.
+      setEntry((e) => ({ ...startEntry(progress.lifts, item, day.index, s + 1), w: e.w }));
       setHold({ left: 0, running: false });
     }
   };
@@ -167,15 +205,14 @@ function GuidedWorkout({ day, progress, onStep, onFinish, onClose }) {
           </div>
         ) : loggable ? (
           <div className="guided-log">
-            <label>
-              <span className="muted small">kg (empty = bodyweight)</span>
-              <input type="number" inputMode="decimal" min="0" step="0.5" placeholder={last?.sets[s]?.w ?? '–'} value={entry.w} onChange={(e) => setEntry({ ...entry, w: e.target.value })} />
-            </label>
-            <label>
-              <span className="muted small">Reps done</span>
-              <input type="number" inputMode="numeric" min="0" step="1" placeholder={last?.sets[s]?.r ?? 'reps'} value={entry.r} onChange={(e) => setEntry({ ...entry, r: e.target.value })} />
-            </label>
-            {last && <p className="muted small">Last time: set {s + 1} was {last.sets[s] ? `${last.sets[s].w ? `${last.sets[s].w} kg × ` : ''}${last.sets[s].r} reps` : 'not logged'}.</p>}
+            <Stepper label="Reps done" value={entry.r} step={1} onChange={(r) => setEntry({ ...entry, r })} />
+            {usesKg(item.id) && (
+              <Stepper label="kg (0 = bodyweight)" value={entry.w === '' ? 0 : entry.w} step={2.5} decimal onChange={(w) => setEntry({ ...entry, w: w || '' })} />
+            )}
+            <p className="muted small">
+              {last ? `Last time: ${last.sets[s] ? `${last.sets[s].w ? `${last.sets[s].w} kg × ` : ''}${last.sets[s].r} reps` : 'not logged'}. ` : ''}
+              Did what it says? Just tap the button below.
+            </p>
           </div>
         ) : null}
 

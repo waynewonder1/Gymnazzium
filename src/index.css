@@ -986,3 +986,12 @@
   .routine-notice p{ color:var(--text); font-size:0.9rem; line-height:1.55; margin:0; }
   .reg-form label.routine-switch{ flex-direction:row; align-items:flex-start; gap:10px; text-transform:none; letter-spacing:0; font-size:0.88rem; font-weight:600; color:var(--text); cursor:pointer; }
   .reg-form label.routine-switch input{ width:auto; margin-top:3px; }
+
+  /* Guided mode: − / + steppers instead of typing */
+  .guided-log{ grid-template-columns:1fr; }
+  .stepper{ display:flex; flex-direction:column; gap:6px; }
+  .stepper-row{ display:grid; grid-template-columns:64px 1fr 64px; gap:10px; align-items:stretch; }
+  .stepper-btn{ font:inherit; font-size:2rem; line-height:1; cursor:pointer; color:var(--text); background:var(--bg-raise); border:1px solid rgba(255,255,255,0.15); border-radius:8px; }
+  .stepper-btn:active{ background:var(--accent-soft); border-color:var(--accent); }
+  .stepper input{ font:inherit; font-family:'Anton',sans-serif; font-size:2.4rem; text-align:center; background:var(--bg-raise); color:var(--text); border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:8px; width:100%; min-width:0; }
+  .stepper input:focus{ outline:none; border-color:var(--accent); }
