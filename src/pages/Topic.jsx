@@ -1,6 +1,6 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { pagesByKind } from '../data/content';
-import { products } from '../data/shop';
+import { products, shopConfig } from '../data/shop';
 import { exercises, gymSplit, gymWeek, homeSplit, homeWeek } from '../data/workouts';
 import CountUp from '../components/CountUp';
 import ExerciseCard from '../components/ExerciseCard';
@@ -181,7 +181,7 @@ function Topic({ kind }) {
         </section>
       ))}
 
-      {gear.length > 0 && (
+      {shopConfig.storeOpen && gear.length > 0 && (
         <section className="topic-section">
           <h2 className="topic-heading">Gear for this</h2>
           <div className="product-grid">{gear.map((p) => <ProductCard key={p.id} product={p} />)}</div>

@@ -19,7 +19,7 @@ Built with React + Vite. Accounts, synced plans, orders and push notifications r
 - **Challenges** (`/challenges`): four monthly challenges sized to each member's plan (workouts, a run without a miss, sets, PRs), milestone badges with a confetti banner when earned, and an opt-in monthly leaderboard under a display name (ranked by workouts, then sets).
 - **Reminders:** web push at the member's workout time (even with the site closed), plus an `.ics` calendar download.
 - **Content:** paths, body types, nutrition, supplements (with sources), an exercise library with a rest/interval timer.
-- **Shop** (`/shop`): cart and checkout; orders are saved to Supabase and can be sent over WhatsApp.
+- **Merch** (`/shop`): the current drop (`drop` in `src/data/shop.js`) sold as pre-orders: size + quantity + name/WhatsApp/location, saved to the `orders` table and shown on /admin. Promoted by the 🔥 button in the top bar, the home page and the plan page until `drop.closes`. The full catalogue and cart are hidden while `shopConfig.storeOpen` is false.
 - **Accounts** (`/login`, `/account`): sign-up, password reset, order history, invite a friend, delete account.
 - **Feedback:** a 💬 button on every page (rating + message + optional contact), read and deleted on `/admin`. First-time visitors get a one-time 3-step welcome on the home page.
 

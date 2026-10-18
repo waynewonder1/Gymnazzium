@@ -4,6 +4,7 @@ import { useCart } from '../context/cart';
 import { useMember } from '../context/member';
 import { checkReminder } from '../lib/reminders';
 import CartDrawer from './CartDrawer';
+import { drop, dropOpen, shopConfig } from '../data/shop';
 import InstallButton from './InstallButton';
 import { isStandalone } from '../lib/install';
 import RestBar from './RestBar';
@@ -19,7 +20,7 @@ const PAGE_TITLES = {
   '/progress': 'My progress',
   '/challenges': 'Challenges',
   '/privacy': 'Privacy',
-  '/shop': 'Shop',
+  '/shop': 'Merch',
   '/exercises': 'Exercise library',
   '/login': 'Log in',
   '/account': 'Account',
@@ -80,7 +81,7 @@ function Layout() {
           <Link to="/#paths" onClick={closeMenu}>Paths</Link>
           <NavLink to="/exercises" onClick={closeMenu}>Exercises</NavLink>
           <NavLink to="/learn/nutrition" onClick={closeMenu}>Nutrition</NavLink>
-          <NavLink to="/shop" onClick={closeMenu}>Shop</NavLink>
+          <NavLink to="/shop" onClick={closeMenu}>{shopConfig.storeOpen ? 'Shop' : 'Merch'}</NavLink>
           {profile ? <NavLink to="/plan" onClick={closeMenu}>My plan</NavLink> : <Link to="/#register" onClick={closeMenu}>Register</Link>}
           {profile && <NavLink to="/challenges" onClick={closeMenu}>Challenges</NavLink>}
           {isAdmin && <NavLink to="/admin" onClick={closeMenu}>Admin</NavLink>}
@@ -95,9 +96,14 @@ function Layout() {
           )}
           {online && pendingSync && user && <span className="offline-pill syncing" role="status">Syncing…</span>}
           <InstallButton />
-          <button className="cart-btn" onClick={() => setOpen(true)} aria-label={`Open cart, ${count} items`}>
-            Cart<span className="cart-count">{count}</span>
-          </button>
+          {shopConfig.storeOpen && (
+            <button className="cart-btn" onClick={() => setOpen(true)} aria-label={`Open cart, ${count} items`}>
+              Cart<span className="cart-count">{count}</span>
+            </button>
+          )}
+          {!shopConfig.storeOpen && dropOpen() && pathname !== '/shop' && (
+            <Link to="/shop" className="drop-pill" onClick={closeMenu}>🔥 {drop.name}</Link>
+          )}
           <button className="menu-btn" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="site-menu" aria-label="Menu">
             <span /><span /><span />
           </button>
@@ -109,7 +115,7 @@ function Layout() {
         <Outlet />
       </main>
 
-      <CartDrawer />
+      {shopConfig.storeOpen && <CartDrawer />}
       <RestBar />
       <BadgeToast />
       <Feedback />
@@ -139,7 +145,7 @@ function Layout() {
             <strong>Gymnazzium</strong>
             <Link to={profile ? '/plan' : '/#register'}>{profile ? 'My plan' : 'Build my plan'}</Link>
             {profile && <Link to="/challenges">Challenges</Link>}
-            <Link to="/shop">Shop</Link>
+            <Link to="/shop">{shopConfig.storeOpen ? 'Shop' : 'Merch'}</Link>
             {backendEnabled && <Link to={user ? '/account' : '/login'}>{user ? 'Account' : 'Log in'}</Link>}
             <Link to="/privacy">Privacy</Link>
           </div>

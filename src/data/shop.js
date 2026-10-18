@@ -10,7 +10,32 @@ export const shopConfig = {
   // Leave empty until you're ready to take orders.
   whatsappNumber: '',
   deliveryNote: 'Delivery within Nairobi in 1–2 days. Countrywide via courier.',
+  // false = the full catalogue below (equipment, cart, "Gear for your plan") is hidden and the
+  // site only shows the merch drop. Set to true to bring the full shop back.
+  storeOpen: false,
 };
+
+// The current merch drop, sold as pre-orders: people reserve, you confirm on WhatsApp,
+// they pay by M-Pesa, then you print exactly what was ordered. Shown on /shop, the home page,
+// the plan page and the 🔥 button in the top bar until `closes`.
+export const drop = {
+  name: 'Drop 01',
+  title: 'The founding drop.',
+  closes: '2026-11-01T23:59:00+03:00', // pre-orders close (Nairobi time)
+  pitch: 'The first Gymnazzium merch. Made only for the people who pre-order it, so this run is the founding edition.',
+  howItWorks: [
+    'Pick your size and reserve below. No payment yet.',
+    'We message you on WhatsApp to confirm your order.',
+    'You pay by M-Pesa, and we print your piece.',
+    'Delivery in Nairobi, or countrywide by courier. We confirm the date with you.',
+  ],
+  items: [
+    { id: 'drop01-tee', name: 'Gymnazzium training tee', price: 1200, mockup: 'tee', sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'Breathable training tee with the Gymnazzium logo on the chest. Built for sweat, good enough for the street.' },
+    { id: 'drop01-vest', name: 'Gymnazzium training vest', price: 1000, mockup: 'vest', sizes: ['S', 'M', 'L', 'XL', 'XXL'], description: 'Sleeveless training vest for heavy days and hot ones. Full range of motion, logo on the chest.' },
+  ],
+};
+
+export const dropOpen = (now = new Date()) => now < new Date(drop.closes);
 
 export const products = [
   // ---------- Equipment ----------

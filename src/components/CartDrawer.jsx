@@ -4,13 +4,7 @@ import { useCart } from '../context/cart';
 import { formatPrice, shopConfig } from '../data/shop';
 import ProductIcon from './ProductIcon';
 import { backendEnabled, supabase } from '../lib/supabase';
-
-// Short code the customer can quote, e.g. GZ-7K2M9Q.
-function makeReference() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const bytes = crypto.getRandomValues(new Uint8Array(6));
-  return `GZ-${Array.from(bytes, (b) => chars[b % chars.length]).join('')}`;
-}
+import { makeReference } from '../lib/orders';
 
 function CartDrawer() {
   const { items, total, setQty, clear, open, setOpen } = useCart();
