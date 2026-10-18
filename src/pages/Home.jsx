@@ -39,6 +39,7 @@ function Home() {
     <>
       <div className="hero">
         <div className="blob"></div>
+        <img className="hero-logo" src="/brand/gymnazzium-metal.png" alt="Gymnazzium" width="1012" height="762" />
         <div className="hero-eyebrow">{intro.eyebrow}</div>
         <h1>Get in shape<br /><em>your way.</em></h1>
         <p>{intro.lead}</p>
