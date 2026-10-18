@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { products, shopConfig } from '../data/shop';
 import ProductCard from '../components/ProductCard';
 
@@ -11,6 +12,18 @@ const filters = [
 function Shop() {
   const [filter, setFilter] = useState('all');
   const list = filter === 'all' ? products : products.filter((p) => p.category === filter);
+
+  // Shop switched off (shopConfig.storeOpen): old links land here instead of on a dead page.
+  if (!shopConfig.storeOpen) {
+    return (
+      <section className="page-top">
+        <div className="section-label">Merch</div>
+        <h1 className="page-title">Coming soon.</h1>
+        <p className="page-lead">Gymnazzium merch is on its way. Keep training, and keep an eye on the app.</p>
+        <Link to="/plan" className="btn">Back to my plan</Link>
+      </section>
+    );
+  }
 
   return (
     <section className="page-top">

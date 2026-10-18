@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { products } from '../data/shop';
+import { products, shopConfig } from '../data/shop';
 import { addDays, getDay, parseDate, phaseInfo, streak, todayIndex, totalDays, usesRoutine } from '../lib/plan';
 import { useMember } from '../context/member';
 import DayCard from '../components/plan/DayCard';
@@ -219,7 +219,7 @@ function PlanView({ profile }) {
           <a className="chip" href="#reminders">Reminders</a>
           <a className="chip" href="#obstacles">Obstacles</a>
           <a className="chip" href="#goal">Your goal in depth</a>
-          {gear.length > 0 && <a className="chip" href="#gear">Gear</a>}
+          {shopConfig.storeOpen && gear.length > 0 && <a className="chip" href="#gear">Gear</a>}
         </div>
       </section>
 
@@ -273,7 +273,7 @@ function PlanView({ profile }) {
         <DeepDive profile={profile} />
       </section>
 
-      {gear.length > 0 && (
+      {shopConfig.storeOpen && gear.length > 0 && (
         <section id="gear" className="plan-section">
           <div className="section-label">Gear for your plan</div>
           <h2 className="section-title">What would help most.</h2>

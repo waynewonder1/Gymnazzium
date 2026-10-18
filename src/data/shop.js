@@ -10,6 +10,9 @@ export const shopConfig = {
   // Leave empty until you're ready to take orders.
   whatsappNumber: '',
   deliveryNote: 'Delivery within Nairobi in 1–2 days. Countrywide via courier.',
+  // false = the shop is switched off: no Shop link, cart or product suggestions anywhere,
+  // and /shop shows "Merch is coming soon". Set to true to bring it back.
+  storeOpen: false,
 };
 
 export const products = [

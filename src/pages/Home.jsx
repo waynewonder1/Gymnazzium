@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { intro, paths, bodyTypes, offers } from '../data/guide';
-import { products } from '../data/shop';
+import { products, shopConfig } from '../data/shop';
 import { exercises } from '../data/workouts';
 import { bodyTypeLinks, offerLinks, pathLinks } from '../data/content';
 import { useMember } from '../context/member';
@@ -159,14 +159,16 @@ function Home() {
         <Link to="/exercises" className="btn">Open the library</Link>
       </section>
 
-      <section id="shop-teaser">
-        <div className="section-label">Our shop</div>
-        <h2 className="section-title reveal">Gear up.</h2>
-        <div className="product-grid">
-          {featured.map((id) => <ProductCard key={id} product={products.find((p) => p.id === id)} />)}
-        </div>
-        <Link to="/shop" className="btn btn-ghost see-all">See the full shop →</Link>
-      </section>
+      {shopConfig.storeOpen && (
+        <section id="shop-teaser">
+          <div className="section-label">Our shop</div>
+          <h2 className="section-title reveal">Gear up.</h2>
+          <div className="product-grid">
+            {featured.map((id) => <ProductCard key={id} product={products.find((p) => p.id === id)} />)}
+          </div>
+          <Link to="/shop" className="btn btn-ghost see-all">See the full shop →</Link>
+        </section>
+      )}
     </>
   );
 }
