@@ -11,6 +11,8 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
   const done = Boolean(progress.done[day.index]);
   const locked = relation === 'future';
   const missionDone = Boolean(progress.missions[day.index]);
+  // Run days (planned, or a routine day with only runs) skip the set-by-set coach and rest timer.
+  const runOnly = day.type === 'train' && (day.sessionKey === 'run' || day.items.every((item) => item.id === 'run'));
 
   return (
     <div className={`day-card ${day.type} ${done ? 'is-done' : ''}`}>
@@ -34,7 +36,7 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
 
       {day.type === 'train' && (
         <>
-          {!locked && onStartGuided && day.sessionKey !== 'run' && (
+          {!locked && onStartGuided && !runOnly && (
             <button type="button" className="btn guided-start" onClick={onStartGuided}>
               ▶ {done ? 'Do it again, guided' : 'Start workout'}
               <span>One set at a time, with rest timer</span>
@@ -83,7 +85,7 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
             })}
           </ul>
           <p className="bookend">{day.cooldown}</p>
-          {!locked && day.sessionKey !== 'run' && <RestSettings />}
+          {!locked && !runOnly && <RestSettings />}
           {!locked && (
             <details className="day-timer">
               <summary>Rest & interval timer</summary>

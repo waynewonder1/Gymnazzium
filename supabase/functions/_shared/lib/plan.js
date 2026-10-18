@@ -400,7 +400,7 @@ function routineDay(profile, base) {
     type: 'train',
     sessionKey: 'routine',
     title: plan.title || 'Training day',
-    focus: groups.map((g) => g.name).filter(Boolean).join(', ') || `${items.length} exercises`,
+    focus: groups.map((g) => g.name).filter(Boolean).join(', ') || (items.every((i) => i.id === 'run') ? 'Run day' : `${items.length} exercise${items.length === 1 ? '' : 's'}`),
     warmup: '5–10 min warm-up: light cardio, then one light set of your first exercise.',
     items,
     cooldown: '5 min cool-down: stretch what you trained, then drink water.',
