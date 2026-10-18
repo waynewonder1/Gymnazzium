@@ -999,3 +999,4 @@
   .guided-reminder p{ line-height:1.5; }
   /* During a guided workout the badge banner sits at the bottom, clear of the "Great work!" stats. */
   body.guided-open .badge-toast{ top:auto; bottom:calc(16px + env(safe-area-inset-bottom, 0px)); }
+  .dose-target{ display:block; font-size:0.72rem; font-weight:600; color:var(--text-dim); text-align:right; }

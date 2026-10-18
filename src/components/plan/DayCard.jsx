@@ -57,7 +57,15 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
                     <span className="check-body">
                       <span className="check-main">
                         <strong>{item.name}</strong>
-                        <span className="dose">{item.dose}</span>
+                        {/* A logged run shows the distance actually run, with the plan's target underneath. */}
+                        {item.id === 'run' && progress.runs?.[day.index] ? (
+                          <span className="dose">
+                            {progress.runs[day.index].km} km ✓
+                            <span className="dose-target">target {item.dose}</span>
+                          </span>
+                        ) : (
+                          <span className="dose">{item.dose}</span>
+                        )}
                       </span>
                       <span className="cue">
                         {item.cue}

@@ -28,6 +28,8 @@ function RunLog({ index, dose, runs, onSave }) {
     e.preventDefault();
     if (!(km > 0 && km <= 100)) return setError('Enter the distance in km, e.g. 3 or 2.5.');
     if (!(sec > 0) || Number(fields.sec || 0) >= 60) return setError('Enter your time in minutes and seconds (seconds under 60).');
+    // Faster than 2:30 per km is beyond world-record pace, so it's almost always a typo (5:30 instead of 50:30).
+    if (sec / km < 150) return setError(`${km} km in ${fields.min || 0}:${String(fields.sec || 0).padStart(2, '0')} would be faster than a world record. Check the time: minutes first, e.g. 50 and 30 for 50 min 30 s.`);
     setError('');
     const run = { km: Math.round(km * 100) / 100, sec };
     const before = runPrFor(runs, index);
