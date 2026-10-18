@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { exercises } from '../../data/workouts';
-import { isLoggable, lastLog, setCount, topOfRange } from '../../lib/lifts';
+import { isLoggable, lastLog, prFor, setCount, topOfRange } from '../../lib/lifts';
+import ShareSheet from '../social/ShareSheet';
 import { startRest, stopRest } from '../../lib/restTimer';
 import { beep } from '../../lib/sound';
 import Confetti from '../Confetti';
@@ -118,6 +119,7 @@ function GuidedWorkout({ day, progress, onStep, onFinish, onClose }) {
   const [hold, setHold] = useState({ left: 0, running: false });
   const [setsDone, setSetsDone] = useState(0);
   const [minutes, setMinutes] = useState(0); // workout length, worked out when it ends
+  const [sharing, setSharing] = useState(false);
   const startedAt = useRef(0);
 
   const item = items[j];
@@ -229,8 +231,16 @@ function GuidedWorkout({ day, progress, onStep, onFinish, onClose }) {
             <div><strong>{items.length}</strong><span>exercises</span></div>
           </div>
           {day.cooldown && <p className="guided-note"><strong>Cool down:</strong> {day.cooldown}</p>}
+          <button type="button" className="btn btn-ghost" onClick={() => setSharing(true)}>📸 Share this workout</button>
           <ReminderPrompt />
           <button type="button" className="btn guided-main" onClick={close}>Done</button>
+          {sharing && (
+            <ShareSheet
+              kind="workout"
+              data={{ title: day.title, exercises: items.length, sets: setsDone, prs: items.filter((it) => prFor(progress.lifts, it.id, day.index)).length, minutes }}
+              onClose={() => setSharing(false)}
+            />
+          )}
         </div>
       </div>
     );

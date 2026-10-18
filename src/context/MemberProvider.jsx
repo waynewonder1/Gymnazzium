@@ -14,7 +14,10 @@ import {
 } from '../lib/storage';
 import { disablePush, renewStalePush } from '../lib/push';
 import { newBadges } from '../lib/challenges';
-import { toISO } from '../lib/plan';
+import { getDay, toISO } from '../lib/plan';
+import { prFor } from '../lib/lifts';
+import { myCommunityProfile, publish, unpublish } from '../lib/social';
+import { postsFromChange } from '../lib/feedPosts';
 
 const now = () => new Date().toISOString();
 const isOffline = () => typeof navigator !== 'undefined' && navigator.onLine === false;
@@ -72,6 +75,17 @@ function MemberProvider({ children }) {
     const { data } = supabase.auth.onAuthStateChange((_event, next) => setSession(next));
     return () => data.subscription.unsubscribe();
   }, []);
+
+  // Community profile (feed): undefined = not loaded yet, null = not joined.
+  const [community, setCommunity] = useState(undefined);
+  useEffect(() => {
+    if (!userId || !online) return;
+    let cancelled = false;
+    myCommunityProfile(userId).then((c) => !cancelled && setCommunity(c ?? null), () => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, online]);
 
   // Staff check for the /admin page. The database enforces it; this only shows or hides the link.
   useEffect(() => {
@@ -205,6 +219,33 @@ function MemberProvider({ children }) {
     return remoteSave('profiles', withZone);
   };
 
+  // Community members: finished workouts, logged runs and new badges post to their followers.
+  // Fire-and-forget; a post that fails (e.g. offline) is simply skipped.
+  const shareToFeed = (prev, next) => {
+    if (!community || !userId || !profile || isOffline()) return;
+    const plan = {
+      startDate: profile.startDate,
+      dateOf: (index) => toISO(getDay(profile, index).date),
+      describeDay: (index) => {
+        const day = getDay(profile, index);
+        if (day.type !== 'train') return null;
+        // A run day with a logged run is posted as the run instead.
+        if (day.items.every((item) => item.id === 'run') && next.runs?.[index]) return null;
+        let sets = 0;
+        let prs = 0;
+        for (const [id, byDay] of Object.entries(next.lifts ?? {})) {
+          sets += (byDay[index] ?? []).filter((x) => x.r > 0).length;
+          if (prFor(next.lifts, id, index)) prs++;
+        }
+        return { title: day.title, exercises: day.items.length, sets, prs, minutes: day.minutes, date: toISO(day.date) };
+      },
+    };
+    for (const change of postsFromChange(prev, next, plan)) {
+      const request = change.action === 'publish' ? publish(userId, change.kind, change.ref, change.data) : unpublish(userId, change.kind, change.ref);
+      request.then(() => {}, () => {});
+    }
+  };
+
   const saveProgress = (next) => {
     // Award any badges this change earned (they're kept even if the progress is later undone).
     const earned = profile ? newBadges(profile, next) : [];
@@ -213,10 +254,12 @@ function MemberProvider({ children }) {
       next = { ...next, badges: { ...next.badges, ...Object.fromEntries(earned.map((key) => [key, today])) } };
       setCelebration({ keys: earned, at: Date.now() });
     }
+    shareToFeed(progress, next);
     saveLocalProgress(next);
     setProgress(next);
     return remoteSave('progress', next);
   };
+
 
   const clearPlan = async () => {
     clearAll();
@@ -257,6 +300,8 @@ function MemberProvider({ children }) {
     signOut,
     celebration,
     dismissCelebration,
+    community: userId ? community : null,
+    setCommunity,
   };
   return <MemberContext.Provider value={value}>{children}</MemberContext.Provider>;
 }

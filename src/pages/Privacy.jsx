@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
 const CONTACT = 'wonderwayne2006@gmail.com';
-const UPDATED = '14 October 2026';
+const UPDATED = '18 October 2026';
 
 // Plain-language privacy notice. Keep it in step with what the app actually stores
 // (supabase/migrations/*.sql, src/lib/storage.js) whenever that changes.
@@ -16,7 +16,7 @@ function Privacy() {
       <ul>
         <li>We only store what we need to build your plan, sync it, send your reminders and handle your orders.</li>
         <li>No ads, no trackers, and we never sell your data.</li>
-        <li>Other members can't see your plan or progress. The leaderboard is opt-in.</li>
+        <li>Other members can't see your plan or progress. The leaderboard and the community feed are opt-in.</li>
         <li>You can delete your account and data yourself, any time, on your <Link to="/account">Account</Link> page.</li>
       </ul>
 
@@ -30,6 +30,7 @@ function Privacy() {
         <li><strong>Your progress:</strong> workouts and exercises you tick, daily missions, logged sets and runs, and badges.</li>
         <li><strong>Reminders:</strong> if you turn on push reminders, your device's push address and the dates reminders were sent.</li>
         <li><strong>Leaderboard:</strong> only if you join it, the display name you choose.</li>
+        <li><strong>Community feed:</strong> only if you join it, your community name, who you follow, kudos you give, and posts made when you finish a workout, log a run or earn a badge (workout name, sets, exercises, PR count, run distance, time and pace). Never your body weight, the weights you lift or your location.</li>
       </ul>
       <h3>If you order from the shop</h3>
       <p>Your name, phone number, delivery location, what you ordered and the total, so we can confirm, deliver and keep a record of the sale.</p>
@@ -41,7 +42,7 @@ function Privacy() {
       <ul>
         <li><strong>You.</strong> Each member can only read and change their own plan, progress and orders.</li>
         <li><strong>Gymnazzium staff</strong> can see shop orders, and a list of members' email addresses, sign-up dates and chosen training path, to run the service. Staff don't browse your plan or progress.</li>
-        <li><strong>Other members</strong> see nothing about you, unless you join the leaderboard. Then they see your display name, your workouts and sets that month, and how many badges you have.</li>
+        <li><strong>Other members</strong> see nothing about you, unless you join the leaderboard (they see your display name, your workouts and sets that month, and how many badges you have) or the community feed (members can find your community name; people who follow you see your posts and who gave them kudos). You can delete any post, or leave the community, any time.</li>
       </ul>
 
       <h2 className="sub-title">Services we use</h2>

@@ -1015,3 +1015,41 @@
     .hero p{ font-size:1.15rem; max-width:540px; }
     .hero > .cta, .hero > .pillars{ justify-self:start; }
   }
+
+  /* ================= COMMUNITY FEED ================= */
+  .feed-page{ max-width:760px; }
+  .avatar{ flex-shrink:0; width:42px; height:42px; border-radius:50%; display:grid; place-items:center; font-family:'Anton',sans-serif; font-size:1.2rem; color:#0A0E0C; background:linear-gradient(135deg, #FF4B3E, #ffbe50); }
+  .avatar.small{ width:32px; height:32px; font-size:0.95rem; }
+  .feed-join{ max-width:620px; }
+  .feed-join-points{ list-style:none; display:flex; flex-direction:column; gap:8px; margin-bottom:16px; color:var(--text-dim); line-height:1.5; }
+  .feed-me{ display:flex; align-items:center; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
+  .feed-me > div{ display:flex; flex-direction:column; flex:1; min-width:150px; }
+  .feed-find{ margin-bottom:22px; }
+  .feed-find input{ width:100%; font:inherit; background:var(--bg-raise); color:var(--text); border:1px solid rgba(255,255,255,0.12); border-radius:999px; padding:12px 18px; }
+  .feed-find input:focus{ outline:none; border-color:var(--accent); }
+  .feed-people{ list-style:none; margin-top:10px; display:flex; flex-direction:column; gap:8px; }
+  .feed-people li{ display:flex; align-items:center; gap:10px; background:var(--bg-raise); border-radius:10px; padding:10px 12px; }
+  .feed-people li > span:nth-child(2){ flex:1; font-weight:600; }
+  .feed-list{ list-style:none; display:flex; flex-direction:column; gap:12px; }
+  .post{ background:var(--bg-raise); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:8px; }
+  .post-head{ display:flex; align-items:center; gap:10px; }
+  .post-head > div{ display:flex; flex-direction:column; }
+  .post-line{ font-size:1.05rem; }
+  .post-stats{ color:var(--steel); font-weight:600; font-size:0.9rem; }
+  .post-foot{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; border-top:1px solid rgba(255,255,255,0.06); padding-top:10px; }
+  .post-actions{ display:flex; gap:14px; }
+  .kudos-btn{ font:inherit; font-size:0.85rem; font-weight:700; cursor:pointer; color:var(--text); background:none; border:1px solid rgba(255,255,255,0.18); border-radius:999px; padding:7px 14px; }
+  .kudos-btn.on{ background:rgba(255,190,80,0.15); border-color:#ffbe50; color:#ffbe50; }
+  .feed-empty{ max-width:620px; }
+  .feed-more{ margin-top:14px; }
+  .feed-leave{ margin-top:26px; }
+  .share-sheet{ width:min(460px, calc(100% - 32px)); max-height:calc(100% - 32px); padding:0; color:var(--text); background:var(--bg-raise); border:1px solid rgba(255,255,255,0.15); border-radius:12px; }
+  .share-sheet::backdrop{ background:rgba(0,0,0,0.7); }
+  .share-body{ display:flex; flex-direction:column; gap:12px; padding:18px; }
+  .share-head{ display:flex; justify-content:space-between; align-items:center; }
+  .share-head h3{ margin:0; }
+  .share-sheet .chip{ cursor:pointer; }
+  .share-preview{ border-radius:10px; overflow:hidden; display:grid; place-items:center; min-height:200px; }
+  .share-preview img{ display:block; width:100%; max-height:52vh; object-fit:contain; }
+  /* Checkerboard behind the sticker, so you can see it's see-through. */
+  .share-preview.sticker{ background:repeating-conic-gradient(#2a312d 0% 25%, #1b211e 0% 50%) 50% / 24px 24px; }

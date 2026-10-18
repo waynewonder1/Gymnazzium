@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { formatPace, formatRun, lastRun, paceOf, runPrFor, targetKm } from '../../lib/runs';
 import Confetti from '../Confetti';
+import ShareSheet from '../social/ShareSheet';
 
 const toFields = (run) => ({
   km: run?.km ?? '',
@@ -17,6 +18,7 @@ function RunLog({ index, dose, runs, onSave }) {
   const [fields, setFields] = useState(() => toFields(logged));
   const [error, setError] = useState('');
   const [celebrations, setCelebrations] = useState(0);
+  const [sharing, setSharing] = useState(false);
   const pr = runPrFor(runs, index);
 
   const km = Number(fields.km);
@@ -53,12 +55,14 @@ function RunLog({ index, dose, runs, onSave }) {
       <div className="lift-summary">
         {last && <span className="muted small">Last run: {formatRun(last)}</span>}
         {logged && <span className="small lift-today">Today: {formatRun(logged)}</span>}
+        {logged && !open && <button type="button" className="link-btn" onClick={() => setSharing(true)}>📸 Share</button>}
         <button type="button" className="link-btn" onClick={() => setOpen(!open)} aria-expanded={open}>
           {open ? 'Close' : logged ? 'Edit run' : 'Log run'}
         </button>
       </div>
       {pr && <p className="lift-pr small">🏆 New best! {pr.text}</p>}
       {celebrations > 0 && <Confetti key={celebrations} />}
+      {sharing && logged && <ShareSheet kind="run" data={{ km: logged.km, sec: logged.sec }} onClose={() => setSharing(false)} />}
       {open && (
         <form className="run-form" onSubmit={save}>
           <label>

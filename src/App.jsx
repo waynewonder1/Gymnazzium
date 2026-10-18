@@ -11,6 +11,7 @@ import Account from './pages/Account';
 import RoutineEditor from './pages/RoutineEditor';
 import Progress from './pages/Progress';
 import Challenges from './pages/Challenges';
+import Feed from './pages/Feed';
 import Privacy from './pages/Privacy';
 import Admin from './pages/Admin';
 
@@ -23,6 +24,7 @@ function App() {
         <Route path="plan/routine" element={<RoutineEditor />} />
         <Route path="progress" element={<Progress />} />
         <Route path="challenges" element={<Challenges />} />
+        <Route path="feed" element={<Feed />} />
         <Route path="privacy" element={<Privacy />} />
         <Route path="shop" element={<Shop />} />
         <Route path="exercises" element={<Exercises />} />

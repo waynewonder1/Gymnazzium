@@ -19,6 +19,7 @@ const PAGE_TITLES = {
   '/plan/routine': 'My routine',
   '/progress': 'My progress',
   '/challenges': 'Challenges',
+  '/feed': 'Feed',
   '/privacy': 'Privacy',
   '/shop': 'Shop',
   '/exercises': 'Exercise library',
@@ -84,6 +85,7 @@ function Layout() {
           {shopConfig.storeOpen && <NavLink to="/shop" onClick={closeMenu}>Shop</NavLink>}
           {profile ? <NavLink to="/plan" onClick={closeMenu}>My plan</NavLink> : <Link to="/#register" onClick={closeMenu}>Register</Link>}
           {profile && <NavLink to="/challenges" onClick={closeMenu}>Challenges</NavLink>}
+          {backendEnabled && user && <NavLink to="/feed" onClick={closeMenu}>Feed</NavLink>}
           {isAdmin && <NavLink to="/admin" onClick={closeMenu}>Admin</NavLink>}
           {!isStandalone() && <Link to="/#get-the-app" className="nav-install-link" onClick={closeMenu}>Install app</Link>}
           {backendEnabled && (user ? <NavLink to="/account" onClick={closeMenu}>Account</NavLink> : <NavLink to="/login" onClick={closeMenu}>Log in</NavLink>)}
