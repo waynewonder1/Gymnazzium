@@ -1,7 +1,15 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { pagesByKind } from '../data/content';
 import { products, shopConfig } from '../data/shop';
-import { exercises, gymSplit, gymWeek, homeSplit, homeWeek } from '../data/workouts';
+import { caliSplit, caliWeek, cardioSplit, cardioWeek, exercises, gymSplit, gymWeek, homeSplit, homeWeek } from '../data/workouts';
+
+// Split sections on path pages: { type: 'split', split: 'gym' | 'home' | 'calisthenics' | 'cardio' }.
+const SPLITS = {
+  gym: { week: gymWeek, split: gymSplit },
+  home: { week: homeWeek, split: homeSplit },
+  calisthenics: { week: caliWeek, split: caliSplit },
+  cardio: { week: cardioWeek, split: cardioSplit },
+};
 import CountUp from '../components/CountUp';
 import ExerciseCard from '../components/ExerciseCard';
 import WorkoutTimer from '../components/WorkoutTimer';
@@ -85,8 +93,8 @@ function Section({ section }) {
         <>
           {section.note && <p className="muted section-note">{section.note}</p>}
           <div className="split-grid">
-            {Object.entries((section.split === 'home' ? homeWeek : gymWeek).byDay).map(([weekday, key]) => {
-              const session = (section.split === 'home' ? homeSplit : gymSplit)[key];
+            {Object.entries((SPLITS[section.split] ?? SPLITS.gym).week.byDay).map(([weekday, key]) => {
+              const session = (SPLITS[section.split] ?? SPLITS.gym).split[key];
               return (
                 <div className="split-day" key={key}>
                   <span className="wday-name">{weekdayName[weekday]}</span>

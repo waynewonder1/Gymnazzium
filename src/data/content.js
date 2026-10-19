@@ -198,6 +198,21 @@ export const pathPages = [
           { name: 'Balance', steps: ['Pike push-up', 'Wall walk', 'Wall handstand 30 s', 'Handstand push-up (wall)', 'Freestanding handstand'] },
         ],
       },
+      {
+        type: 'week',
+        heading: 'The calisthenics split',
+        note: 'Your plan follows this week. Training fewer days? It works through these sessions in order.',
+        days: [
+          { day: 'Mon', title: 'Push', detail: 'Push-ups, diamond and pike push-ups, bench dips, plank' },
+          { day: 'Tue', title: 'Pull & core', detail: 'Pull-ups, table rows, dead hang, hanging leg raises' },
+          { day: 'Wed', title: 'Rest', detail: 'Recover: sleep, water, protein' },
+          { day: 'Thu', title: 'Legs', detail: 'Squats, Bulgarian split squats, lunges, calves, wall sit' },
+          { day: 'Fri', title: 'Skills & core', detail: 'Wall handstand, crow pose, L-sit · scapular protractions, side plank' },
+          { day: 'Sat', title: 'Full-body circuit', detail: 'Burpees, pull-ups, Tyson push-ups, squats, mountain climbers' },
+          { day: 'Sun', title: 'Rest', detail: 'Recover and get ready for Monday' },
+        ],
+      },
+      { type: 'split', split: 'calisthenics', heading: 'Every session, exercise by exercise', note: 'No pull-up bar? Do table rows instead. Form cues for every move are in your plan and the exercise library.' },
       { type: 'workout', heading: 'Try it now: calisthenics fundamentals', note: '3 rounds. Rest 90 s between exercises.', ids: ['pullup', 'pushup', 'squat', 'pikePushup', 'deadHang', 'crucifixHold'] },
       {
         type: 'faq',
@@ -243,6 +258,21 @@ export const pathPages = [
           { title: 'Intervals', text: 'Short bursts of vigorous effort with rest in between: sprints, jump rope rounds, burpees.' },
         ],
       },
+      {
+        type: 'week',
+        heading: 'The cardio split',
+        note: 'Easy, hard, then long: stamina builds without burning out. Your plan follows this week.',
+        days: [
+          { day: 'Mon', title: 'Easy run', detail: 'A jog at talking pace' },
+          { day: 'Tue', title: 'Jump rope & core', detail: 'Rope rounds · mountain climbers, plank, leg raises' },
+          { day: 'Wed', title: 'Rest', detail: 'Or a 30-minute walk' },
+          { day: 'Thu', title: 'Speed day', detail: 'Warm-up jog, then short sprints with full recovery' },
+          { day: 'Fri', title: 'HIIT circuit', detail: 'Burpees, jump squats, mountain climbers, Tyson push-ups, high knees' },
+          { day: 'Sat', title: 'Long run', detail: 'Your longest, slowest run of the week' },
+          { day: 'Sun', title: 'Rest', detail: 'Recover and get ready for Monday' },
+        ],
+      },
+      { type: 'split', split: 'cardio', heading: 'Every session, exercise by exercise', note: 'Runs and rounds get longer every 3 weeks in your plan.' },
       {
         type: 'compare',
         heading: 'Intervals (HIIT) vs steady cardio',

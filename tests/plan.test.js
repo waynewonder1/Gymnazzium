@@ -93,8 +93,30 @@ describe('home split', () => {
     assert.equal(pushups(21), '3 × 15 reps');
   });
 
-  test('other paths are unaffected', () => {
-    assert.equal(getDay(profileFor({ lookingFor: 'Calisthenics', schedule: '3 days a week' }), 0).title, 'Push day');
+});
+
+describe('calisthenics and cardio splits', () => {
+  test('calisthenics: push, pull & core, rest, legs, skills & core, full body, rest', () => {
+    assert.deepEqual(firstWeek(profileFor({ lookingFor: 'Calisthenics' })), [
+      'Mon:Push', 'Tue:Pull & core', 'Wed:rest', 'Thu:Legs', 'Fri:Skills & core', 'Sat:Full-body circuit', 'Sun:rest',
+    ]);
+  });
+
+  test('cardio: easy run, rope & core, rest, speed, HIIT, long run, rest', () => {
+    assert.deepEqual(firstWeek(profileFor({ lookingFor: 'Overall cardio' })), [
+      'Mon:Easy run', 'Tue:Jump rope & core', 'Wed:rest', 'Thu:Speed day', 'Fri:HIIT circuit', 'Sat:Long run', 'Sun:rest',
+    ]);
+  });
+
+  test('run minutes scale with level and climb every 3 weeks, in tidy steps', () => {
+    const longRun = (level, i) => getDay(profileFor({ lookingFor: 'Overall cardio', level, timeline: '6 months' }), i).items[0].dose;
+    assert.deepEqual(['Beginner', 'Intermediate', 'Advanced'].map((l) => longRun(l, 5)), ['25 min', '30 min', '40 min']);
+    assert.equal(longRun('Beginner', 47), '35 min');
+  });
+
+  test('calisthenics skills day uses the timed skill holds', () => {
+    const fri = getDay(profileFor({ lookingFor: 'Calisthenics' }), 4);
+    assert.deepEqual(fri.items.slice(0, 3).map((i) => i.dose), ['3 × 15 s hold', '3 × 10 s hold', '3 × 10 s hold']);
   });
 });
 

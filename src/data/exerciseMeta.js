@@ -74,6 +74,14 @@ export const exerciseMeta = {
 
   run: { muscles: ['Cardio', 'Legs'], equipment: 'Running shoes', level: 1 },
 
+  // Calisthenics skills & cardio
+  wallHandstand: { muscles: ['Shoulders', 'Triceps', 'Abs'], equipment: 'A wall', level: 2 },
+  crowPose: { muscles: ['Shoulders', 'Abs'], equipment: 'None', level: 2 },
+  lSit: { muscles: ['Abs', 'Triceps'], equipment: 'Two sturdy chairs', level: 3 },
+  jumpSquat: { muscles: ['Legs', 'Cardio'], equipment: 'None', level: 1 },
+  highKnees: { muscles: ['Cardio', 'Legs'], equipment: 'None', level: 1 },
+  longRun: { muscles: ['Cardio', 'Legs'], equipment: 'Running shoes', level: 1 },
+
   // Home split
   declinePushup: { muscles: ['Chest', 'Shoulders', 'Triceps'], equipment: 'Bed or chair', level: 2 },
   bottleLateralRaise: { muscles: ['Shoulders'], equipment: 'Water bottles or jerricans', level: 1 },

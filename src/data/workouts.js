@@ -87,6 +87,16 @@ export const exercises = {
   gluteBridge: { name: 'Glute bridges', cue: 'Lie on your back, knees bent. Drive through your heels to lift your hips, squeeze at the top.', kind: 'reps', base: 12, step: 3, max: 30 },
   wallSit: { name: 'Wall sit', cue: 'Back flat on a wall, thighs parallel to the floor, knees over ankles. Hold.', kind: 'hold', base: 30, step: 15, max: 120 },
 
+  // Calisthenics skills
+  wallHandstand: { name: 'Wall handstand hold', cue: 'Hands shoulder-width a hand away from a wall, kick up and hold with straight arms, body tight. Not ready? Hold a pike with your feet on a chair.', kind: 'hold', base: 15, step: 10, max: 60 },
+  crowPose: { name: 'Crow pose', cue: 'Squat, hands flat, knees on the backs of your upper arms. Lean forward until your feet lift. Put a pillow in front of your face.', kind: 'hold', base: 10, step: 5, max: 45 },
+  lSit: { name: 'L-sit hold', cue: 'Hands on two sturdy chairs (or the floor), push down, lift your body and hold your legs out straight. Start with knees tucked.', kind: 'hold', base: 10, step: 5, max: 30 },
+
+  // Cardio
+  jumpSquat: { name: 'Jump squats', cue: 'Squat down, jump as high as you can, land softly and go straight into the next one.', kind: 'reps', base: 10, step: 3, max: 25 },
+  highKnees: { name: 'High knees', cue: 'Run on the spot, driving your knees to hip height, arms pumping. Fast feet.', kind: 'hold', base: 30, step: 10, max: 60, unit: 's' },
+  longRun: { name: 'Long run', cue: 'Your longest, slowest run of the week. You should be able to talk the whole way.', kind: 'minutes', base: 25, step: 5, max: 70, sets: 1 },
+
   // Abs
   crunch: { name: 'Crunches', cue: 'On a mat, knees bent, hands at your temples. Upper abs.', kind: 'reps', base: 20, step: 5, max: 40 },
   legRaise: { name: 'Leg raises', cue: 'Lie flat, raise both legs together. Lower abs.', kind: 'reps', base: 5, step: 3, max: 20 },
@@ -278,4 +288,91 @@ export const runRules = {
   breaks: { label: 'walk breaks OK', note: 'Take walk breaks whenever you need them: walk 1 minute, then run again. Finish the distance.' },
   oneBreak: { label: 'one break max', note: 'Run the whole distance, or take one short walk break (2 minutes at most).' },
   nonStop: { label: 'non-stop', note: 'No stopping. Pick a pace you can hold the whole way; you should still be able to say a few words.' },
+};
+
+// The Gymnazzium calisthenics split: push, pull, legs, skills and a full-body circuit.
+export const caliSplit = {
+  push: {
+    title: 'Push',
+    focus: 'Chest, shoulders and triceps',
+    warmup: 'Warm up: arm circles, wrist rolls, then 1 easy set of push-ups.',
+    groups: [{ name: 'Push', ids: ['pushup', 'diamondPushup', 'pikePushup', 'benchDip'] }, { name: 'Core', ids: ['plank'] }],
+  },
+  pullCore: {
+    title: 'Pull & core',
+    focus: 'Back and biceps, then abs',
+    warmup: 'Warm up: shoulder rolls, then a 20-second hang from the bar.',
+    groups: [{ name: 'Pull', ids: ['pullup', 'tableRow', 'deadHang'] }, { name: 'Core', ids: ['hangingLegRaise'] }],
+  },
+  legs: {
+    title: 'Legs',
+    focus: 'Quads, glutes and calves',
+    warmup: '5 min of marching or skipping, then 1 slow set of squats.',
+    groups: [{ name: 'Legs', ids: ['squat', 'splitSquat', 'bwLunge', 'homeCalfRaise', 'wallSit'] }],
+  },
+  skills: {
+    title: 'Skills & core',
+    focus: 'Handstand, crow and L-sit, then core',
+    warmup: 'Warm up: wrist circles and stretches, then 2 easy pike holds. Wrists matter on skills day.',
+    groups: [{ name: 'Skills', ids: ['wallHandstand', 'crowPose', 'lSit'] }, { name: 'Core', ids: ['scapProtraction', 'sidePlank'] }],
+  },
+  fullbody: {
+    title: 'Full-body circuit',
+    focus: 'Everything, fast. Doubles as cardio',
+    warmup: '3 min of jumping jacks or skipping, then 1 easy round of the circuit.',
+    groups: [{ name: 'Circuit', ids: ['burpees', 'pullup', 'tysonPushup', 'squat', 'mountainClimber'] }],
+  },
+};
+
+export const caliWeek = {
+  byDay: { 1: 'push', 2: 'pullCore', 4: 'legs', 5: 'skills', 6: 'fullbody' },
+  order: ['push', 'pullCore', 'legs', 'skills', 'fullbody'],
+  days: gymWeek.days,
+};
+
+// The Gymnazzium cardio split: easy, intervals, speed, HIIT and one long run.
+export const cardioSplit = {
+  easyRun: {
+    title: 'Easy run',
+    focus: 'An easy jog at talking pace',
+    warmup: '5 min brisk walk, then leg swings.',
+    groups: [{ name: 'Run', ids: ['jog'] }],
+  },
+  ropeCore: {
+    title: 'Jump rope & core',
+    focus: 'Rope rounds, then abs',
+    warmup: '3 min of easy skipping without the rope, then ankle circles.',
+    groups: [{ name: 'Cardio', ids: ['jumpRope'] }, { name: 'Core', ids: ['mountainClimber', 'plank', 'legRaise'] }],
+  },
+  speed: {
+    title: 'Speed day',
+    focus: 'Short, fast sprints with full recovery',
+    warmup: '10 min easy jog, then 3 short build-ups from jog to fast.',
+    groups: [{ name: 'Speed', ids: ['sprints'] }],
+  },
+  hiit: {
+    title: 'HIIT circuit',
+    focus: 'Hard intervals that burn fat',
+    warmup: '3 min of jumping jacks, then 1 easy round of the circuit.',
+    groups: [{ name: 'Circuit', ids: ['burpees', 'jumpSquat', 'mountainClimber', 'tysonPushup', 'highKnees'] }],
+  },
+  longRun: {
+    title: 'Long run',
+    focus: 'Your longest, slowest run of the week',
+    warmup: '5 min brisk walk, then leg swings.',
+    groups: [{ name: 'Run', ids: ['longRun'] }],
+  },
+};
+
+export const cardioWeek = {
+  byDay: { 1: 'easyRun', 2: 'ropeCore', 4: 'speed', 5: 'hiit', 6: 'longRun' },
+  order: ['easyRun', 'ropeCore', 'speed', 'hiit', 'longRun'],
+  days: gymWeek.days,
+};
+
+// Which split each bodyweight path follows (the gym split has its own heavy-phase logic).
+export const pathSplits = {
+  'Home workout': { week: homeWeek, split: homeSplit },
+  Calisthenics: { week: caliWeek, split: caliSplit },
+  'Overall cardio': { week: cardioWeek, split: cardioSplit },
 };

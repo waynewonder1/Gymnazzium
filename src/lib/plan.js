@@ -1,6 +1,6 @@
 // Turns a member's profile into a day-by-day plan.
 // Everything is computed from the profile, so the same profile always gives the same plan.
-import { RUN_GOAL, exercises, gymSplit, gymWeek, homeNotes, homeSplit, homeWeek, runLevels, runRules, sessions } from '../data/workouts.js';
+import { RUN_GOAL, exercises, gymSplit, gymWeek, homeNotes, homeSplit, homeWeek, pathSplits, runLevels, runRules, sessions } from '../data/workouts.js';
 import { challenges, milestones, missions, weeklyMission } from '../data/coaching.js';
 
 export const TIMELINE_DAYS = { '1 month': 28, '3 months': 84, '6 months': 182, '1 year+': 364 };
@@ -14,6 +14,7 @@ const SCHEDULE_OFFSETS = {
 };
 const ACTIVITY_FACTOR = { '2 days a week': 1.375, '3 days a week': 1.45, '4 days a week': 1.55, '5+ days a week': 1.65 };
 const LEVEL_FACTOR = { Beginner: 1, Intermediate: 1.5, Advanced: 2 };
+const MINUTES_FACTOR = { Beginner: 1, Intermediate: 1.25, Advanced: 1.5 };
 
 // Gym plans: build strength and form first, then go heavy (2 × 6–10) from this day on.
 const HEAVY_FROM = { Beginner: 182, Intermediate: 91, Advanced: 0 };
@@ -56,13 +57,14 @@ function getRotation(profile) {
 }
 
 const isGym = (profile) => profile.lookingFor === 'Gym work';
-const isHome = (profile) => profile.lookingFor === 'Home workout';
+// Home, calisthenics and cardio each follow their own weekly split (data/workouts.js → pathSplits).
+const splitFor = (profile) => pathSplits[profile.lookingFor];
 // A member's own routine (built in the routine editor) replaces the generated plan.
 export const usesRoutine = (profile) => profile.planMode === 'custom' && Boolean(profile.routine);
 const variantFor = (profile) => (profile.lookingFor === 'Calisthenics' ? 'calisthenics' : 'home');
 const trainingDaysPerWeek = (profile) => {
   if (usesRoutine(profile)) return Object.values(profile.routine.days).filter((d) => d?.groups?.some((g) => g.items.length)).length;
-  const sessions = (isGym(profile) || isHome(profile) ? gymWeek.days[profile.schedule] : SCHEDULE_OFFSETS[profile.schedule])?.length ?? 3;
+  const sessions = (isGym(profile) || splitFor(profile) ? gymWeek.days[profile.schedule] : SCHEDULE_OFFSETS[profile.schedule])?.length ?? 3;
   return sessions + runsPerWeek(profile, 7 - sessions);
 };
 
@@ -75,7 +77,7 @@ const RUN_WEEKDAYS = [3, 6, 2, 4, 1, 5, 0];
 
 // Whether the plan's own sessions (before any runs) train on this day.
 function trainsOn(profile, index) {
-  if (isGym(profile) || isHome(profile)) {
+  if (isGym(profile) || splitFor(profile)) {
     const days = gymWeek.days[profile.schedule] ?? gymWeek.days['4 days a week'];
     return days.includes(addDays(parseDate(profile.startDate), index).getDay());
   }
@@ -215,8 +217,10 @@ function prescribe(ex, phase, level) {
   if (ex.kind === 'weight') {
     return { dose: '3 × 8–12 reps', note: 'Pick a weight that makes rep 12 hard. When you can do 12 on every set, go heavier.' };
   }
-  const start = ex.kind === 'minutes' ? ex.base : Math.round(ex.base * (LEVEL_FACTOR[level] ?? 1));
-  const raw = start + ex.step * phase;
+  // Timed cardio scales more gently with level than reps do, rounded to tidy numbers (5-minute steps).
+  const start = ex.kind === 'minutes' ? ex.base * (MINUTES_FACTOR[level] ?? 1) : Math.round(ex.base * (LEVEL_FACTOR[level] ?? 1));
+  const rawMinutes = start + ex.step * phase;
+  const raw = ex.kind === 'minutes' ? (rawMinutes >= 10 ? Math.round(rawMinutes / 5) * 5 : Math.round(rawMinutes * 2) / 2) : start + ex.step * phase;
   const value = Math.min(raw, ex.max);
   const capped = raw > ex.max;
   const unit = ex.unit ?? { reps: 'reps', hold: 's hold', minutes: 'min' }[ex.kind];
@@ -325,12 +329,12 @@ function gymDay(profile, index, base) {
   };
 }
 
-// ---------- home split ----------
-// Same weekdays as the gym split; doses climb every 3 weeks like the other bodyweight plans.
-function homeDay(profile, index, base) {
-  const key = splitSessionFor(homeWeek, profile, base.date, index);
+// ---------- home, calisthenics and cardio splits ----------
+// Same weekdays as the gym split; doses climb every 3 weeks.
+function splitDay(profile, index, base, { week, split }) {
+  const key = splitSessionFor(week, profile, base.date, index);
   if (!key) return restDay(profile, base);
-  const session = homeSplit[key];
+  const session = split[key];
   const dayIds = session.groups.flatMap((g) => g.ids);
   const items = session.groups.flatMap((group) =>
     group.ids.map((rawId) => {
@@ -486,7 +490,7 @@ export function getDay(profile, index) {
   if (usesRoutine(profile)) return routineDay(profile, base);
   if (isRunDay(profile, index)) return runDay(profile, base);
   if (isGym(profile)) return gymDay(profile, index, base);
-  if (isHome(profile)) return homeDay(profile, index, base);
+  if (splitFor(profile)) return splitDay(profile, index, base, splitFor(profile));
 
   if (!offsets.includes(dow)) return restDay(profile, base);
 
