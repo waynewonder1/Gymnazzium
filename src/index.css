@@ -1053,3 +1053,27 @@
   .share-preview img{ display:block; width:100%; max-height:52vh; object-fit:contain; }
   /* Checkerboard behind the sticker, so you can see it's see-through. */
   .share-preview.sticker{ background:repeating-conic-gradient(#2a312d 0% 25%, #1b211e 0% 50%) 50% / 24px 24px; }
+
+  /* ================= SMART COACH ================= */
+  .coach-page{ max-width:760px; }
+  .coach-quick{ margin-bottom:18px; }
+  .coach-quick .chip, .coach-a .chip{ cursor:pointer; }
+  .coach-chat{ list-style:none; display:flex; flex-direction:column; gap:18px; margin-bottom:18px; scroll-margin-top:90px; }
+  .coach-chat > li{ display:flex; flex-direction:column; gap:10px; scroll-margin-top:90px; }
+  .coach-q{ align-self:flex-end; max-width:85%; background:var(--accent); color:#0A0E0C; font-weight:600; padding:10px 14px; border-radius:16px 16px 4px 16px; }
+  .coach-a{ display:flex; gap:10px; align-items:flex-start; }
+  .coach-badge{ flex-shrink:0; width:34px; height:34px; border-radius:50%; display:grid; place-items:center; font-family:'Anton',sans-serif; background:var(--bg-raise); border:1px solid rgba(255,255,255,0.15); color:var(--text); }
+  .coach-a-body{ flex:1; min-width:0; background:var(--bg-raise); border:1px solid rgba(255,255,255,0.06); border-radius:4px 16px 16px 16px; padding:14px 16px; display:flex; flex-direction:column; gap:10px; line-height:1.55; }
+  .coach-list{ padding-left:20px; display:flex; flex-direction:column; gap:6px; color:var(--text-dim); }
+  .coach-list strong{ color:var(--text); }
+  .coach-moves{ list-style:none; display:flex; flex-direction:column; gap:8px; }
+  .coach-moves li{ background:var(--bg); border-radius:8px; padding:10px 12px; display:flex; flex-direction:column; gap:3px; }
+  .coach-dose{ color:var(--steel); font-weight:700; font-size:0.85rem; }
+  .coach-warn{ color:#ffbe50; }
+  .coach-targets{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
+  .coach-targets div{ background:var(--bg); border-radius:8px; padding:10px; display:flex; flex-direction:column; align-items:center; }
+  .coach-targets strong{ font-family:'Anton',sans-serif; font-weight:400; font-size:1.4rem; }
+  .coach-targets span{ color:var(--text-dim); font-size:0.78rem; }
+  .coach-ask{ display:flex; gap:10px; margin-bottom:10px; }
+  .coach-ask input{ flex:1; min-width:0; font:inherit; background:var(--bg-raise); color:var(--text); border:1px solid rgba(255,255,255,0.15); border-radius:999px; padding:12px 18px; }
+  .coach-ask input:focus{ outline:none; border-color:var(--accent); }
