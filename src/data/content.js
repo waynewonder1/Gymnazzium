@@ -579,23 +579,6 @@ export const learnPages = [
 ];
 
 // Where each home-page card links to.
-export const pathLinks = {
-  'Home workout': '/paths/home-workout',
-  'Gym work': '/paths/gym-work',
-  Calisthenics: '/paths/calisthenics',
-  'Overall cardio': '/paths/overall-cardio',
-};
-export const bodyTypeLinks = {
-  'V-taper': '/body-types/v-taper',
-  'The morphs': '/body-types/the-morphs',
-  'Slim cut': '/body-types/slim-cut',
-  'Big buff (barbarian)': '/body-types/barbarian',
-};
-export const offerLinks = {
-  Cardio: '/paths/overall-cardio',
-  'Muscle building': '/learn/muscle-building',
-  'Nutrition & diet': '/learn/nutrition',
-  'Supplements & energy': '/learn/supplements',
-};
+export { bodyTypeLinks, offerLinks, pathLinks } from './links.js';
 
 export const pagesByKind = { paths: pathPages, 'body-types': bodyTypePages, learn: learnPages };

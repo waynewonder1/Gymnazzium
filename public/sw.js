@@ -6,12 +6,12 @@
 // App code in /assets/ has unique file names per build, so it's cache-first.
 // Supabase and other APIs are never cached; the app handles those itself.
 
-const SHELL = 'gz-shell-v1'; // index.html, app code, icons
+const SHELL = 'gz-shell-v1'; // also holds page chunks once they've been opened // index.html, app code, icons
 const RUNTIME = 'gz-runtime-v1'; // Google Fonts
 // Look-ups ignore the Vary header: some servers send "Vary: Origin", which would stop a
 // file saved in the background from matching the page's own request for it.
 const MATCH = { ignoreVary: true };
-const CORE = ['/manifest.webmanifest', '/icon.svg', '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png', '/apple-touch-icon.png'];
+const CORE = ['/manifest.webmanifest', '/icon.svg', '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png', '/apple-touch-icon.png', '/brand/gymnazzium-metal.webp'];
 
 // Save index.html plus the app code it references, and drop code from older builds.
 async function cacheAppShell(response) {
@@ -33,9 +33,14 @@ async function cacheAppShell(response) {
       }
     })
   );
+  // Pages load in separate chunks (only when opened), so keep every file of this build and drop
+  // only older builds'. No list (offline, or an old build) → keep everything rather than guess.
+  const list = await fetch('/asset-list.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  if (!list) return;
+  const keep = new Set([...list, ...assets]);
   for (const request of await cache.keys()) {
     const path = new URL(request.url).pathname;
-    if (path.startsWith('/assets/') && !assets.includes(path)) await cache.delete(request);
+    if (path.startsWith('/assets/') && !keep.has(path)) await cache.delete(request);
   }
 }
 

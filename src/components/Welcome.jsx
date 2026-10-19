@@ -51,7 +51,7 @@ function Welcome() {
   return (
     <dialog ref={dialog} className="welcome-dialog" aria-labelledby="welcome-title" onClose={markSeen}>
       <div className="welcome-body">
-        <img className="welcome-logo" src="/brand/gymnazzium-metal.png" alt="Gymnazzium" width="1012" height="762" />
+        <img className="welcome-logo" src="/brand/gymnazzium-metal.webp" alt="Gymnazzium" width="1012" height="762" />
         <div className="section-label">Welcome to Gymnazzium</div>
         <h2 id="welcome-title">Your free personal training plan.</h2>
         <ol className="welcome-steps">

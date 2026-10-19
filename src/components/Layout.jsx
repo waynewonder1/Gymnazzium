@@ -9,9 +9,9 @@ import InstallButton from './InstallButton';
 import { isStandalone } from '../lib/install';
 import RestBar from './RestBar';
 import BadgeToast from './BadgeToast';
+import PageBoundary from './PageBoundary';
 import Feedback from './Feedback';
 import Welcome from './Welcome';
-import { pagesByKind } from '../data/content';
 
 const SITE = 'Gymnazzium';
 const PAGE_TITLES = {
@@ -29,10 +29,11 @@ const PAGE_TITLES = {
   '/admin': 'Admin',
 };
 
-// Browser-tab title for each page, e.g. "Gym work · Gymnazzium".
+// Browser-tab title for each page, e.g. "Coach · Gymnazzium". Guide pages (/paths/…, /body-types/…,
+// /learn/…) set their own title in Topic.jsx, so the guide text isn't needed here.
+const isGuidePage = (pathname) => /^\/(paths|body-types|learn)\//.test(pathname);
 function titleFor(pathname) {
-  const topic = pathname.match(/^\/(paths|body-types|learn)\/([^/]+)/);
-  const name = topic ? pagesByKind[topic[1]]?.find((p) => p.slug === topic[2])?.title : PAGE_TITLES[pathname];
+  const name = PAGE_TITLES[pathname];
   return name ? `${name} · ${SITE}` : `${SITE}: get in shape your way`;
 }
 
@@ -51,7 +52,7 @@ function Layout() {
   }, [pathname, hash]);
 
   useEffect(() => {
-    document.title = titleFor(pathname);
+    if (!isGuidePage(pathname)) document.title = titleFor(pathname);
   }, [pathname]);
 
   // Scroll-reveal effect, re-run for each page.
@@ -113,7 +114,9 @@ function Layout() {
 
       <main>
         {state?.notice && <p className="notice-banner" role="status">{state.notice}</p>}
-        <Outlet />
+        <PageBoundary key={pathname}>
+          <Outlet />
+        </PageBoundary>
       </main>
 
       {shopConfig.storeOpen && <CartDrawer />}

@@ -1,20 +1,24 @@
+import { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import './index.css';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import Plan from './pages/Plan';
-import Shop from './pages/Shop';
-import Topic from './pages/Topic';
-import Exercises from './pages/Exercises';
-import Login from './pages/Login';
-import Account from './pages/Account';
-import RoutineEditor from './pages/RoutineEditor';
-import Progress from './pages/Progress';
-import Challenges from './pages/Challenges';
-import Feed from './pages/Feed';
-import Coach from './pages/Coach';
-import Privacy from './pages/Privacy';
-import Admin from './pages/Admin';
+
+// Home and My plan load straight away (and work offline from the first visit). Other pages are
+// downloaded only when opened, which keeps the first visit light on data.
+const Shop = lazy(() => import('./pages/Shop'));
+const Topic = lazy(() => import('./pages/Topic'));
+const Exercises = lazy(() => import('./pages/Exercises'));
+const Login = lazy(() => import('./pages/Login'));
+const Account = lazy(() => import('./pages/Account'));
+const RoutineEditor = lazy(() => import('./pages/RoutineEditor'));
+const Progress = lazy(() => import('./pages/Progress'));
+const Challenges = lazy(() => import('./pages/Challenges'));
+const Feed = lazy(() => import('./pages/Feed'));
+const Coach = lazy(() => import('./pages/Coach'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+const Admin = lazy(() => import('./pages/Admin'));
 
 function App() {
   return (

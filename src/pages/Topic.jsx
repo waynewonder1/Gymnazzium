@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { pagesByKind } from '../data/content';
 import { products, shopConfig } from '../data/shop';
@@ -148,6 +149,10 @@ function Topic({ kind }) {
   const navigate = useNavigate();
   const pages = pagesByKind[kind];
   const page = pages.find((p) => p.slug === slug);
+
+  useEffect(() => {
+    document.title = page ? `${page.title} · Gymnazzium` : 'Gymnazzium';
+  }, [page]);
 
   if (!page) {
     return (

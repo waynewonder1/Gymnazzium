@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { intro, paths, bodyTypes, offers } from '../data/guide';
 import { products, shopConfig } from '../data/shop';
 import { exercises } from '../data/workouts';
-import { bodyTypeLinks, offerLinks, pathLinks } from '../data/content';
+import { bodyTypeLinks, offerLinks, pathLinks } from '../data/links';
 import { useMember } from '../context/member';
 import Registration from '../components/Registration';
 import ProductCard from '../components/ProductCard';
@@ -39,7 +39,7 @@ function Home() {
     <>
       <div className="hero">
         <div className="blob"></div>
-        <img className="hero-logo" src="/brand/gymnazzium-metal.png" alt="Gymnazzium" width="1012" height="762" />
+        <img className="hero-logo" src="/brand/gymnazzium-metal.webp" alt="Gymnazzium" width="1012" height="762" />
         <div className="hero-eyebrow">{intro.eyebrow}</div>
         <h1>Get in shape<br /><em>your way.</em></h1>
         <p>{intro.lead}</p>
