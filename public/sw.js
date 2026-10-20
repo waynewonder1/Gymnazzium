@@ -6,12 +6,13 @@
 // App code in /assets/ has unique file names per build, so it's cache-first.
 // Supabase and other APIs are never cached; the app handles those itself.
 
-const SHELL = 'gz-shell-v1'; // also holds page chunks once they've been opened // index.html, app code, icons
+const SHELL = 'gz-shell-v2'; // index.html, app code, small icons, and page chunks once opened
 const RUNTIME = 'gz-runtime-v1'; // Google Fonts
 // Look-ups ignore the Vary header: some servers send "Vary: Origin", which would stop a
 // file saved in the background from matching the page's own request for it.
 const MATCH = { ignoreVary: true };
-const CORE = ['/manifest.webmanifest', '/icon.svg', '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png', '/apple-touch-icon.png', '/brand/gymnazzium-metal.webp'];
+// Small files only: the 512 px install icons (~190 KB each) are fetched by the phone when installing.
+const CORE = ['/manifest.webmanifest', '/icon.svg', '/icon-192.png', '/badge-96.png', '/apple-touch-icon.png', '/brand/gymnazzium-metal.webp'];
 
 // Save index.html plus the app code it references, and drop code from older builds.
 async function cacheAppShell(response) {
@@ -125,7 +126,7 @@ self.addEventListener('push', (event) => {
     self.registration.showNotification(data.title || 'Gymnazzium', {
       body: data.body || '',
       icon: '/icon-192.png',
-      badge: '/icon-192.png',
+      badge: '/badge-96.png', // Android status bar: white G on transparent
       tag: data.tag || 'gymnazzium',
       data: { url: data.url || '/plan' },
     })
