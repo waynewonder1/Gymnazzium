@@ -11,6 +11,7 @@ import RestBar from './RestBar';
 import BadgeToast from './BadgeToast';
 import PageBoundary from './PageBoundary';
 import Feedback from './Feedback';
+import TeamReply from './TeamReply';
 import Welcome from './Welcome';
 
 const SITE = 'Gymnazzium';
@@ -114,6 +115,7 @@ function Layout() {
 
       <main>
         {state?.notice && <p className="notice-banner" role="status">{state.notice}</p>}
+        <TeamReply />
         <PageBoundary key={pathname}>
           <Outlet />
         </PageBoundary>

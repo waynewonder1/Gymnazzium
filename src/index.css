@@ -1077,3 +1077,13 @@
   .coach-ask{ display:flex; gap:10px; margin-bottom:10px; }
   .coach-ask input{ flex:1; min-width:0; font:inherit; background:var(--bg-raise); color:var(--text); border:1px solid rgba(255,255,255,0.15); border-radius:999px; padding:12px 18px; }
   .coach-ask input:focus{ outline:none; border-color:var(--accent); }
+
+  /* ================= FEEDBACK REPLIES ================= */
+  .feedback-reply{ border-top:1px solid rgba(255,255,255,0.06); padding-top:8px; display:flex; flex-direction:column; gap:6px; }
+  .feedback-reply-form{ display:flex; flex-direction:column; gap:8px; }
+  .feedback-reply-form textarea{ font:inherit; font-size:0.9rem; background:var(--bg-raise); color:var(--text); border:1px solid rgba(255,255,255,0.15); border-radius:6px; padding:10px; resize:vertical; }
+  .feedback-reply-note{ border-top:1px solid rgba(255,255,255,0.06); padding-top:8px; }
+  .team-reply-banner{ position:relative; z-index:5; display:block; max-width:960px; margin:96px 6% -60px; padding:12px 16px; text-align:left; font:inherit; color:var(--text); cursor:pointer; border-radius:8px; background:rgba(255,190,80,0.12); border:1px solid rgba(255,190,80,0.45); }
+  .team-reply-banner strong{ color:#ffbe50; margin-left:6px; }
+  .team-reply-item{ display:flex; flex-direction:column; gap:6px; background:var(--bg); border-radius:8px; padding:12px; }
+  .team-reply-text{ white-space:pre-wrap; line-height:1.55; }

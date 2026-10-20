@@ -222,7 +222,7 @@ function FeedbackInbox() {
     () =>
       supabase
         .from('feedback')
-        .select('id, rating, message, contact, page, user_id, created_at')
+        .select('id, rating, message, contact, page, user_id, created_at, reply, replied_at, reply_seen_at')
         .order('created_at', { ascending: false })
         .limit(200)
         .then(({ data, error: e }) => {
@@ -272,12 +272,57 @@ function FeedbackInbox() {
               </div>
               <p>{f.message}</p>
               <div className="feedback-meta">
-                <span className="muted small admin-email">{f.contact ? `Reply to: ${f.contact}` : 'No contact left'}</span>
+                <span className="muted small admin-email">{f.contact ? `Contact: ${f.contact}` : 'No contact left'}</span>
                 <button type="button" className="link-btn" onClick={() => remove(f.id)}>Delete</button>
               </div>
+              <FeedbackReply item={f} onSaved={load} />
             </li>
           ))}
         </ul>
+      )}
+    </div>
+  );
+}
+
+// Your reply to one message. Members who were logged in see it in the app (TeamReply.jsx);
+// visitors can't be reached in the app, so their contact is shown instead.
+function FeedbackReply({ item, onSaved }) {
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState(item.reply ?? '');
+  const [state, setState] = useState({ busy: false, error: '' });
+
+  const send = async (e) => {
+    e.preventDefault();
+    if (!text.trim()) return;
+    setState({ busy: true, error: '' });
+    const { error: err } = await supabase.from('feedback').update({ reply: text.trim().slice(0, 1000), replied_at: new Date().toISOString() }).eq('id', item.id);
+    if (err) return setState({ busy: false, error: err.message });
+    setState({ busy: false, error: '' });
+    setOpen(false);
+    onSaved();
+  };
+
+  if (!item.user_id) {
+    return <p className="muted small feedback-reply-note">Sent while not logged in, so a reply can't reach them in the app.{item.contact ? ` Reply by email or DM: ${item.contact}` : ''}</p>;
+  }
+  return (
+    <div className="feedback-reply">
+      {item.reply && !open && (
+        <p className="small">
+          <strong>Your reply</strong> ({fmtDateTime(item.replied_at)}, {item.reply_seen_at ? 'seen ✓' : 'not seen yet'}): {item.reply}
+        </p>
+      )}
+      {open ? (
+        <form onSubmit={send} className="feedback-reply-form">
+          <textarea rows="3" maxLength={1000} value={text} onChange={(e) => setText(e.target.value)} placeholder="Your reply. They'll see it in the app next time they open it." autoFocus />
+          <div className="form-actions">
+            <button className="btn btn-sm" disabled={state.busy}>{state.busy ? 'Sending…' : 'Send reply'}</button>
+            <button type="button" className="link-btn" onClick={() => setOpen(false)}>Cancel</button>
+          </div>
+          {state.error && <p className="form-error small">{state.error}</p>}
+        </form>
+      ) : (
+        <button type="button" className="link-btn" onClick={() => setOpen(true)}>{item.reply ? 'Edit reply' : 'Reply'}</button>
       )}
     </div>
   );
