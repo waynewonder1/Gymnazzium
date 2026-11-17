@@ -63,6 +63,7 @@ function Feedback() {
           <div className="feedback-body">
             <h3 id="feedback-title">Thank you! 🙏</h3>
             <p className="muted">Your feedback goes straight to the Gymnazzium team and helps us make the app better.</p>
+            <p className="muted small">Need help? DM <strong>@wonderrrr</strong> on TikTok or Instagram.</p>
             <button type="button" className="btn btn-sm" onClick={close}>Close</button>
           </div>
         ) : (

@@ -154,6 +154,7 @@ function Layout() {
             {shopConfig.storeOpen && <Link to="/shop">Shop</Link>}
             {backendEnabled && <Link to={user ? '/account' : '/login'}>{user ? 'Account' : 'Log in'}</Link>}
             <Link to="/privacy">Privacy</Link>
+            <span className="muted small">Need help? DM @wonderrrr on TikTok or Instagram</span>
           </div>
         </div>
         <p className="footer-note">This guide is general fitness information, not medical advice. Check with a doctor before starting a new training or diet programme.</p>
