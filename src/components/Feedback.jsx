@@ -54,8 +54,9 @@ function Feedback() {
     <>
       {/* Steps aside while the rest timer bar is showing, so they don't overlap. */}
       {!rest.endsAt && (
-        <button type="button" className="feedback-btn" onClick={open}>
-          💬 Feedback
+        <button type="button" className="feedback-btn" onClick={open} aria-label="Feedback">
+          <span aria-hidden="true">💬</span>
+          <span className="feedback-label"> Feedback</span>
         </button>
       )}
       <dialog ref={dialog} className="feedback-dialog" aria-labelledby="feedback-title" onClick={(e) => e.target === dialog.current && close()}>

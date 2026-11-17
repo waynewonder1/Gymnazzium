@@ -75,7 +75,7 @@ function Coach() {
       </ol>
 
       <form className="coach-ask" onSubmit={submit}>
-        <input aria-label="Ask the coach" placeholder="e.g. My knee hurts on lunges" maxLength={300} value={text} onChange={(e) => setText(e.target.value)} />
+        <input aria-label="Ask the coach" placeholder="e.g. Knee pain on lunges" maxLength={300} value={text} onChange={(e) => setText(e.target.value)} />
         <button className="btn btn-sm">Ask</button>
       </form>
       <p className="muted small">General fitness guidance, not medical advice. For pain that is sharp or doesn't go away, see a doctor or physiotherapist.</p>
