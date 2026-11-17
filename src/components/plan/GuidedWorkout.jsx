@@ -5,6 +5,7 @@ import ShareSheet from '../social/ShareSheet';
 import { startRest, stopRest } from '../../lib/restTimer';
 import { beep } from '../../lib/sound';
 import Confetti from '../Confetti';
+import ExerciseMedia from '../ExerciseMedia';
 import { useMember } from '../../context/member';
 import { currentSubscription, enablePush, needsHomeScreen, pushAvailable, testNotification } from '../../lib/push';
 
@@ -261,6 +262,7 @@ function GuidedWorkout({ day, progress, onStep, onFinish, onClose }) {
         <h2 id="guided-title">{item.name}</h2>
         <p className="guided-dose">{item.dose}</p>
         <p className="muted">{item.cue}</p>
+        <ExerciseMedia key={item.id} id={item.id} name={item.name} compact />
         {item.note && <p className="guided-note">{item.note}</p>}
 
         {isHold ? (

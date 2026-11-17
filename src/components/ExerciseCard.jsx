@@ -1,6 +1,7 @@
 import { exercises } from '../data/workouts';
 import { exerciseMeta, levelName } from '../data/exerciseMeta';
 import { doseFor } from '../lib/plan';
+import ExerciseMedia from './ExerciseMedia';
 
 function ExerciseCard({ id, index }) {
   const ex = exercises[id];
@@ -9,6 +10,7 @@ function ExerciseCard({ id, index }) {
 
   return (
     <div className="exercise ex-card">
+      <ExerciseMedia id={id} name={ex.name} />
       <div className="ex-head">
         {index !== undefined && <span className="ex-num">{index + 1}</span>}
         <h5>{ex.name}</h5>
