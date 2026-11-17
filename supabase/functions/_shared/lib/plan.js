@@ -1,6 +1,6 @@
 // Turns a member's profile into a day-by-day plan.
 // Everything is computed from the profile, so the same profile always gives the same plan.
-import { RUN_GOAL, exercises, gymSplit, gymWeek, homeNotes, homeSplit, homeWeek, pathSplits, runLevels, runRules, sessions } from '../data/workouts.js';
+import { RUN_GOAL, exercises, gymSplit, gymStyleFor, gymStyles, gymWeek, homeNotes, homeSplit, homeWeek, pathSplits, runLevels, runRules, sessions } from '../data/workouts.js';
 import { challenges, milestones, missions, weeklyMission } from '../data/coaching.js';
 
 export const TIMELINE_DAYS = { '1 month': 28, '3 months': 84, '6 months': 182, '1 year+': 364 };
@@ -62,9 +62,16 @@ const splitFor = (profile) => pathSplits[profile.lookingFor];
 // A member's own routine (built in the routine editor) replaces the generated plan.
 export const usesRoutine = (profile) => profile.planMode === 'custom' && Boolean(profile.routine);
 const variantFor = (profile) => (profile.lookingFor === 'Calisthenics' ? 'calisthenics' : 'home');
+// Gym members follow the split they picked (Full body, Push/Pull/Legs, Upper/Lower… see gymStyles).
+const gymWeekFor = (profile) => gymStyles[gymStyleFor(profile)];
+// Training weekdays for split-based plans (gym and the bodyweight paths).
+const splitWeekdays = (profile) => {
+  const week = isGym(profile) ? gymWeekFor(profile) : gymWeek;
+  return week.days[profile.schedule] ?? gymWeek.days['4 days a week'];
+};
 const trainingDaysPerWeek = (profile) => {
   if (usesRoutine(profile)) return Object.values(profile.routine.days).filter((d) => d?.groups?.some((g) => g.items.length)).length;
-  const sessions = (isGym(profile) || splitFor(profile) ? gymWeek.days[profile.schedule] : SCHEDULE_OFFSETS[profile.schedule])?.length ?? 3;
+  const sessions = (isGym(profile) || splitFor(profile) ? splitWeekdays(profile) : SCHEDULE_OFFSETS[profile.schedule])?.length ?? 3;
   return sessions + runsPerWeek(profile, 7 - sessions);
 };
 
@@ -78,8 +85,7 @@ const RUN_WEEKDAYS = [3, 6, 2, 4, 1, 5, 0];
 // Whether the plan's own sessions (before any runs) train on this day.
 function trainsOn(profile, index) {
   if (isGym(profile) || splitFor(profile)) {
-    const days = gymWeek.days[profile.schedule] ?? gymWeek.days['4 days a week'];
-    return days.includes(addDays(parseDate(profile.startDate), index).getDay());
+    return splitWeekdays(profile).includes(addDays(parseDate(profile.startDate), index).getDay());
   }
   return (SCHEDULE_OFFSETS[profile.schedule] ?? [0, 2, 4]).includes(index % 7);
 }
@@ -270,7 +276,8 @@ const heavyFrom = (profile) => HEAVY_FROM[profile.level] ?? HEAVY_FROM.Beginner;
 function splitSessionFor(week, profile, date, index) {
   const days = week.days[profile.schedule] ?? week.days['4 days a week'];
   if (!days.includes(date.getDay())) return null;
-  if (days.length === 5) return week.byDay[date.getDay()];
+  // Every session has its own weekday: use it.
+  if (week.byDay && days.length === Object.keys(week.byDay).length) return week.byDay[date.getDay()];
   // Fewer training days: work through the split in order so every session comes round.
   const start = parseDate(profile.startDate);
   let count = 0;
@@ -295,7 +302,7 @@ export function phaseInfo(profile, index) {
 }
 
 function gymDay(profile, index, base) {
-  const key = splitSessionFor(gymWeek, profile, base.date, index);
+  const key = splitSessionFor(gymWeekFor(profile), profile, base.date, index);
   if (!key) {
     return {
       ...base,
@@ -309,7 +316,11 @@ function gymDay(profile, index, base) {
   const items = session.groups.flatMap((group) =>
     group.ids.map((id) => {
       const ex = exercises[id];
-      const dose = ex.kind === 'warmup' ? '2 × 12–15 light' : heavy ? '2 × 6–10 heavy' : '3 × 8–12 reps';
+      // Bodyweight moves (planks, leg raises) use their own reps or hold times.
+      const dose =
+        ex.kind === 'warmup' ? '2 × 12–15 light'
+        : ex.kind !== 'weight' ? prescribe(ex, base.phase, profile.level).dose
+        : heavy ? '2 × 6–10 heavy' : '3 × 8–12 reps';
       return { id, name: ex.name, cue: ex.cue, dose, note: null, group: group.name };
     })
   );

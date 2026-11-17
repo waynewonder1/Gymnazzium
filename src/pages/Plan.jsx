@@ -13,6 +13,9 @@ import DeepDive from '../components/plan/DeepDive';
 import ProductCard from '../components/ProductCard';
 import Registration from '../components/Registration';
 import GuidedWorkout from '../components/plan/GuidedWorkout';
+import PlanGuide from '../components/plan/PlanGuide';
+import { guideSeen } from '../lib/planGuide';
+import SplitPicker from '../components/plan/SplitPicker';
 
 function Plan() {
   const { profile, authReady, syncing } = useMember();
@@ -58,6 +61,7 @@ function PlanView({ profile }) {
   const [selected, setSelected] = useState(clamp(today));
   const [week, setWeek] = useState(Math.floor(clamp(today) / 7));
   const [guided, setGuided] = useState(false); // guided workout mode open
+  const [guideOpen, setGuideOpen] = useState(() => !guideSeen()); // "How it works" walkthrough, first visit
   const day = getDay(profile, selected);
 
   const commit = saveProgress;
@@ -213,7 +217,12 @@ function PlanView({ profile }) {
           </div>
         )}
 
+        {profile.lookingFor === 'Gym work' && !usesRoutine(profile) && (
+          <SplitPicker profile={profile} onPick={(gymStyle) => saveProfile({ ...profile, gymStyle })} />
+        )}
+
         <div className="chips plan-nav">
+          <button type="button" className="chip chip-guide" onClick={() => setGuideOpen(true)}>📖 How it works</button>
           <Link className="chip" to="/progress">My progress</Link>
           <a className="chip" href="#today">Day by day</a>
           <a className="chip" href="#reminders">Reminders</a>
@@ -283,6 +292,8 @@ function PlanView({ profile }) {
           <Link to="/shop" className="btn btn-ghost see-all">See the full shop →</Link>
         </section>
       )}
+
+      <PlanGuide profile={profile} open={guideOpen} onClose={() => setGuideOpen(false)} />
 
       <section className="plan-section plan-actions">
         <button className="btn btn-ghost" onClick={() => navigate('/#register', { state: { edit: true } })}>Edit my details</button>

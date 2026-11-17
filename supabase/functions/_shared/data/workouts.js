@@ -189,6 +189,83 @@ export const gymSplit = {
     warmup: 'Warm up: 2 easy sets of pull-ups or light pull-downs.',
     groups: [{ name: 'Back (pull day)', ids: ['latPulldown', 'narrowPulldown', 'machineRow'] }, ...arms],
   },
+
+  // Sessions for the classic splits (gymStyles below).
+  push: {
+    title: 'Push: chest, shoulders & triceps',
+    focus: 'Everything that pushes',
+    warmup: 'Warm up: arm circles, then 2 light sets of bench press.',
+    groups: [
+      { name: 'Chest', ids: ['inclineBench', 'chestFly'] },
+      { name: 'Shoulders', ids: ['shoulderPress', 'lateralRaise'] },
+      { name: 'Triceps', ids: ['tricepsPushdown', 'tricepsExtension'] },
+    ],
+  },
+  pull: {
+    title: 'Pull: back & biceps',
+    focus: 'Everything that pulls',
+    warmup: 'Warm up: 2 easy sets of pull-ups or light pull-downs.',
+    groups: [
+      { name: 'Back', ids: ['latPulldown', 'bentRow', 'machinePullover'] },
+      { name: 'Rear shoulders', ids: ['rearDeltFly'] },
+      { name: 'Biceps', ids: ['machineCurl', 'ropeCurl'] },
+    ],
+  },
+  legs: {
+    title: 'Legs',
+    focus: 'Quads, hamstrings and calves',
+    warmup: '5 min on the bike or treadmill, then 2 light sets of squats.',
+    groups: [
+      { name: 'Quads', ids: ['backSquat', 'legPress', 'legExtension'] },
+      { name: 'Hamstrings', ids: ['rdl', 'hamstringCurl'] },
+      { name: 'Calves', ids: ['calfRaise'] },
+    ],
+  },
+  upper: {
+    title: 'Upper body',
+    focus: 'Chest, back, shoulders and arms',
+    warmup: 'Warm up: arm circles, then 1 light set of bench press and pull-downs.',
+    groups: [
+      { name: 'Chest', ids: ['inclineBench', 'chestFly'] },
+      { name: 'Back', ids: ['latPulldown', 'bentRow'] },
+      { name: 'Shoulders', ids: ['shoulderPress'] },
+      { name: 'Arms', ids: ['tricepsPushdown', 'machineCurl'] },
+    ],
+  },
+  lower: {
+    title: 'Lower body',
+    focus: 'Quads, hamstrings, calves and core',
+    warmup: '5 min on the bike or treadmill, then 2 light sets of squats.',
+    groups: [
+      { name: 'Quads', ids: ['backSquat', 'legPress', 'legExtension'] },
+      { name: 'Hamstrings', ids: ['rdl', 'hamstringCurl'] },
+      { name: 'Calves & core', ids: ['calfRaise', 'hangingLegRaise'] },
+    ],
+  },
+  fullA: {
+    title: 'Full body A',
+    focus: 'Squat, press and row: the whole body in one session',
+    warmup: '5 min on the bike or treadmill, then 1 light set of squats and bench press.',
+    groups: [
+      { name: 'Legs', ids: ['backSquat', 'hamstringCurl'] },
+      { name: 'Chest', ids: ['inclineBench'] },
+      { name: 'Back', ids: ['bentRow'] },
+      { name: 'Shoulders', ids: ['shoulderPress'] },
+      { name: 'Core', ids: ['plank'] },
+    ],
+  },
+  fullB: {
+    title: 'Full body B',
+    focus: 'Hinge, pull and fly: the whole body in one session',
+    warmup: '5 min on the bike or treadmill, then 1 light set of pull-downs and leg press.',
+    groups: [
+      { name: 'Legs', ids: ['rdl', 'legPress'] },
+      { name: 'Back', ids: ['latPulldown'] },
+      { name: 'Chest', ids: ['chestFly'] },
+      { name: 'Shoulders', ids: ['lateralRaise'] },
+      { name: 'Core', ids: ['hangingLegRaise'] },
+    ],
+  },
 };
 
 // Training weekdays for each schedule (0 = Sunday … 6 = Saturday).
@@ -203,6 +280,71 @@ export const gymWeek = {
     '5+ days a week': [1, 2, 4, 5, 6],
   },
 };
+
+// The split a gym member follows (profile.gymStyle), offered by training days.
+// days: training weekdays per schedule (a style only exists for the schedules listed);
+// sessions run in `order`, or on fixed weekdays (`byDay`) when every day is trained.
+export const gymStyles = {
+  fullBody: {
+    name: 'Full body',
+    text: 'The whole body every session. Best for beginners and busy weeks.',
+    days: { '2 days a week': [1, 4], '3 days a week': [1, 3, 5] },
+    order: ['fullA', 'fullB'],
+  },
+  ppl: {
+    name: 'Push / Pull / Legs',
+    text: 'One day for pushing muscles, one for pulling, one for legs.',
+    days: { '3 days a week': [1, 3, 5] },
+    order: ['push', 'pull', 'legs'],
+  },
+  upperLower: {
+    name: 'Upper / Lower',
+    text: 'Upper body, lower body, rest, then again. Each muscle twice a week.',
+    days: { '4 days a week': [1, 2, 4, 5] },
+    order: ['upper', 'lower'],
+  },
+  ulppl: {
+    name: 'Upper / Lower + Push / Pull / Legs',
+    text: 'Upper, lower, rest, then push, pull, legs. Each muscle twice a week.',
+    days: { '5+ days a week': [1, 2, 4, 5, 6] },
+    order: ['upper', 'lower', 'push', 'pull', 'legs'],
+    byDay: { 1: 'upper', 2: 'lower', 4: 'push', 5: 'pull', 6: 'legs' },
+  },
+  ppl6: {
+    name: 'Push / Pull / Legs ×2',
+    text: 'Push, pull, legs twice a week, Sunday off. For experienced lifters.',
+    days: { '5+ days a week': [1, 2, 3, 4, 5, 6] },
+    order: ['push', 'pull', 'legs'],
+  },
+  gymnazzium: {
+    name: 'Gymnazzium split',
+    text: 'Chest & back, legs, chest/shoulders/arms, legs, back & arms.',
+    ...gymWeek,
+  },
+};
+
+// The best split for a schedule and level.
+export function recommendedGymStyle(schedule, level) {
+  if (schedule === '2 days a week') return 'fullBody';
+  if (schedule === '3 days a week') return level === 'Beginner' ? 'fullBody' : 'ppl';
+  if (schedule === '4 days a week') return 'upperLower';
+  return 'ulppl';
+}
+
+// The splits that fit a schedule, recommended first.
+export function gymStyleOptions(schedule, level) {
+  const best = recommendedGymStyle(schedule, level);
+  const fits = Object.keys(gymStyles).filter((k) => gymStyles[k].days[schedule]);
+  return [best, ...fits.filter((k) => k !== best)];
+}
+
+// Which split a member follows. Plans made before splits could be picked (no gymStyle at all)
+// keep the Gymnazzium split; an empty or no-longer-fitting choice gets the recommended one.
+export function gymStyleFor(profile) {
+  if (profile.gymStyle === undefined) return 'gymnazzium';
+  if (gymStyles[profile.gymStyle]?.days[profile.schedule]) return profile.gymStyle;
+  return recommendedGymStyle(profile.schedule, profile.level);
+}
 
 // The Gymnazzium home split, used for everyone who picks "Home workout".
 // Same rhythm as the gym split, built from bodyweight moves and household objects.

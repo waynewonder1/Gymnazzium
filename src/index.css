@@ -935,7 +935,8 @@
   /* ================= FEEDBACK, INVITE, WELCOME ================= */
   .feedback-btn{ position:fixed; right:16px; bottom:calc(16px + env(safe-area-inset-bottom, 0px)); z-index:240; font:inherit; font-size:0.8rem; font-weight:700; cursor:pointer; color:var(--text); background:var(--bg-raise); border:1px solid rgba(255,255,255,0.18); border-radius:999px; padding:9px 14px; box-shadow:0 6px 24px rgba(0,0,0,0.45); }
   .feedback-btn:hover{ border-color:var(--accent); }
-  .feedback-dialog, .welcome-dialog{ width:min(480px, calc(100% - 32px)); max-height:calc(100% - 32px); padding:0; color:var(--text); background:var(--bg-raise); border:1px solid rgba(255,255,255,0.15); border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.6); }
+  /* margin:auto centres modal dialogs (the * reset above removes the browser's own centring). */
+  .feedback-dialog, .welcome-dialog{ margin:auto; width:min(480px, calc(100% - 32px)); max-height:calc(100% - 32px); padding:0; color:var(--text); background:var(--bg-raise); border:1px solid rgba(255,255,255,0.15); border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.6); }
   .feedback-dialog::backdrop, .welcome-dialog::backdrop{ background:rgba(0,0,0,0.6); }
   .feedback-body, .welcome-body{ display:flex; flex-direction:column; gap:14px; padding:22px; }
   .feedback-body h3{ font-size:1.2rem; }
@@ -1100,3 +1101,23 @@
   .team-reply-banner strong{ color:#ffbe50; margin-left:6px; }
   .team-reply-item{ display:flex; flex-direction:column; gap:6px; background:var(--bg); border-radius:8px; padding:12px; }
   .team-reply-text{ white-space:pre-wrap; line-height:1.55; }
+
+/* ---------- SPLITS, HOW-TO, PLAN WALKTHROUGH ---------- */
+.rec-tag{ margin-left:8px; font-size:0.62rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; background:var(--accent-soft); color:var(--accent); vertical-align:middle; }
+.split-choice{ margin-top:20px; }
+.split-choice .levels{ grid-template-columns:1fr; margin-top:8px; }
+.split-picker{ max-width:960px; margin-bottom:20px; padding:14px 20px; border:1px solid rgba(255,255,255,0.12); border-radius:8px; }
+.split-picker summary{ display:flex; justify-content:space-between; align-items:center; gap:12px; cursor:pointer; list-style:none; }
+.split-picker summary::-webkit-details-marker{ display:none; }
+.split-picker summary .link-btn{ flex-shrink:0; }
+.split-picker .levels{ grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); margin:14px 0 10px; }
+button.level{ display:flex; flex-direction:column; gap:4px; text-align:left; font:inherit; color:var(--text-dim); font-size:0.85rem; background:none; cursor:pointer; border:1px solid rgba(255,255,255,0.12); border-radius:6px; padding:14px; }
+button.level:hover{ border-color:rgba(255,255,255,0.3); }
+.howto-btn{ align-self:flex-start; margin-top:4px; font:inherit; font-size:0.75rem; font-weight:700; padding:4px 10px; border-radius:999px; border:1px solid rgba(255,255,255,0.18); background:transparent; color:var(--text); cursor:pointer; }
+.howto-btn:hover{ border-color:var(--accent); color:var(--accent); }
+.guided .howto-btn{ align-self:center; margin:0 auto 12px; display:block; }
+.howto-dialog .ex-tags{ margin:0; padding:0; }
+.howto-dialog .ex-media.compact{ margin:4px auto 4px; }
+.chip.chip-guide{ border-color:var(--accent); color:var(--text); font-weight:600; }
+.plan-guide .progress-bar{ margin:4px 0 6px; }
+.plan-guide h3{ margin-top:6px; }

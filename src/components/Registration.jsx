@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { registration } from '../data/guide';
 import { challenges } from '../data/coaching';
-import { RUN_GOAL, runLevels } from '../data/workouts';
+import { RUN_GOAL, gymStyleFor, gymStyleOptions, gymStyles, recommendedGymStyle, runLevels } from '../data/workouts';
 import { useMember } from '../context/member';
 import { emptyProgress } from '../lib/storage';
 import { toISO, todayIndex, totalDays } from '../lib/plan';
@@ -31,7 +31,28 @@ const emptyProfile = () => ({
   startDate: toISO(new Date()),
   challenges: [],
   challengesNote: '',
+  gymStyle: '', // '' = the recommended split for the training days
 });
+
+// Gym only: which split to follow, from the ones that fit the training days.
+function SplitChoice({ profile, onPick }) {
+  const current = gymStyleFor(profile);
+  const best = recommendedGymStyle(profile.schedule, profile.level);
+  return (
+    <div className="split-choice">
+      <p className="muted small form-hint">Your gym split for {profile.schedule.replace(' a week', '')} a week:</p>
+      <div className="levels">
+        {gymStyleOptions(profile.schedule, profile.level).map((key) => (
+          <label key={key} className={`level ${current === key ? 'active' : ''}`}>
+            <input type="radio" name="gymStyle" value={key} checked={current === key} onChange={() => onPick(key)} />
+            <strong>{gymStyles[key].name}{key === best && <span className="tag rec-tag">Recommended</span>}</strong>
+            <span>{gymStyles[key].text}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function Chips({ options, selected, onToggle }) {
   return (
@@ -51,7 +72,8 @@ function Registration() {
   const { profile: saved, progress, saveProfile, saveProgress, clearPlan } = useMember();
   // Pages like /paths/home-workout link here with some answers already picked.
   const prefill = location.state?.prefill ?? {};
-  const [profile, setProfile] = useState(() => ({ ...emptyProfile(), ...saved, ...prefill }));
+  // Plans made before splits could be picked stay on the Gymnazzium split until the member picks another.
+  const [profile, setProfile] = useState(() => ({ ...emptyProfile(), ...(saved && { gymStyle: 'gymnazzium' }), ...saved, ...prefill }));
   const [editing, setEditing] = useState(() => !saved || location.state?.edit === true || Boolean(location.state?.prefill));
   const [step, setStep] = useState(0);
   // Members following their own routine (routine editor): their week ignores these answers.
@@ -242,9 +264,10 @@ function Registration() {
           <label>Workout time<input type="time" required value={profile.workoutTime} onChange={update('workoutTime')} /></label>
           <label>Start date<input type="date" required value={profile.startDate} onChange={update('startDate')} /></label>
         </div>
-        {['Gym work', 'Home workout'].includes(profile.lookingFor) && ['2 days a week', '3 days a week'].includes(profile.schedule) && (
-          <p className="muted small form-hint">Tip: the {profile.lookingFor === 'Gym work' ? 'gym' : 'home'} split is built for 4–5 days a week. With fewer days, your plan rotates through the sessions more slowly.</p>
+        {profile.lookingFor === 'Home workout' && ['2 days a week', '3 days a week'].includes(profile.schedule) && (
+          <p className="muted small form-hint">Tip: the home split is built for 4–5 days a week. With fewer days, your plan rotates through the sessions more slowly.</p>
         )}
+        {profile.lookingFor === 'Gym work' && <SplitChoice profile={profile} onPick={(gymStyle) => setProfile({ ...profile, gymStyle })} />}
       </fieldset>
       )}
 

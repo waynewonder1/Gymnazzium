@@ -2,6 +2,7 @@ import { before, describe, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { expectations, getDay, parseDose, routineTemplate, runStep, totalDays } from '../src/lib/plan.js';
 import { registration } from '../src/data/guide.js';
+import { gymStyleOptions, gymStyles, recommendedGymStyle } from '../src/data/workouts.js';
 import { WEEKDAY, freezeToday, profileFor } from './helpers.js';
 
 before(() => freezeToday());
@@ -63,6 +64,68 @@ describe('gym split', () => {
     const titles = [];
     for (let i = 0; i < 14; i++) if (getDay(profile, i).type === 'train') titles.push(getDay(profile, i).title);
     assert.deepEqual(titles, ['Chest & back', 'Legs: quads', 'Chest, shoulders & arms', 'Legs: hamstrings', 'Back & arms', 'Chest & back']);
+  });
+
+  test('old gym plans keep only weighted moves and their usual doses', () => {
+    const day = getDay(profileFor(), 0);
+    for (const item of day.items) assert.match(item.dose, /^(2 × 12–15 light|3 × 8–12 reps)$/, item.id);
+  });
+});
+
+describe('gym split choices', () => {
+  const week = (schedule, gymStyle, level = 'Beginner') => firstWeek(profileFor({ schedule, gymStyle, level }));
+
+  test('2 days: full body A and B', () => {
+    assert.deepEqual(week('2 days a week', ''), ['Mon:Full body A', 'Tue:rest', 'Wed:rest', 'Thu:Full body B', 'Fri:rest', 'Sat:rest', 'Sun:rest']);
+  });
+
+  test('3 days: full body for beginners, push/pull/legs for everyone else', () => {
+    assert.deepEqual(week('3 days a week', ''), ['Mon:Full body A', 'Tue:rest', 'Wed:Full body B', 'Thu:rest', 'Fri:Full body A', 'Sat:rest', 'Sun:rest']);
+    assert.deepEqual(week('3 days a week', '', 'Intermediate'), [
+      'Mon:Push: chest, shoulders & triceps', 'Tue:rest', 'Wed:Pull: back & biceps', 'Thu:rest', 'Fri:Legs', 'Sat:rest', 'Sun:rest',
+    ]);
+  });
+
+  test('4 days: upper, lower, rest, upper, lower', () => {
+    assert.deepEqual(week('4 days a week', ''), ['Mon:Upper body', 'Tue:Lower body', 'Wed:rest', 'Thu:Upper body', 'Fri:Lower body', 'Sat:rest', 'Sun:rest']);
+  });
+
+  test('5 days: upper/lower then push/pull/legs; or push/pull/legs twice', () => {
+    assert.deepEqual(week('5+ days a week', ''), [
+      'Mon:Upper body', 'Tue:Lower body', 'Wed:rest', 'Thu:Push: chest, shoulders & triceps', 'Fri:Pull: back & biceps', 'Sat:Legs', 'Sun:rest',
+    ]);
+    assert.deepEqual(week('5+ days a week', 'ppl6').map((d) => d.split(':')[0] + ':' + d.split(':')[1]), [
+      'Mon:Push', 'Tue:Pull', 'Wed:Legs', 'Thu:Push', 'Fri:Pull', 'Sat:Legs', 'Sun:rest',
+    ]);
+  });
+
+  test('a split that no longer fits the training days falls back to the recommended one', () => {
+    assert.equal(getDay(profileFor({ schedule: '4 days a week', gymStyle: 'ppl' }), 0).title, 'Upper body');
+  });
+
+  test('the Gymnazzium split can still be picked on any schedule', () => {
+    assert.equal(getDay(profileFor({ schedule: '4 days a week', gymStyle: 'gymnazzium' }), 0).title, 'Chest & back');
+  });
+
+  test('every split builds valid days at every level, including plank and leg-raise doses', () => {
+    for (const [style, def] of Object.entries(gymStyles))
+      for (const schedule of Object.keys(def.days))
+        for (const level of ['Beginner', 'Intermediate', 'Advanced']) {
+          const profile = profileFor({ schedule, gymStyle: style, level, timeline: '6 months' });
+          for (let i = 0; i < totalDays(profile); i++) {
+            const day = getDay(profile, i);
+            if (day.type !== 'train') continue;
+            for (const item of day.items) assert.ok(item.name && item.dose && !/undefined/.test(item.dose), `${style}/${schedule}/${level}/${i}: ${item.id} ${item.dose}`);
+          }
+        }
+    const plank = getDay(profileFor({ schedule: '2 days a week', gymStyle: '' }), 0).items.find((i) => i.id === 'plank');
+    assert.doesNotMatch(plank.dose, /reps/);
+  });
+
+  test('options for each schedule list the recommended split first', () => {
+    assert.deepEqual(gymStyleOptions('3 days a week', 'Beginner'), ['fullBody', 'ppl', 'gymnazzium']);
+    assert.deepEqual(gymStyleOptions('5+ days a week', 'Advanced'), ['ulppl', 'ppl6', 'gymnazzium']);
+    assert.equal(recommendedGymStyle('4 days a week', 'Advanced'), 'upperLower');
   });
 });
 

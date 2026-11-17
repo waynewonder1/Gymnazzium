@@ -2,6 +2,7 @@ import WorkoutTimer from '../WorkoutTimer';
 import LiftLog from './LiftLog';
 import RunLog from './RunLog';
 import RestSettings from './RestSettings';
+import ExerciseHowTo from '../ExerciseHowTo';
 import { isLoggable, lastLog } from '../../lib/lifts';
 
 const formatDate = (date) => date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -71,6 +72,7 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
                         {item.cue}
                         {item.note && <em> {item.note}</em>}
                       </span>
+                      {item.id !== 'run' && <ExerciseHowTo id={item.id} name={item.name} cue={item.cue} />}
                     </span>
                   </label>
                   {!locked && isLoggable(item.id) && (

@@ -6,6 +6,8 @@ import { startRest, stopRest } from '../../lib/restTimer';
 import { beep } from '../../lib/sound';
 import Confetti from '../Confetti';
 import ExerciseMedia from '../ExerciseMedia';
+import ExerciseHowTo from '../ExerciseHowTo';
+import { exerciseMedia } from '../../data/exerciseMedia';
 import { useMember } from '../../context/member';
 import { currentSubscription, enablePush, needsHomeScreen, pushAvailable, testNotification } from '../../lib/push';
 
@@ -263,6 +265,7 @@ function GuidedWorkout({ day, progress, onStep, onFinish, onClose }) {
         <p className="guided-dose">{item.dose}</p>
         <p className="muted">{item.cue}</p>
         <ExerciseMedia key={item.id} id={item.id} name={item.name} compact />
+        {!exerciseMedia[item.id] && item.id !== 'run' && <ExerciseHowTo key={`howto-${item.id}`} id={item.id} name={item.name} cue={item.cue} />}
         {item.note && <p className="guided-note">{item.note}</p>}
 
         {isHold ? (
