@@ -4,8 +4,8 @@
 export const exerciseMedia = {
   chestFly: { photos: ['Arms open', 'Squeeze together'], video: true },
   shoulderPress: { photos: ['Handles at shoulder height', 'Press overhead'], video: true },
-  inclineBench: { photos: ['Lock out over your upper chest'] },
-  benchPress: { photos: ['Grip just wider than shoulders'] },
+  inclineBench: { photos: ['Lock out over your upper chest'], video: true },
+  benchPress: { photos: ['Grip just wider than shoulders'], video: true },
   machinePullover: { photos: ['Start: arms overhead', 'Finish: hands by your hips'], video: true },
   latPulldown: { photos: ['Start: arms long', 'Finish: bar to upper chest'] },
   machineRow: { photos: ['Start: reach forward', 'Finish: pull to your ribs'] },
