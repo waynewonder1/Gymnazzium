@@ -37,12 +37,12 @@ const emptyProfile = () => ({
 // Gym only: which split to follow, from the ones that fit the training days.
 function SplitChoice({ profile, onPick }) {
   const current = gymStyleFor(profile);
-  const best = recommendedGymStyle(profile.schedule, profile.level);
+  const best = recommendedGymStyle(profile.schedule, profile.level, profile.gender);
   return (
     <div className="split-choice">
       <p className="muted small form-hint">Your gym split for {profile.schedule.replace(' a week', '')} a week:</p>
       <div className="levels">
-        {gymStyleOptions(profile.schedule, profile.level).map((key) => (
+        {gymStyleOptions(profile.schedule, profile.level, profile.gender).map((key) => (
           <label key={key} className={`level ${current === key ? 'active' : ''}`}>
             <input type="radio" name="gymStyle" value={key} checked={current === key} onChange={() => onPick(key)} />
             <strong>{gymStyles[key].name}{key === best && <span className="tag rec-tag">Recommended</span>}</strong>

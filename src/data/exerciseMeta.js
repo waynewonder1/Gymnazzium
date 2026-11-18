@@ -1,6 +1,6 @@
 // Extra details for the exercise library (/exercises). Keys match data/workouts.js.
 // level: 1 = beginner, 2 = intermediate, 3 = advanced
-export const muscleGroups = ['Chest', 'Shoulders', 'Back', 'Biceps', 'Triceps', 'Forearms', 'Abs', 'Obliques', 'Legs', 'Cardio'];
+export const muscleGroups = ['Chest', 'Shoulders', 'Back', 'Biceps', 'Triceps', 'Forearms', 'Abs', 'Obliques', 'Legs', 'Glutes', 'Cardio'];
 
 export const exerciseMeta = {
   pushup: { muscles: ['Chest', 'Triceps', 'Shoulders'], equipment: 'None', level: 1 },
@@ -48,6 +48,11 @@ export const exerciseMeta = {
   legPress: { muscles: ['Legs'], equipment: 'Leg press machine', level: 1 },
   hackSquat: { muscles: ['Legs'], equipment: 'Hack squat machine', level: 2 },
   hamstringCurl: { muscles: ['Legs'], equipment: 'Leg curl machine', level: 1 },
+  hipThrust: { muscles: ['Glutes', 'Legs'], equipment: 'Bench + barbell or dumbbell', level: 1 },
+  cableKickback: { muscles: ['Glutes'], equipment: 'Cable + ankle strap', level: 1 },
+  hipAbduction: { muscles: ['Glutes'], equipment: 'Hip abduction machine', level: 1 },
+  sumoSquat: { muscles: ['Legs', 'Glutes'], equipment: 'Dumbbell', level: 1 },
+  stepUp: { muscles: ['Glutes', 'Legs'], equipment: 'Bench or box + dumbbells', level: 1 },
   militaryPress: { muscles: ['Shoulders', 'Triceps'], equipment: 'Barbell', level: 2 },
   tricepsPushdown: { muscles: ['Triceps'], equipment: 'Cable + rope or bar', level: 1 },
   tricepsExtension: { muscles: ['Triceps'], equipment: 'Dumbbell or cable', level: 1 },
@@ -92,7 +97,7 @@ export const exerciseMeta = {
   homeCalfRaise: { muscles: ['Legs'], equipment: 'A step', level: 1 },
   bwLunge: { muscles: ['Legs'], equipment: 'None', level: 1 },
   splitSquat: { muscles: ['Legs'], equipment: 'Chair', level: 2 },
-  gluteBridge: { muscles: ['Legs'], equipment: 'None', level: 1 },
+  gluteBridge: { muscles: ['Glutes', 'Legs'], equipment: 'None', level: 1 },
   wallSit: { muscles: ['Legs'], equipment: 'A wall', level: 1 },
 };
 

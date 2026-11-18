@@ -3,8 +3,8 @@ import { gymStyleFor, gymStyleOptions, gymStyles, recommendedGymStyle } from '..
 // Gym plans: show the split being followed, and let the member switch to another that fits their days.
 function SplitPicker({ profile, onPick }) {
   const current = gymStyleFor(profile);
-  const best = recommendedGymStyle(profile.schedule, profile.level);
-  const options = gymStyleOptions(profile.schedule, profile.level);
+  const best = recommendedGymStyle(profile.schedule, profile.level, profile.gender);
+  const options = gymStyleOptions(profile.schedule, profile.level, profile.gender);
 
   const pick = (key) => {
     if (key === current) return;

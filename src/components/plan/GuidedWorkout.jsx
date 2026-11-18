@@ -214,7 +214,8 @@ function GuidedWorkout({ day, progress, onStep, onFinish, onClose }) {
           <span className="guided-kicker">Guided workout · ~{day.minutes} min</span>
           <h2 id="guided-title">{day.title}</h2>
           <p className="muted">{items.length} exercises, {totalSets} sets. We'll take you through them one set at a time, with your rest timer in between.</p>
-          {day.warmup && <p className="guided-note"><strong>Warm up first:</strong> {day.warmup}</p>}
+          {/* Most warm-ups already start with "Warm up:", so don't say it twice. */}
+          {day.warmup && <p className="guided-note"><strong>Warm up first:</strong> {day.warmup.replace(/^warm up:\s*/i, '')}</p>}
           <button type="button" className="btn guided-main" onClick={begin}>▶ Start</button>
         </div>
       </div>

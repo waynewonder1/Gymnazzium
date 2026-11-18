@@ -1,6 +1,6 @@
 // Turns a member's profile into a day-by-day plan.
 // Everything is computed from the profile, so the same profile always gives the same plan.
-import { RUN_GOAL, exercises, gymSplit, gymStyleFor, gymStyles, gymWeek, homeNotes, homeSplit, homeWeek, pathSplits, runLevels, runRules, sessions } from '../data/workouts.js';
+import { RUN_GOAL, exercises, gymSplit, gymStyleFor, gymStyles, gymWeek, homeNotes, homeSwap, homeSplit, homeWeek, pathSplits, runLevels, runRules, sessions } from '../data/workouts.js';
 import { challenges, milestones, missions, weeklyMission } from '../data/coaching.js';
 
 export const TIMELINE_DAYS = { '1 month': 28, '3 months': 84, '6 months': 182, '1 year+': 364 };
@@ -282,7 +282,8 @@ function splitSessionFor(week, profile, date, index) {
   const start = parseDate(profile.startDate);
   let count = 0;
   for (let i = 0; i < index; i++) if (days.includes(addDays(start, i).getDay())) count++;
-  return week.order[count % week.order.length];
+  const order = week.orders?.[profile.schedule] ?? week.order;
+  return order[count % order.length];
 }
 
 export function phaseInfo(profile, index) {
@@ -345,7 +346,11 @@ function gymDay(profile, index, base) {
 function splitDay(profile, index, base, { week, split }) {
   const key = splitSessionFor(week, profile, base.date, index);
   if (!key) return restDay(profile, base);
-  const session = split[key];
+  return bodyweightSession(profile, base, split[key], key);
+}
+
+// A training day from a bodyweight session ({ title, focus, warmup, groups }), dosed for the member.
+function bodyweightSession(profile, base, session, key) {
   const dayIds = session.groups.flatMap((g) => g.ids);
   const items = session.groups.flatMap((group) =>
     group.ids.map((rawId) => {
@@ -368,6 +373,17 @@ function splitDay(profile, index, base, { week, split }) {
     cooldown: '5 min cool-down: stretch what you trained, then drink water.',
     minutes: 10 + items.length * 4,
   };
+}
+
+// "Can't make it to the gym today?": the same day as a no-equipment home workout for the same
+// muscles. Only for gym days on the recommended plan; null when there's no home version.
+export function homeVersion(profile, day) {
+  if (!isGym(profile) || usesRoutine(profile) || day.type !== 'train') return null;
+  const session = homeSwap[day.sessionKey];
+  if (!session) return null;
+  const { index, date, week, phase, mission, obstacle } = day;
+  const home = bodyweightSession(profile, { index, date, week, phase, mission, obstacle }, session, day.sessionKey);
+  return { ...home, title: `${session.title} at home`, atHome: true, gymTitle: day.title };
 }
 
 function restDay(profile, base) {

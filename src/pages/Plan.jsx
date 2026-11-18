@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { products, shopConfig } from '../data/shop';
-import { addDays, getDay, parseDate, phaseInfo, streak, todayIndex, totalDays, usesRoutine } from '../lib/plan';
+import { addDays, getDay, homeVersion, parseDate, phaseInfo, streak, todayIndex, totalDays, usesRoutine } from '../lib/plan';
 import { useMember } from '../context/member';
 import DayCard from '../components/plan/DayCard';
 import WeekStrip from '../components/plan/WeekStrip';
@@ -62,9 +62,28 @@ function PlanView({ profile }) {
   const [week, setWeek] = useState(Math.floor(clamp(today) / 7));
   const [guided, setGuided] = useState(false); // guided workout mode open
   const [guideOpen, setGuideOpen] = useState(() => !guideSeen()); // "How it works" walkthrough, first visit
-  const day = getDay(profile, selected);
+  // A gym day the member switched to the home version ("Can't make it to the gym?").
+  const dayAt = (i) => {
+    const planned = getDay(profile, i);
+    return (progress.homeDays?.[i] && homeVersion(profile, planned)) || planned;
+  };
+  const day = dayAt(selected);
+  const canGoHome = !day.atHome && Boolean(homeVersion(profile, day));
 
   const commit = saveProgress;
+
+  // Switch the selected day between the gym workout and its home version. The exercise list
+  // changes, so that day's ticks are cleared (after asking, if any were ticked).
+  const toggleHome = () => {
+    const prefix = `${selected}:`;
+    const ticked = Object.keys(progress.checks).some((k) => k.startsWith(prefix) && progress.checks[k]);
+    if (ticked && !window.confirm("Switch this workout? The exercises you've ticked today will be unticked.")) return;
+    const homeDays = { ...progress.homeDays };
+    if (homeDays[selected]) delete homeDays[selected];
+    else homeDays[selected] = true;
+    const checks = Object.fromEntries(Object.entries(progress.checks).filter(([k]) => !k.startsWith(prefix)));
+    commit({ ...progress, homeDays, checks });
+  };
 
   const toggleCheck = (j) => {
     const key = `${selected}:${j}`;
@@ -138,7 +157,7 @@ function PlanView({ profile }) {
 
   const relationOf = (i) => (i < today ? 'past' : i === today ? 'today' : 'future');
   const statusOf = (i) => {
-    const d = getDay(profile, i);
+    const d = dayAt(i);
     const rel = relationOf(i);
     if (d.type === 'rest') return { type: 'rest', rel, title: d.title };
     return { type: 'train', rel, title: d.title, state: progress.done[i] ? 'done' : rel === 'past' ? 'missed' : 'todo' };
@@ -254,6 +273,8 @@ function PlanView({ profile }) {
           onLog={logLift}
           onLogRun={logRun}
           onStartGuided={() => setGuided(true)}
+          canGoHome={canGoHome && !progress.done[selected]}
+          onToggleHome={toggleHome}
         />
         {guided && day.type === 'train' && (
           <GuidedWorkout key={selected} day={day} progress={progress} onStep={guidedStep} onFinish={finishWorkout} onClose={() => setGuided(false)} />

@@ -8,7 +8,7 @@ import { isLoggable, lastLog } from '../../lib/lifts';
 const formatDate = (date) => date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
 
 // relation: 'past' | 'today' | 'future'
-function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggleMission, onLog, onLogRun, onStartGuided }) {
+function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggleMission, onLog, onLogRun, onStartGuided, canGoHome, onToggleHome }) {
   const done = Boolean(progress.done[day.index]);
   const locked = relation === 'future';
   const missionDone = Boolean(progress.missions[day.index]);
@@ -33,6 +33,18 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
           <strong>Heads-up: {day.obstacle.title}</strong>
           <p>{day.obstacle.text}</p>
         </div>
+      )}
+
+      {day.atHome && (
+        <div className="home-swap on">
+          <span>🏠 <strong>Home version.</strong> Same muscles as {day.gymTitle}, no gym needed.</span>
+          {!done && <button type="button" className="link-btn" onClick={onToggleHome}>Back to the gym workout</button>}
+        </div>
+      )}
+      {canGoHome && onToggleHome && (
+        <button type="button" className="home-swap" onClick={onToggleHome}>
+          🏠 Can't make it to the gym? <strong>Do this workout at home</strong>
+        </button>
       )}
 
       {day.type === 'train' && (

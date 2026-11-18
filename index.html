@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="A free day-by-day fitness plan built around your goals, with a gym split, push reminders, weight logging, progress charts and a gear shop." />
     <meta name="theme-color" content="#0A0E0C" />
+    <script>
+      // Apply the saved light/dark choice before the page draws (no dark-to-light flash).
+      try {
+        if (localStorage.getItem('gymnazzium-theme') === 'light') {
+          document.documentElement.dataset.theme = 'light';
+          document.querySelector('meta[name="theme-color"]').content = '#F4F5F3';
+        }
+      } catch (e) {}
+    </script>
 
     <!-- Link previews (WhatsApp, Instagram, Facebook, X, LinkedIn) -->
     <meta property="og:type" content="website" />

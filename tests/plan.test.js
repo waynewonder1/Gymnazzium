@@ -1,6 +1,7 @@
 import { before, describe, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { expectations, getDay, parseDose, routineTemplate, runStep, totalDays } from '../src/lib/plan.js';
+import { expectations, getDay, homeVersion, parseDose, routineTemplate, runStep, totalDays } from '../src/lib/plan.js';
+import { exerciseMeta } from '../src/data/exerciseMeta.js';
 import { registration } from '../src/data/guide.js';
 import { gymStyleOptions, gymStyles, recommendedGymStyle } from '../src/data/workouts.js';
 import { WEEKDAY, freezeToday, profileFor } from './helpers.js';
@@ -122,9 +123,25 @@ describe('gym split choices', () => {
     assert.doesNotMatch(plank.dose, /reps/);
   });
 
+  test('women: glutes & legs plan is recommended from 3 days, same sessions every week', () => {
+    assert.equal(recommendedGymStyle('3 days a week', 'Beginner', 'Female'), 'glutes');
+    assert.equal(recommendedGymStyle('2 days a week', 'Beginner', 'Female'), 'fullBody');
+    assert.equal(recommendedGymStyle('3 days a week', 'Beginner', 'Male'), 'fullBody');
+    const three = profileFor({ schedule: '3 days a week', gender: 'Female', gymStyle: '' });
+    assert.deepEqual(firstWeek(three), ['Mon:Glutes & hamstrings', 'Tue:rest', 'Wed:Upper body & core', 'Thu:rest', 'Fri:Glutes & quads', 'Sat:rest', 'Sun:rest']);
+    assert.deepEqual(firstWeek({ ...three, startDate: '2026-10-19' }), firstWeek(three));
+    assert.deepEqual(firstWeek(profileFor({ schedule: '5+ days a week', gender: 'Female', gymStyle: '' })), [
+      'Mon:Glutes & hamstrings', 'Tue:Upper body & core', 'Wed:rest', 'Thu:Glutes & quads', 'Fri:Upper body & core', 'Sat:Glutes & full body', 'Sun:rest',
+    ]);
+    // Anyone can pick it.
+    assert.equal(getDay(profileFor({ schedule: '4 days a week', gender: 'Male', gymStyle: 'glutes' }), 0).title, 'Glutes & hamstrings');
+  });
+
   test('options for each schedule list the recommended split first', () => {
-    assert.deepEqual(gymStyleOptions('3 days a week', 'Beginner'), ['fullBody', 'ppl', 'gymnazzium']);
-    assert.deepEqual(gymStyleOptions('5+ days a week', 'Advanced'), ['ulppl', 'ppl6', 'gymnazzium']);
+    assert.deepEqual(gymStyleOptions('3 days a week', 'Beginner'), ['fullBody', 'ppl', 'glutes', 'gymnazzium']);
+    assert.deepEqual(gymStyleOptions('5+ days a week', 'Advanced'), ['ulppl', 'ppl6', 'glutes', 'gymnazzium']);
+    assert.deepEqual(gymStyleOptions('4 days a week', 'Beginner', 'Female'), ['glutes', 'upperLower', 'gymnazzium']);
+    assert.deepEqual(gymStyleOptions('2 days a week', 'Beginner', 'Female'), ['fullBody', 'gymnazzium']);
     assert.equal(recommendedGymStyle('4 days a week', 'Advanced'), 'upperLower');
   });
 });
@@ -223,6 +240,43 @@ describe('running goal', () => {
     const running = (overrides) => expectations(runner(overrides)).find((e) => e.label === 'Running').value;
     assert.equal(running({ runLevel: 'Intermediate', timeline: '1 month' }), '4 km, one break max');
     assert.equal(running({ runLevel: 'Experienced', timeline: '6 months' }), '10 km, non-stop');
+  });
+});
+
+describe("can't make it to the gym: home version of a day", () => {
+  const noGym = /machine|barbell|cable|dumbbell|bench \+|leg press|lat pull/i;
+
+  test('every gym session of every split has a no-equipment home version for the same day', () => {
+    for (const [style, def] of Object.entries(gymStyles))
+      for (const schedule of Object.keys(def.days))
+        for (const gender of ['Male', 'Female']) {
+          const profile = profileFor({ schedule, gymStyle: style, gender });
+          for (let i = 0; i < 28; i++) {
+            const day = getDay(profile, i);
+            if (day.type !== 'train') continue;
+            const home = homeVersion(profile, day);
+            const where = `${style}/${schedule}/${day.title}`;
+            assert.ok(home, `${where}: no home version`);
+            assert.equal(home.index, day.index);
+            assert.ok(home.atHome && home.title.endsWith('at home') && home.gymTitle === day.title, where);
+            for (const item of home.items) assert.doesNotMatch(exerciseMeta[item.id]?.equipment ?? '', noGym, `${where}: ${item.id}`);
+            const ids = home.items.map((x) => x.id);
+            assert.equal(new Set(ids).size, ids.length, `${where}: repeats an exercise (${ids})`);
+          }
+        }
+  });
+
+  test('push day at home trains chest, shoulders and arms', () => {
+    const profile = profileFor({ schedule: '3 days a week', level: 'Intermediate', gymStyle: 'ppl' });
+    const home = homeVersion(profile, getDay(profile, 0));
+    assert.equal(home.gymTitle, 'Push: chest, shoulders & triceps');
+    assert.ok(home.items.some((x) => /push-ups/i.test(x.name)));
+  });
+
+  test('no home version for rest days, runs, other paths or custom routines', () => {
+    assert.equal(homeVersion(profileFor(), getDay(profileFor(), 2)), null); // Wednesday rest
+    const home = profileFor({ lookingFor: 'Home workout' });
+    assert.equal(homeVersion(home, getDay(home, 0)), null);
   });
 });
 

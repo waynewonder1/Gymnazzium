@@ -63,6 +63,12 @@ export const exercises = {
   legPress: { name: 'Leg press', cue: 'Feet shoulder-width, lower until knees reach 90°, never lock your knees at the top.', kind: 'weight' },
   hackSquat: { name: 'Hack squats', cue: 'Back flat on the pad, sink deep, drive through your whole foot.', kind: 'weight' },
   hamstringCurl: { name: 'Hamstring curls', cue: 'Curl your heels towards your glutes, squeeze, lower slowly.', kind: 'weight' },
+  // Glutes (the "Glutes & legs" women's plan)
+  hipThrust: { name: 'Hip thrusts', cue: 'Upper back on a bench, bar or dumbbell on your hips. Drive through your heels, squeeze your glutes hard at the top, chin tucked.', kind: 'weight' },
+  cableKickback: { name: 'Cable kickbacks', cue: 'Ankle strap on a low cable. Kick the leg straight back, squeeze the glute, no swinging. Each leg.', kind: 'weight' },
+  hipAbduction: { name: 'Hip abduction machine', cue: 'Sit tall or lean slightly forward, push your knees out against the pads, pause, return slowly.', kind: 'weight' },
+  sumoSquat: { name: 'Sumo squats', cue: 'Wide stance, toes out, one dumbbell held between your legs. Sit straight down, knees out, stand and squeeze.', kind: 'weight' },
+  stepUp: { name: 'Step-ups', cue: 'Dumbbells in hand, step up onto a bench or box, drive through the front heel, control the step down. Each leg.', kind: 'weight' },
   militaryPress: { name: 'Overhead military press', cue: 'Standing, core tight, press the bar straight overhead. Moderate weight — protect your lower back.', kind: 'weight' },
   tricepsPushdown: { name: 'Triceps push-downs', cue: 'Elbows pinned to your sides, push the rope or bar down, spread at the bottom.', kind: 'weight' },
   tricepsExtension: { name: 'Triceps extensions', cue: 'Overhead with a dumbbell or cable, lower behind your head, extend fully.', kind: 'weight' },
@@ -254,6 +260,48 @@ export const gymSplit = {
       { name: 'Core', ids: ['plank'] },
     ],
   },
+  // The "Glutes & legs" women's plan: two or three glute days a week, upper body for tone.
+  glutesHams: {
+    title: 'Glutes & hamstrings',
+    focus: 'Hip thrusts and hinges: the back of the legs',
+    warmup: 'Warm up: 5 min on the bike or stepper, then 2 sets of 15 glute bridges.',
+    groups: [
+      { name: 'Glutes', ids: ['hipThrust', 'cableKickback'] },
+      { name: 'Hamstrings', ids: ['rdl', 'hamstringCurl'] },
+      { name: 'Side glutes', ids: ['hipAbduction'] },
+    ],
+  },
+  glutesQuads: {
+    title: 'Glutes & quads',
+    focus: 'Squats, presses and step-ups',
+    warmup: 'Warm up: 5 min on the bike or stepper, then 2 light sets of sumo squats.',
+    groups: [
+      { name: 'Legs & glutes', ids: ['sumoSquat', 'legPress', 'stepUp'] },
+      { name: 'Single leg', ids: ['splitSquat'] },
+      { name: 'Side glutes & calves', ids: ['hipAbduction', 'calfRaise'] },
+    ],
+  },
+  upperTone: {
+    title: 'Upper body & core',
+    focus: 'Back, shoulders and arms for tone and posture',
+    warmup: 'Warm up: arm circles, then 1 light set of pull-downs.',
+    groups: [
+      { name: 'Back', ids: ['latPulldown', 'machineRow'] },
+      { name: 'Shoulders', ids: ['shoulderPress', 'lateralRaise'] },
+      { name: 'Arms', ids: ['tricepsPushdown', 'bicepCurl'] },
+      { name: 'Core', ids: ['plank'] },
+    ],
+  },
+  glutesFull: {
+    title: 'Glutes & full body',
+    focus: 'One more glute session, plus a little of everything',
+    warmup: 'Warm up: 5 min on the bike or stepper, then 2 sets of 15 glute bridges.',
+    groups: [
+      { name: 'Glutes', ids: ['hipThrust', 'stepUp', 'cableKickback'] },
+      { name: 'Upper body', ids: ['latPulldown', 'shoulderPress'] },
+      { name: 'Core', ids: ['hangingLegRaise'] },
+    ],
+  },
   fullB: {
     title: 'Full body B',
     focus: 'Hinge, pull and fly: the whole body in one session',
@@ -316,6 +364,14 @@ export const gymStyles = {
     days: { '5+ days a week': [1, 2, 3, 4, 5, 6] },
     order: ['push', 'pull', 'legs'],
   },
+  glutes: {
+    name: 'Glutes & legs (women’s plan)',
+    text: 'Glutes and legs 2–3 times a week, plus upper body and core for tone. Popular with women.',
+    days: { '3 days a week': [1, 3, 5], '4 days a week': [1, 2, 4, 5], '5+ days a week': [1, 2, 4, 5, 6] },
+    order: ['glutesHams', 'upperTone', 'glutesQuads', 'upperTone'],
+    orders: { '3 days a week': ['glutesHams', 'upperTone', 'glutesQuads'] }, // same 3 sessions every week
+    byDay: { 1: 'glutesHams', 2: 'upperTone', 4: 'glutesQuads', 5: 'upperTone', 6: 'glutesFull' },
+  },
   gymnazzium: {
     name: 'Gymnazzium split',
     text: 'Chest & back, legs, chest/shoulders/arms, legs, back & arms.',
@@ -323,17 +379,18 @@ export const gymStyles = {
   },
 };
 
-// The best split for a schedule and level.
-export function recommendedGymStyle(schedule, level) {
+// The best split for a schedule and level (women training 3+ days get the glutes & legs plan first).
+export function recommendedGymStyle(schedule, level, gender) {
   if (schedule === '2 days a week') return 'fullBody';
+  if (gender === 'Female') return 'glutes';
   if (schedule === '3 days a week') return level === 'Beginner' ? 'fullBody' : 'ppl';
   if (schedule === '4 days a week') return 'upperLower';
   return 'ulppl';
 }
 
 // The splits that fit a schedule, recommended first.
-export function gymStyleOptions(schedule, level) {
-  const best = recommendedGymStyle(schedule, level);
+export function gymStyleOptions(schedule, level, gender) {
+  const best = recommendedGymStyle(schedule, level, gender);
   const fits = Object.keys(gymStyles).filter((k) => gymStyles[k].days[schedule]);
   return [best, ...fits.filter((k) => k !== best)];
 }
@@ -343,7 +400,7 @@ export function gymStyleOptions(schedule, level) {
 export function gymStyleFor(profile) {
   if (profile.gymStyle === undefined) return 'gymnazzium';
   if (gymStyles[profile.gymStyle]?.days[profile.schedule]) return profile.gymStyle;
-  return recommendedGymStyle(profile.schedule, profile.level);
+  return recommendedGymStyle(profile.schedule, profile.level, profile.gender);
 }
 
 // The Gymnazzium home split, used for everyone who picks "Home workout".
@@ -517,4 +574,57 @@ export const pathSplits = {
   'Home workout': { week: homeWeek, split: homeSplit },
   Calisthenics: { week: caliWeek, split: caliSplit },
   'Overall cardio': { week: cardioWeek, split: cardioSplit },
+};
+
+// "Can't make it to the gym today?": the home session that trains the same muscles as each gym session.
+const homeUpper = {
+  title: 'Upper body',
+  focus: 'Push-ups, rows and pikes: chest, back, shoulders and arms',
+  warmup: 'Warm up: arm circles, then 1 easy set of incline push-ups.',
+  groups: [
+    { name: 'Chest', ids: ['pushup', 'widePushup'] },
+    { name: 'Back', ids: ['pullup', 'tableRow'] },
+    { name: 'Shoulders', ids: ['pikePushup', 'bottleLateralRaise'] },
+    { name: 'Arms', ids: ['diamondPushup', 'homeCurl'] },
+  ],
+};
+const homeFull = {
+  title: 'Full body',
+  focus: 'The whole body with no equipment',
+  warmup: 'Warm up: 2 min of jumping jacks or marching on the spot, arm circles, leg swings.',
+  groups: [
+    { name: 'Legs', ids: ['squat', 'splitSquat'] },
+    { name: 'Chest', ids: ['pushup'] },
+    { name: 'Back', ids: ['tableRow'] },
+    { name: 'Shoulders', ids: ['pikePushup'] },
+    { name: 'Core', ids: ['plank'] },
+  ],
+};
+const homeGlutes = {
+  title: 'Glutes & legs',
+  focus: 'Bridges, squats and lunges with no equipment',
+  warmup: 'Warm up: 2 min marching on the spot, leg swings, then 1 set of 15 glute bridges.',
+  groups: [
+    { name: 'Glutes', ids: ['gluteBridge', 'splitSquat'] },
+    { name: 'Legs', ids: ['squat', 'bwLunge', 'wallSit'] },
+    { name: 'Calves', ids: ['homeCalfRaise'] },
+  ],
+};
+export const homeSwap = {
+  chestBack: homeSplit.chestBack,
+  legsQuads: homeSplit.legsAbs,
+  chestShouldersArms: homeSplit.chestShouldersArms,
+  legsHams: homeSplit.legsGlutes,
+  backArms: homeSplit.backArms,
+  push: homeSplit.chestShouldersArms,
+  pull: homeSplit.backArms,
+  legs: homeSplit.legsGlutes,
+  upper: homeUpper,
+  lower: homeSplit.legsAbs,
+  fullA: homeFull,
+  fullB: homeFull,
+  glutesHams: homeGlutes,
+  glutesQuads: homeGlutes,
+  upperTone: homeUpper,
+  glutesFull: homeGlutes,
 };

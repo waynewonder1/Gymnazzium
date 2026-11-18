@@ -13,6 +13,7 @@ import PageBoundary from './PageBoundary';
 import Feedback from './Feedback';
 import TeamReply from './TeamReply';
 import Welcome from './Welcome';
+import ThemeToggle from './ThemeToggle';
 
 const SITE = 'Gymnazzium';
 const PAGE_TITLES = {
@@ -102,6 +103,7 @@ function Layout() {
           )}
           {online && pendingSync && user && <span className="offline-pill syncing" role="status">Syncing…</span>}
           <InstallButton />
+          <ThemeToggle />
           {shopConfig.storeOpen && (
             <button className="cart-btn" onClick={() => setOpen(true)} aria-label={`Open cart, ${count} items`}>
               Cart<span className="cart-count">{count}</span>
