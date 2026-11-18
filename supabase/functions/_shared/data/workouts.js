@@ -347,8 +347,9 @@ export const gymStyles = {
   },
   upperLower: {
     name: 'Upper / Lower',
-    text: 'Upper body, lower body, rest, then again. Each muscle twice a week.',
-    days: { '4 days a week': [1, 2, 4, 5] },
+    text: 'Upper body, lower body, rest, then again: 4 training days. Each muscle twice a week.',
+    // Also offered on 5+ days for people who want an extra rest day.
+    days: { '4 days a week': [1, 2, 4, 5], '5+ days a week': [1, 2, 4, 5] },
     order: ['upper', 'lower'],
   },
   ulppl: {

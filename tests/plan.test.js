@@ -139,7 +139,11 @@ describe('gym split choices', () => {
 
   test('options for each schedule list the recommended split first', () => {
     assert.deepEqual(gymStyleOptions('3 days a week', 'Beginner'), ['fullBody', 'ppl', 'glutes', 'gymnazzium']);
-    assert.deepEqual(gymStyleOptions('5+ days a week', 'Advanced'), ['ulppl', 'ppl6', 'glutes', 'gymnazzium']);
+    assert.deepEqual(gymStyleOptions('5+ days a week', 'Advanced'), ['ulppl', 'upperLower', 'ppl6', 'glutes', 'gymnazzium']);
+    // Upper / Lower on a 5+ day plan: upper, lower, rest, upper, lower, then the weekend off.
+    assert.deepEqual(firstWeek(profileFor({ schedule: '5+ days a week', gymStyle: 'upperLower' })), [
+      'Mon:Upper body', 'Tue:Lower body', 'Wed:rest', 'Thu:Upper body', 'Fri:Lower body', 'Sat:rest', 'Sun:rest',
+    ]);
     assert.deepEqual(gymStyleOptions('4 days a week', 'Beginner', 'Female'), ['glutes', 'upperLower', 'gymnazzium']);
     assert.deepEqual(gymStyleOptions('2 days a week', 'Beginner', 'Female'), ['fullBody', 'gymnazzium']);
     assert.equal(recommendedGymStyle('4 days a week', 'Advanced'), 'upperLower');
