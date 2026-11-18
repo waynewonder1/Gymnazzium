@@ -25,6 +25,11 @@
     --warn: #9A6200;
     color-scheme: light;
   }
+  /* The top bar (and the phone menu that drops from it) stays dark in both themes: the brand look. */
+  :root[data-theme="light"] nav{
+    --bg: #0A0E0C; --bg-raise: #121815; --text: #ECEFEC; --text-dim: #9AA39F; --ink: 255,255,255;
+    --nav-bg: rgba(10,14,12,0.96); --accent: #FF4B3E; color: var(--text); border-bottom-color: transparent;
+  }
   /* Photo-style cards stay dark in both themes. */
   :root[data-theme="light"] :is(.slide, .product-art, .ex-media-frame, .share-preview){
     --text: #ECEFEC; --text-dim: #B9C1BD; --ink: 255,255,255; --bg-raise: #121815; color: var(--text);
