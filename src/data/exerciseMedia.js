@@ -12,6 +12,7 @@ export const exerciseMedia = {
   bentRow: { photos: ['Start: arms long', 'Finish: squeeze your back'] },
   tricepsPushdown: { photos: ['Start: elbows at your sides', 'Finish: arms straight'], video: true },
   rearDeltFly: { photos: ['Machine version: arms out wide'] },
+  preacherCurl: { photos: ['Start: arm long on the pad', 'Finish: curl up and squeeze'], video: true },
   hangingLegRaise: { photos: ['Easier: knees up', 'Harder: legs all the way up'], video: true },
   deadHang: { photos: ['Straight arms, grip hard'] },
 };
