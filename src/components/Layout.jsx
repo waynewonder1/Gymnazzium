@@ -14,6 +14,8 @@ import Feedback from './Feedback';
 import TeamReply from './TeamReply';
 import Welcome from './Welcome';
 import ThemeToggle from './ThemeToggle';
+import TabBar from './TabBar';
+import { openFeedback } from '../lib/feedbackEvent';
 
 const SITE = 'Gymnazzium';
 const PAGE_TITLES = {
@@ -93,6 +95,10 @@ function Layout() {
           {backendEnabled && user && <NavLink to="/feed" onClick={closeMenu}>Feed</NavLink>}
           {isAdmin && <NavLink to="/admin" onClick={closeMenu}>Admin</NavLink>}
           {!isStandalone() && <Link to="/#get-the-app" className="nav-install-link" onClick={closeMenu}>Install app</Link>}
+          {/* Phones with the tab bar: Feedback lives here instead of the floating bubble. */}
+          {backendEnabled && profile && (
+            <button type="button" className="nav-feedback" onClick={() => { closeMenu(); openFeedback(); }}>💬 Feedback</button>
+          )}
           {backendEnabled && (user ? <NavLink to="/account" onClick={closeMenu}>Account</NavLink> : <NavLink to="/login" onClick={closeMenu}>Log in</NavLink>)}
         </div>
         <div className="nav-actions">
@@ -128,6 +134,15 @@ function Layout() {
       <BadgeToast />
       <Feedback />
       <Welcome />
+      {profile && (
+        <TabBar
+          menuOpen={menuOpen}
+          onMore={() => {
+            setMenuOpen(!menuOpen);
+            window.scrollTo({ top: 0, behavior: 'instant' });
+          }}
+        />
+      )}
 
       <footer>
         <div className="footer-grid">

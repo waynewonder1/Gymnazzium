@@ -198,8 +198,8 @@ function PlanView({ profile }) {
         </p>
 
         {backendEnabled && !user && (
-          <p className="banner">
-            This plan is only saved on this device. <Link to="/login" state={{ next: '/plan' }}>Create a free account</Link> to keep it safe, use it on your phone and laptop, and get push reminders.
+          <p className="banner banner-compact">
+            Saved on this device only. <Link to="/login" state={{ next: '/plan' }}>Create a free account</Link> to keep it safe and get reminders.
           </p>
         )}
         {!online && (
@@ -210,50 +210,14 @@ function PlanView({ profile }) {
         {online && syncError && <p className="banner warn">Couldn't save to your account ({syncError}). Your changes are kept on this device. We'll try again on your next change.</p>}
         {today < 0 && <p className="banner">Your plan starts on {dateOf(0).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}. Here's a preview of day one.</p>}
         {today >= total && <p className="banner">You finished your {profile.timeline} plan. Update your details to set the next target.</p>}
-
-        <div className="progress-bar" role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin="0" aria-valuemax="100">
-          <div style={{ width: `${pct}%` }} />
-        </div>
-
-        <div className="stat-grid">
-          <div className="stat"><span className="stat-label">Day</span><strong className="stat-value">{Math.max(0, Math.min(today + 1, total))} / {total}</strong></div>
-          <div className="stat"><span className="stat-label">Streak</span><strong className="stat-value">{streak(profile, progress.done)} 🔥</strong><span className="stat-note">Workouts in a row</span></div>
-          <div className="stat"><span className="stat-label">Workouts done</span><strong className="stat-value">{sessionsDone} / {sessionsSoFar}</strong><span className="stat-note">So far</span></div>
-          <div className="stat"><span className="stat-label">{phase.label}</span><strong className="stat-value">{phase.value}</strong><span className="stat-note">{phase.note}</span></div>
-        </div>
-
-        {usesRoutine(profile) ? (
-          <p className="banner routine-banner">
-            You're following <strong>your own routine</strong>. <Link to="/plan/routine">Edit it</Link> · <button type="button" className="link-btn" onClick={switchToRecommended}>Switch back to the recommended plan</button>
-          </p>
-        ) : (
-          <div className="customize-cta">
-            <div>
-              <strong>Want it your way?</strong>
-              <span className="muted small">Build your own weekly routine: pick your days, exercises, sets and reps.</span>
-            </div>
-            <Link to="/plan/routine" className="btn btn-sm">{profile.routine ? 'Use my routine' : 'Customize my plan'}</Link>
-          </div>
-        )}
-
-        {profile.lookingFor === 'Gym work' && !usesRoutine(profile) && (
-          <SplitPicker profile={profile} onPick={(gymStyle) => saveProfile({ ...profile, gymStyle })} />
-        )}
-
-        <div className="chips plan-nav">
+        <div className="plan-quick">
           <button type="button" className="chip chip-guide" onClick={() => setGuideOpen(true)}>📖 How it works</button>
-          <Link className="chip" to="/progress">My progress</Link>
-          <a className="chip" href="#today">Day by day</a>
-          <a className="chip" href="#reminders">Reminders</a>
-          <a className="chip" href="#obstacles">Obstacles</a>
-          <a className="chip" href="#goal">Your goal in depth</a>
-          {shopConfig.storeOpen && gear.length > 0 && <a className="chip" href="#gear">Gear</a>}
+          <a className="chip" href="#details">📊 Stats & settings</a>
         </div>
       </section>
 
-      <section id="today" className="plan-section">
-        <div className="section-label">Day by day</div>
-        {today >= 0 && today < total && <WeekSummary profile={profile} progress={progress} today={today} />}
+      {/* Today first: the workout and its Start button sit right under the greeting. */}
+      <section id="today" className="plan-section plan-today">
         <WeekStrip
           week={week}
           totalDays={total}
@@ -282,7 +246,49 @@ function PlanView({ profile }) {
         {selected !== current && (
           <button className="btn btn-ghost back-today" onClick={() => select(current)}>Back to today</button>
         )}
+      </section>
+
+      <section id="details" className="plan-section">
+        <div className="section-label">Stats & settings</div>
+        <div className="progress-bar" role="progressbar" aria-label="How far through your plan" aria-valuenow={Math.round(pct)} aria-valuemin="0" aria-valuemax="100">
+          <div style={{ width: `${pct}%` }} />
+        </div>
+
+        <div className="stat-grid">
+          <div className="stat"><span className="stat-label">Day</span><strong className="stat-value">{Math.max(0, Math.min(today + 1, total))} / {total}</strong></div>
+          <div className="stat"><span className="stat-label">Streak</span><strong className="stat-value">{streak(profile, progress.done)} 🔥</strong><span className="stat-note">Workouts in a row</span></div>
+          <div className="stat"><span className="stat-label">Workouts done</span><strong className="stat-value">{sessionsDone} / {sessionsSoFar}</strong><span className="stat-note">So far</span></div>
+          <div className="stat"><span className="stat-label">{phase.label}</span><strong className="stat-value">{phase.value}</strong><span className="stat-note">{phase.note}</span></div>
+        </div>
+
+        {usesRoutine(profile) ? (
+          <p className="banner routine-banner">
+            You're following <strong>your own routine</strong>. <Link to="/plan/routine">Edit it</Link> · <button type="button" className="link-btn" onClick={switchToRecommended}>Switch back to the recommended plan</button>
+          </p>
+        ) : (
+          <div className="customize-cta">
+            <div>
+              <strong>Want it your way?</strong>
+              <span className="muted small">Build your own weekly routine: pick your days, exercises, sets and reps.</span>
+            </div>
+            <Link to="/plan/routine" className="btn btn-sm">{profile.routine ? 'Use my routine' : 'Customize my plan'}</Link>
+          </div>
+        )}
+
+        {profile.lookingFor === 'Gym work' && !usesRoutine(profile) && (
+          <SplitPicker profile={profile} onPick={(gymStyle) => saveProfile({ ...profile, gymStyle })} />
+        )}
+
+        {today >= 0 && today < total && <WeekSummary profile={profile} progress={progress} today={today} />}
         <PlanOverview totalDays={total} selected={selected} onSelect={(i) => select(i, true)} statusOf={statusOf} />
+
+        <div className="chips plan-nav">
+          <Link className="chip" to="/progress">My progress</Link>
+          <a className="chip" href="#reminders">Reminders</a>
+          <a className="chip" href="#obstacles">Obstacles</a>
+          <a className="chip" href="#goal">Your goal in depth</a>
+          {shopConfig.storeOpen && gear.length > 0 && <a className="chip" href="#gear">Gear</a>}
+        </div>
       </section>
 
       <section id="reminders" className="plan-section">

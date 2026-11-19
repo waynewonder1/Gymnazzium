@@ -1,8 +1,9 @@
-import { useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useMember } from '../context/member';
 import { supabase } from '../lib/supabase';
 import { getRest, subscribeRest } from '../lib/restTimer';
+import { OPEN_FEEDBACK } from '../lib/feedbackEvent';
 
 const RATINGS = [
   { value: 1, label: '😞' },
@@ -23,13 +24,19 @@ function Feedback() {
   const [contact, setContact] = useState('');
   const [state, setState] = useState({ busy: false, sent: false, error: '' });
 
-  if (!backendEnabled) return null;
-
-  const open = () => {
+  const open = useCallback(() => {
     setState({ busy: false, sent: false, error: '' });
     if (!contact && user?.email) setContact(user.email);
     dialog.current?.showModal();
-  };
+  }, [contact, user]);
+
+  // Other places (the phone menu's "Feedback" item) open the form with this event.
+  useEffect(() => {
+    window.addEventListener(OPEN_FEEDBACK, open);
+    return () => window.removeEventListener(OPEN_FEEDBACK, open);
+  }, [open]);
+
+  if (!backendEnabled) return null;
   const close = () => dialog.current?.close();
 
   const send = async (e) => {

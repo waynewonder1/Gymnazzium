@@ -19,7 +19,6 @@ export const exerciseMedia = {
   // Landscape clips (wide: true → shown in a 5:3 frame instead of the tall 4:5 one)
   lateralRaise: { photos: ['Start: arms by your sides', 'Finish: arms out to shoulder height'], video: true, wide: true },
   skullCrusher: { photos: ['Start: bar straight above your chest', 'Finish: bar lowered to your forehead'], video: true, wide: true },
-  machineCurl: { photos: ['Curl up and squeeze, one arm at a time or both'], video: true, wide: true },
   spiderCurl: { photos: ['Start: arms hanging straight down', 'Finish: curl up and squeeze'], video: true, wide: true },
   preacherCurl: { photos: ['Start: arm long on the pad', 'Finish: curl up and squeeze'], video: true },
   hangingLegRaise: { photos: ['Easier: knees up', 'Harder: legs all the way up'], video: true },

@@ -46,7 +46,12 @@ function Home() {
         <div className="pillars">
           {intro.pillars.map((p) => <span key={p}>{p}</span>)}
         </div>
-        <a href="#register" className="cta">Build my plan</a>
+        {/* Members already have a plan: send them straight to today's workout. */}
+        {profile ? (
+          <Link to="/plan" className="cta">Go to today's workout →</Link>
+        ) : (
+          <a href="#register" className="cta">Build my plan</a>
+        )}
       </div>
 
       <section id="how">
