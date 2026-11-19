@@ -115,7 +115,10 @@ function Registration() {
       }
     }
     // A fresh plan (or a new start date) starts fresh progress; earned badges stay.
-    if (!saved || saved.startDate !== profile.startDate) saveProgress({ ...emptyProgress, badges: progress.badges ?? {} });
+    // Food logs aren't tied to the plan, so they stay too.
+    if (!saved || saved.startDate !== profile.startDate) {
+      saveProgress({ ...emptyProgress, badges: progress.badges ?? {}, meals: progress.meals ?? {}, customFoods: progress.customFoods ?? {} });
+    }
     // On their own routine, the answers only change the week if they switch back to the recommended plan.
     saveProfile(onRoutine && useRecommended ? { ...profile, planMode: undefined } : profile);
     navigate('/plan');

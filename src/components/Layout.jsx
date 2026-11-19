@@ -25,6 +25,7 @@ const PAGE_TITLES = {
   '/challenges': 'Challenges',
   '/feed': 'Feed',
   '/coach': 'Coach',
+  '/food': 'Food',
   '/privacy': 'Privacy',
   '/shop': 'Shop',
   '/exercises': 'Exercise library',
@@ -91,6 +92,7 @@ function Layout() {
           {shopConfig.storeOpen && <NavLink to="/shop" onClick={closeMenu}>Shop</NavLink>}
           {profile ? <NavLink to="/plan" onClick={closeMenu}>My plan</NavLink> : <Link to="/#register" onClick={closeMenu}>Register</Link>}
           {profile && <NavLink to="/challenges" onClick={closeMenu}>Challenges</NavLink>}
+          {profile && <NavLink to="/food" onClick={closeMenu}>Food</NavLink>}
           {profile && <NavLink to="/coach" onClick={closeMenu}>Coach</NavLink>}
           {backendEnabled && user && <NavLink to="/feed" onClick={closeMenu}>Feed</NavLink>}
           {isAdmin && <NavLink to="/admin" onClick={closeMenu}>Admin</NavLink>}

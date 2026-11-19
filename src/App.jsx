@@ -17,6 +17,7 @@ const Progress = lazy(() => import('./pages/Progress'));
 const Challenges = lazy(() => import('./pages/Challenges'));
 const Feed = lazy(() => import('./pages/Feed'));
 const Coach = lazy(() => import('./pages/Coach'));
+const Food = lazy(() => import('./pages/Food'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const Admin = lazy(() => import('./pages/Admin'));
 
@@ -31,6 +32,7 @@ function App() {
         <Route path="challenges" element={<Challenges />} />
         <Route path="feed" element={<Feed />} />
         <Route path="coach" element={<Coach />} />
+        <Route path="food" element={<Food />} />
         <Route path="privacy" element={<Privacy />} />
         <Route path="shop" element={<Shop />} />
         <Route path="exercises" element={<Exercises />} />

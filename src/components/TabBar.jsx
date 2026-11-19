@@ -5,7 +5,7 @@ const TABS = [
   { to: '/plan', icon: '🏠', label: 'Today' },
   { to: '/exercises', icon: '💪', label: 'Exercises' },
   { to: '/progress', icon: '📈', label: 'Progress' },
-  { to: '/coach', icon: '🧠', label: 'Coach' },
+  { to: '/food', icon: '🍽️', label: 'Food' },
 ];
 
 function TabBar({ onMore, menuOpen }) {

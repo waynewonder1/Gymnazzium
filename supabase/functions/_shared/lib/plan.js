@@ -145,6 +145,10 @@ export function nutrition(profile) {
   else if (fat) adjustment = -500;
   else if (toned) adjustment = -250;
   else if (muscle) adjustment = 250;
+  // The food tracker's own question ("gain / maintain / lose") wins when answered.
+  // Kept in sync with FOOD_GOALS in data/meals.js (not imported: this file also runs in the reminder function).
+  const FOOD_ADJUST = { gain: 300, maintain: 0, lose: -500 };
+  if (profile.foodGoal in FOOD_ADJUST) adjustment = FOOD_ADJUST[profile.foodGoal];
 
   // Never recommend starving: keep a sensible floor.
   const floor = profile.gender === 'Female' ? 1200 : profile.gender === 'Male' ? 1500 : 1350;

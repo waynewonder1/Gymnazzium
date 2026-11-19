@@ -16,6 +16,8 @@ import GuidedWorkout from '../components/plan/GuidedWorkout';
 import PlanGuide from '../components/plan/PlanGuide';
 import { guideSeen } from '../lib/planGuide';
 import SplitPicker from '../components/plan/SplitPicker';
+import RefuelDialog from '../components/food/RefuelDialog';
+import { markRefuelShown, refuelShownToday } from '../lib/food';
 
 function Plan() {
   const { profile, authReady, syncing } = useMember();
@@ -62,6 +64,7 @@ function PlanView({ profile }) {
   const [week, setWeek] = useState(Math.floor(clamp(today) / 7));
   const [guided, setGuided] = useState(false); // guided workout mode open
   const [guideOpen, setGuideOpen] = useState(() => !guideSeen()); // "How it works" walkthrough, first visit
+  const [refuel, setRefuel] = useState(false); // post-workout meal ideas
   // A gym day the member switched to the home version ("Can't make it to the gym?").
   const dayAt = (i) => {
     const planned = getDay(profile, i);
@@ -123,6 +126,22 @@ function PlanView({ profile }) {
     }
     if (endWorkout) done[selected] = true;
     commit({ ...progress, lifts, checks, done });
+  };
+
+  // After today's workout is done: meal ideas, once a day.
+  const offerRefuel = () => {
+    if (refuelShownToday()) return;
+    markRefuelShown();
+    setRefuel(true);
+  };
+  const markDone = () => {
+    const wasDone = Boolean(progress.done[selected]);
+    toggleIn('done')();
+    if (!wasDone && selected === today) offerRefuel();
+  };
+  const closeGuided = () => {
+    setGuided(false);
+    if (progress.done[selected] && selected === today) offerRefuel();
   };
 
   const finishWorkout = () => {
@@ -232,7 +251,7 @@ function PlanView({ profile }) {
           relation={relationOf(selected)}
           progress={progress}
           onToggleCheck={toggleCheck}
-          onToggleDone={toggleIn('done')}
+          onToggleDone={markDone}
           onToggleMission={toggleIn('missions')}
           onLog={logLift}
           onLogRun={logRun}
@@ -241,7 +260,7 @@ function PlanView({ profile }) {
           onToggleHome={toggleHome}
         />
         {guided && day.type === 'train' && (
-          <GuidedWorkout key={selected} day={day} progress={progress} onStep={guidedStep} onFinish={finishWorkout} onClose={() => setGuided(false)} />
+          <GuidedWorkout key={selected} day={day} progress={progress} onStep={guidedStep} onFinish={finishWorkout} onClose={closeGuided} />
         )}
         {selected !== current && (
           <button className="btn btn-ghost back-today" onClick={() => select(current)}>Back to today</button>
@@ -321,6 +340,9 @@ function PlanView({ profile }) {
       )}
 
       <PlanGuide profile={profile} open={guideOpen} onClose={() => setGuideOpen(false)} />
+      {refuel && (
+        <RefuelDialog open={refuel} onClose={() => setRefuel(false)} profile={profile} progress={progress} saveProfile={saveProfile} saveProgress={saveProgress} />
+      )}
 
       <section className="plan-section plan-actions">
         <button className="btn btn-ghost" onClick={() => navigate('/#register', { state: { edit: true } })}>Edit my details</button>
