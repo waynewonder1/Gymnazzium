@@ -2,6 +2,10 @@
 // <id>-1.webp, <id>-2.webp … (640×800, no location data) and <id>.mp4 (short, silent loop).
 // `photos` are captions in order: usually the start and the finish of one rep.
 export const exerciseMedia = {
+  // Home moves (from the TikTok home push day)
+  pushup: { photos: ['Start: arms straight, body in a line', 'Finish: chest to the floor'], video: true },
+  diamondPushup: { photos: ['Start: hands together under your chest', 'Finish: chest down to your hands'], video: true },
+  pikePushup: { photos: ['Start: hips high, arms straight', 'Finish: head down between your hands'], video: true },
   chestFly: { photos: ['Arms open', 'Squeeze together'], video: true },
   shoulderPress: { photos: ['Handles at shoulder height', 'Press overhead'], video: true },
   inclineBench: { photos: ['Lock out over your upper chest'], video: true },
