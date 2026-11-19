@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { products, shopConfig } from '../data/shop';
-import { addDays, getDay, homeVersion, parseDate, phaseInfo, streak, todayIndex, totalDays, usesRoutine } from '../lib/plan';
+import { addDays, getDay, homeVersion, nutrition, parseDate, phaseInfo, streak, todayIndex, totalDays, usesRoutine } from '../lib/plan';
 import { useMember } from '../context/member';
 import DayCard from '../components/plan/DayCard';
 import WeekStrip from '../components/plan/WeekStrip';
@@ -17,7 +17,7 @@ import PlanGuide from '../components/plan/PlanGuide';
 import { guideSeen } from '../lib/planGuide';
 import SplitPicker from '../components/plan/SplitPicker';
 import RefuelDialog from '../components/food/RefuelDialog';
-import { markRefuelShown, refuelShownToday } from '../lib/food';
+import { dayKey, markRefuelShown, refuelShownToday, totals } from '../lib/food';
 
 function Plan() {
   const { profile, authReady, syncing } = useMember();
@@ -231,6 +231,7 @@ function PlanView({ profile }) {
         {today >= total && <p className="banner">You finished your {profile.timeline} plan. Update your details to set the next target.</p>}
         <div className="plan-quick">
           <button type="button" className="chip chip-guide" onClick={() => setGuideOpen(true)}>📖 How it works</button>
+          <Link className="chip chip-food" to="/food">🍽️ Food today: {totals(progress.meals?.[dayKey()]).kcal.toLocaleString()} / {nutrition(profile).target.toLocaleString()} kcal</Link>
           <a className="chip" href="#details">📊 Stats & settings</a>
         </div>
       </section>

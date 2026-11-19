@@ -1252,3 +1252,4 @@ button.home-swap:hover{ border-color:var(--accent); }
 .refuel-ideas li{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 12px; background:var(--bg); border:1px solid rgba(var(--ink),0.08); border-radius:8px; }
 .refuel-ideas li > span{ display:flex; flex-direction:column; gap:2px; }
 .refuel-done{ color:var(--steel); font-weight:700; font-size:0.85rem; white-space:nowrap; }
+.chip.chip-food{ border-color:var(--steel); color:var(--text); }
