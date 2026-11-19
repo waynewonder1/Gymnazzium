@@ -56,6 +56,8 @@ export const exerciseMeta = {
   militaryPress: { muscles: ['Shoulders', 'Triceps'], equipment: 'Barbell', level: 2 },
   tricepsPushdown: { muscles: ['Triceps'], equipment: 'Cable + rope or bar', level: 1 },
   tricepsExtension: { muscles: ['Triceps'], equipment: 'Dumbbell or cable', level: 1 },
+  skullCrusher: { muscles: ['Triceps'], equipment: 'EZ bar + bench', level: 2 },
+  spiderCurl: { muscles: ['Biceps'], equipment: 'EZ bar or dumbbells + incline bench', level: 2 },
   machineCurl: { muscles: ['Biceps'], equipment: 'Curl machine', level: 1 },
   ropeCurl: { muscles: ['Biceps', 'Forearms'], equipment: 'Dumbbells or cable + rope', level: 1 },
   preacherCurl: { muscles: ['Biceps'], equipment: 'Preacher bench + EZ bar', level: 1 },

@@ -14,12 +14,12 @@ function ExerciseMedia({ id, name, compact = false }) {
 
   return (
     <figure className={`ex-media${compact ? ' compact' : ''}`}>
-      <div className="ex-media-frame">
+      <div className={`ex-media-frame${media.wide ? ' wide' : ''}`}>
         {playing ? (
           <video src={videoSrc(id)} poster={photoSrc(id, 0)} autoPlay muted loop playsInline aria-label={`${name}, short clip`} />
         ) : (
           <button type="button" className="ex-media-photo" onClick={() => count > 1 && setI((i + 1) % count)} disabled={count < 2} aria-label={count > 1 ? `${name}: photo ${i + 1} of ${count}, tap for the next` : undefined}>
-            <img src={photoSrc(id, i)} alt={`${name}: ${media.photos[i]}`} width="640" height="800" loading="lazy" decoding="async" />
+            <img src={photoSrc(id, i)} alt={`${name}: ${media.photos[i]}`} width="640" height={media.wide ? 384 : 800} loading="lazy" decoding="async" />
             {count > 1 && <span className="ex-media-count">{i + 1}/{count}</span>}
           </button>
         )}

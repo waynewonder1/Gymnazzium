@@ -71,6 +71,8 @@ export const exercises = {
   stepUp: { name: 'Step-ups', cue: 'Dumbbells in hand, step up onto a bench or box, drive through the front heel, control the step down. Each leg.', kind: 'weight' },
   militaryPress: { name: 'Overhead military press', cue: 'Standing, core tight, press the bar straight overhead. Moderate weight — protect your lower back.', kind: 'weight' },
   tricepsPushdown: { name: 'Triceps push-downs', cue: 'Elbows pinned to your sides, push the rope or bar down, spread at the bottom.', kind: 'weight' },
+  skullCrusher: { name: 'Skull crushers', cue: 'Lie on a bench, EZ bar over your chest. Bend only at the elbows to lower it towards your forehead, then press back up.', kind: 'weight' },
+  spiderCurl: { name: 'Spider curls', cue: 'Chest on an incline bench, arms hanging straight down. Curl the bar up without swinging, squeeze, lower slowly.', kind: 'weight' },
   tricepsExtension: { name: 'Triceps extensions', cue: 'Overhead with a dumbbell or cable, lower behind your head, extend fully.', kind: 'weight' },
   machineCurl: { name: 'Machine curls', cue: 'Full range, squeeze at the top, lower slowly.', kind: 'weight' },
   ropeCurl: { name: 'Hammer / rope curls', cue: 'Palms facing each other. Builds the brachialis, which widens the arm.', kind: 'weight' },
