@@ -3,6 +3,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { useMember } from '../context/member';
 import { supabase } from '../lib/supabase';
 import { formatPrice } from '../data/shop';
+import AdminNumbers from '../components/admin/AdminNumbers';
 
 const STATUSES = ['new', 'confirmed', 'paid', 'delivered', 'cancelled'];
 const OPEN = ['new', 'confirmed'];
@@ -134,6 +135,8 @@ function Dashboard() {
         <div className="stat"><span className="stat-label">Orders to handle</span><strong className="stat-value">{count(OPEN)}</strong><span className="stat-note">New or confirmed</span></div>
         <div className="stat"><span className="stat-label">Revenue</span><strong className="stat-value">{formatPrice(revenue)}</strong><span className="stat-note">Paid + delivered</span></div>
       </div>
+
+      <AdminNumbers />
 
       <h2 className="sub-title">Orders</h2>
       <div className="chips admin-filters">

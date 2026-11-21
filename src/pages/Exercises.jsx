@@ -10,6 +10,8 @@ function Exercises() {
   const [query, setQuery] = useState('');
   const [muscle, setMuscle] = useState('All');
   const [noKit, setNoKit] = useState(false);
+  // Phones get a short, tappable list; bigger screens show every card open.
+  const [folded] = useState(() => window.matchMedia('(max-width: 600px)').matches);
 
   const q = query.trim().toLowerCase();
   const list = ids.filter((id) => {
@@ -50,11 +52,11 @@ function Exercises() {
 
       <div className="library">
         <div>
-          <p className="muted small result-count">{list.length} exercise{list.length === 1 ? '' : 's'}</p>
+          <p className="muted small result-count">{list.length} exercise{list.length === 1 ? '' : 's'}{folded ? ' · tap one for photos and tips' : ''}</p>
           {list.length === 0 ? (
             <p className="muted">Nothing matches. Try another search or muscle.</p>
           ) : (
-            <div className="exercise-grid">{list.map((id) => <ExerciseCard key={id} id={id} />)}</div>
+            <div className="exercise-grid">{list.map((id) => <ExerciseCard key={id} id={id} folded={folded} />)}</div>
           )}
         </div>
         <aside className="library-timer">

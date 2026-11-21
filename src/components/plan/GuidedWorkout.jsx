@@ -123,6 +123,7 @@ function GuidedWorkout({ day, progress, onStep, onFinish, onClose }) {
   const [setsDone, setSetsDone] = useState(0);
   const [minutes, setMinutes] = useState(0); // workout length, worked out when it ends
   const [sharing, setSharing] = useState(false);
+  const [ending, setEnding] = useState(null); // "End workout?" check after at least one set: { minutes }
   const startedAt = useRef(0);
 
   const item = items[j];
@@ -205,6 +206,12 @@ function GuidedWorkout({ day, progress, onStep, onFinish, onClose }) {
     stopRest();
     onClose();
   };
+  // Ending part-way: check first once sets are logged, so a stray tap doesn't end the workout.
+  const askEnd = () => {
+    if (setsDone === 0) return close();
+    stopRest(); // the rest bar would cover the question
+    setEnding({ minutes: Math.max(1, Math.round((Date.now() - startedAt.current) / 60000)) });
+  };
 
   if (phase === 'intro') {
     return (
@@ -253,7 +260,7 @@ function GuidedWorkout({ day, progress, onStep, onFinish, onClose }) {
   return (
     <div className="guided" role="dialog" aria-modal="true" aria-labelledby="guided-title">
       <div className="guided-inner">
-        <button type="button" className="icon-btn guided-close" onClick={close} aria-label="End workout">✕</button>
+        <button type="button" className="icon-btn guided-close" onClick={askEnd} aria-label="End workout">✕</button>
         <div className="guided-progress">
           <span className="muted small">Exercise {j + 1} of {items.length}{item.group ? ` · ${item.group}` : ''}</span>
           <div className="progress-bar" role="progressbar" aria-label="Workout progress" aria-valuenow={doneBefore} aria-valuemin="0" aria-valuemax={totalSets}>
@@ -284,20 +291,36 @@ function GuidedWorkout({ day, progress, onStep, onFinish, onClose }) {
           <div className="guided-log">
             <Stepper label="Reps done" value={entry.r} step={1} onChange={(r) => setEntry({ ...entry, r })} />
             {usesKg(item.id) && (
-              <Stepper label="kg (0 = bodyweight)" value={entry.w === '' ? 0 : entry.w} step={2.5} decimal onChange={(w) => setEntry({ ...entry, w: w || '' })} />
+              <Stepper label={exercises[item.id] ? 'kg' : 'kg (0 = bodyweight)'} value={entry.w === '' ? 0 : entry.w} step={2.5} decimal onChange={(w) => setEntry({ ...entry, w: w || '' })} />
             )}
             <p className="muted small">
               {last ? `Last time: ${last.sets[s] ? `${last.sets[s].w ? `${last.sets[s].w} kg × ` : ''}${last.sets[s].r} reps` : 'not logged'}. ` : ''}
-              Did what it says? Just tap the button below.
+              Tap a number to type it, or use − and +.
             </p>
           </div>
         ) : null}
 
-        <button type="button" className="btn guided-main" onClick={setDone}>✓ {s + 1 >= n ? (j + 1 >= items.length ? 'Finish workout' : 'Done, next exercise') : 'Set done'}</button>
-        <div className="guided-links">
-          <button type="button" className="link-btn" onClick={() => goToExercise(j + 1)}>Skip exercise</button>
-          <button type="button" className="link-btn" onClick={close}>End workout</button>
-        </div>
+      </div>
+      {/* Pinned to the bottom so the main button is always in reach, even on small phones. */}
+      <div className="guided-dock">
+        {ending ? (
+          <div className="guided-dock-inner guided-ending" role="alertdialog" aria-labelledby="end-title" aria-describedby="end-text">
+            <strong id="end-title">End this workout?</strong>
+            <p id="end-text" className="muted small">
+              {setsDone} of {totalSets} sets done in {ending.minutes} min. Your sets are saved, and you can finish the rest later today.
+            </p>
+            <button type="button" className="btn guided-main" onClick={() => setEnding(null)} autoFocus>Keep going</button>
+            <button type="button" className="btn btn-ghost" onClick={close}>End workout</button>
+          </div>
+        ) : (
+          <div className="guided-dock-inner">
+            <button type="button" className="btn guided-main" onClick={setDone}>✓ {s + 1 >= n ? (j + 1 >= items.length ? 'Finish workout' : 'Done, next exercise') : 'Set done'}</button>
+            <div className="guided-links">
+              <button type="button" className="link-btn" onClick={() => goToExercise(j + 1)}>Skip exercise</button>
+              <button type="button" className="link-btn" onClick={askEnd}>End workout</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

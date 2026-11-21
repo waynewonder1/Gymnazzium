@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { products, shopConfig } from '../data/shop';
 import { addDays, getDay, homeVersion, nutrition, parseDate, phaseInfo, streak, todayIndex, totalDays, usesRoutine } from '../lib/plan';
 import { useMember } from '../context/member';
@@ -14,6 +14,7 @@ import ProductCard from '../components/ProductCard';
 import Registration from '../components/Registration';
 import GuidedWorkout from '../components/plan/GuidedWorkout';
 import PlanGuide from '../components/plan/PlanGuide';
+import SavePlan from '../components/plan/SavePlan';
 import { guideSeen } from '../lib/planGuide';
 import SplitPicker from '../components/plan/SplitPicker';
 import RefuelDialog from '../components/food/RefuelDialog';
@@ -63,7 +64,15 @@ function PlanView({ profile }) {
   const [selected, setSelected] = useState(clamp(today));
   const [week, setWeek] = useState(Math.floor(clamp(today) / 7));
   const [guided, setGuided] = useState(false); // guided workout mode open
-  const [guideOpen, setGuideOpen] = useState(() => !guideSeen()); // "How it works" walkthrough, first visit
+  const location = useLocation();
+  // Just built a plan and not logged in: offer to save it to an account first, then the walkthrough.
+  const [savePrompt, setSavePrompt] = useState(() => Boolean(location.state?.justBuilt) && backendEnabled && !user);
+  const [guideOpen, setGuideOpen] = useState(() => !guideSeen() && !savePrompt); // "How it works" walkthrough, first visit
+  const closeSavePrompt = () => {
+    setSavePrompt(false);
+    navigate(location.pathname, { replace: true, state: null }); // don't offer again on reload
+    if (!guideSeen()) setGuideOpen(true);
+  };
   const [refuel, setRefuel] = useState(false); // post-workout meal ideas
   // A gym day the member switched to the home version ("Can't make it to the gym?").
   const dayAt = (i) => {
@@ -190,6 +199,11 @@ function PlanView({ profile }) {
   };
 
   const changeTime = (workoutTime) => saveProfile({ ...profile, workoutTime });
+  // Open a folded section before the link scrolls to it.
+  const openFold = (id) => () => {
+    const fold = document.getElementById(id);
+    if (fold) fold.open = true;
+  };
 
   const startOver = async () => {
     if (!window.confirm('Delete your plan and progress and start again?')) return;
@@ -218,7 +232,7 @@ function PlanView({ profile }) {
 
         {backendEnabled && !user && (
           <p className="banner banner-compact">
-            Saved on this device only. <Link to="/login" state={{ next: '/plan' }}>Create a free account</Link> to keep it safe and get reminders.
+            Only saved on this phone. <Link to="/login" state={{ next: '/plan' }}>Create a free account</Link> to keep it.
           </p>
         )}
         {!online && (
@@ -305,8 +319,8 @@ function PlanView({ profile }) {
         <div className="chips plan-nav">
           <Link className="chip" to="/progress">My progress</Link>
           <a className="chip" href="#reminders">Reminders</a>
-          <a className="chip" href="#obstacles">Obstacles</a>
-          <a className="chip" href="#goal">Your goal in depth</a>
+          <a className="chip" href="#obstacles" onClick={openFold('obstacles')}>Obstacles</a>
+          <a className="chip" href="#goal" onClick={openFold('goal')}>Your goal in depth</a>
           {shopConfig.storeOpen && gear.length > 0 && <a className="chip" href="#gear">Gear</a>}
         </div>
       </section>
@@ -317,16 +331,25 @@ function PlanView({ profile }) {
         <Reminders profile={profile} onChangeTime={changeTime} />
       </section>
 
-      <section id="obstacles" className="plan-section">
-        <div className="section-label">Obstacles</div>
-        <h2 className="section-title">What's going to try to stop you, and what to do about it.</h2>
-        <Obstacles profile={profile} today={today} totalDays={total} />
+      {/* Long reads, folded so the page stays short; the chips above open them. */}
+      <section className="plan-section plan-fold-section">
+        <details id="obstacles" className="plan-fold">
+          <summary>
+            <span className="section-label">Obstacles</span>
+            <h2 className="section-title">What's going to try to stop you, and what to do about it.</h2>
+          </summary>
+          <Obstacles profile={profile} today={today} totalDays={total} />
+        </details>
       </section>
 
-      <section id="goal" className="plan-section">
-        <div className="section-label">Your goal in depth</div>
-        <h2 className="section-title">How you'll actually get there.</h2>
-        <DeepDive profile={profile} />
+      <section className="plan-section plan-fold-section">
+        <details id="goal" className="plan-fold">
+          <summary>
+            <span className="section-label">Your goal in depth</span>
+            <h2 className="section-title">How you'll actually get there.</h2>
+          </summary>
+          <DeepDive profile={profile} />
+        </details>
       </section>
 
       {shopConfig.storeOpen && gear.length > 0 && (
@@ -344,6 +367,7 @@ function PlanView({ profile }) {
       {refuel && (
         <RefuelDialog open={refuel} onClose={() => setRefuel(false)} profile={profile} progress={progress} saveProfile={saveProfile} saveProgress={saveProgress} />
       )}
+      {savePrompt && <SavePlan open={savePrompt} onClose={closeSavePrompt} />}
 
       <section className="plan-section plan-actions">
         <button className="btn btn-ghost" onClick={() => navigate('/#register', { state: { edit: true } })}>Edit my details</button>

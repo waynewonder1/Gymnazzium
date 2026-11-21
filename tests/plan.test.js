@@ -302,3 +302,40 @@ describe('routine editor helpers', () => {
     assert.equal(getDay(profile, 0).items[0].dose, '5 km');
   });
 });
+
+describe('day 1 is always a workout on new plans', () => {
+  // 17 Oct 2026 is a Saturday, 18 Oct a Sunday.
+  const fullBody = profileFor({ schedule: '3 days a week', gymStyle: 'fullBody', startDate: '2026-10-17' });
+
+  test('a plan started on a rest weekday trains on day 1 and carries on through the split', () => {
+    const week = firstWeek({ ...fullBody, firstDayWorkout: true });
+    const old = firstWeek(fullBody);
+    assert.equal(old[0], 'Sat:rest');
+    assert.notEqual(week[0], 'Sat:rest');
+    // Day 1 takes the first session, so Monday moves on to the next one instead of repeating it.
+    assert.equal(week[0].split(':')[1], old[2].split(':')[1]);
+    assert.notEqual(week[2], old[2]);
+    assert.equal(getDay({ ...fullBody, firstDayWorkout: true }, 1).type, 'rest');
+  });
+
+  test('weekday splits use the session before the start day, so nothing repeats back to back', () => {
+    const ppl6 = profileFor({ gymStyle: 'ppl6', startDate: '2026-10-18', firstDayWorkout: true });
+    const day1 = getDay(ppl6, 0);
+    const saturday = getDay({ ...ppl6, firstDayWorkout: false, startDate: '2026-10-17' }, 0);
+    assert.equal(day1.type, 'train');
+    assert.equal(day1.title, saturday.title);
+    assert.notEqual(getDay(ppl6, 1).title, day1.title);
+  });
+
+  test('a plan that starts on a training weekday is unchanged', () => {
+    const monday = profileFor({ schedule: '3 days a week', gymStyle: 'fullBody', startDate: '2026-10-12' });
+    assert.deepEqual(firstWeek({ ...monday, firstDayWorkout: true }), firstWeek(monday));
+  });
+
+  test('home, calisthenics and cardio plans also start with a workout', () => {
+    for (const lookingFor of ['Home workout', 'Calisthenics', 'Overall cardio']) {
+      const p = profileFor({ lookingFor, schedule: '3 days a week', startDate: '2026-10-17', firstDayWorkout: true });
+      assert.equal(getDay(p, 0).type, 'train', lookingFor);
+    }
+  });
+});

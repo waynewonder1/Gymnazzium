@@ -28,6 +28,14 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
         {day.type === 'train' && <span className="pill">~{day.minutes} min</span>}
       </div>
 
+      {/* Start sits right under the title so it's on the first screen of a phone. */}
+      {day.type === 'train' && !locked && onStartGuided && !runOnly && (
+        <button type="button" className="btn guided-start" onClick={onStartGuided}>
+          ▶ {done ? 'Do it again, guided' : 'Start workout'}
+          <span>One set at a time, with rest timer</span>
+        </button>
+      )}
+
       {day.obstacle && (
         <div className="heads-up">
           <strong>Heads-up: {day.obstacle.title}</strong>
@@ -49,12 +57,6 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
 
       {day.type === 'train' && (
         <>
-          {!locked && onStartGuided && !runOnly && (
-            <button type="button" className="btn guided-start" onClick={onStartGuided}>
-              ▶ {done ? 'Do it again, guided' : 'Start workout'}
-              <span>One set at a time, with rest timer</span>
-            </button>
-          )}
           <p className="bookend">{day.warmup}</p>
           {day.phaseNote && <p className="phase-note">{day.phaseNote}</p>}
           <ul className="checklist">
@@ -62,6 +64,8 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
               const checked = Boolean(progress.checks[`${day.index}:${j}`]);
               // Gym days are split into muscle groups; show a heading when the group changes.
               const newGroup = item.group && item.group !== day.items[j - 1]?.group;
+              const logs = !locked && isLoggable(item.id);
+              const howTo = item.id !== 'run' && <ExerciseHowTo id={item.id} name={item.name} cue={item.cue} />;
               return (
                 <li key={`${item.group ?? ''}-${item.id}`} className={checked ? 'checked' : ''}>
                   {newGroup && <span className="check-group">{item.group}</span>}
@@ -84,11 +88,13 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
                         {item.cue}
                         {item.note && <em> {item.note}</em>}
                       </span>
-                      {item.id !== 'run' && <ExerciseHowTo id={item.id} name={item.name} cue={item.cue} />}
+                      {/* With a set log, "How to" shares its row (shorter list on phones). */}
+                      {!logs && howTo}
                     </span>
                   </label>
-                  {!locked && isLoggable(item.id) && (
+                  {logs && (
                     <LiftLog
+                      lead={howTo}
                       key={`${day.index}-${j}`}
                       id={item.id}
                       index={day.index}

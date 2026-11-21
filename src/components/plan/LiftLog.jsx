@@ -12,7 +12,7 @@ const toSets = (rows) => rows.map((row) => ({ w: row.w === '' ? null : Number(ro
 
 // Weight × reps for each set of one exercise. Saves when you leave a box.
 // Finishing a set starts the auto rest timer; beating your best fires a PR celebration.
-function LiftLog({ id, index, name, dose, lifts, last, onSave }) {
+function LiftLog({ id, index, name, dose, lifts, last, onSave, lead = null }) {
   const n = setCount(dose);
   const logged = lifts?.[id]?.[index];
   const [open, setOpen] = useState(false);
@@ -56,6 +56,7 @@ function LiftLog({ id, index, name, dose, lifts, last, onSave }) {
   return (
     <div className="lift-log">
       <div className="lift-summary">
+        {lead}
         {last && <span className="muted small">Last time: {formatSets(last.sets)}</span>}
         {summary && <span className="small lift-today">Today: {summary}</span>}
         <button type="button" className="link-btn" onClick={() => setOpen(!open)} aria-expanded={open}>
