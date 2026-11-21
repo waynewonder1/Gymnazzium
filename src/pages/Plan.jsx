@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { products, shopConfig } from '../data/shop';
 import { addDays, getDay, homeVersion, parseDate, phaseInfo, streak, todayIndex, totalDays, usesRoutine } from '../lib/plan';
 import { useMember } from '../context/member';
@@ -14,6 +14,7 @@ import ProductCard from '../components/ProductCard';
 import Registration from '../components/Registration';
 import GuidedWorkout from '../components/plan/GuidedWorkout';
 import PlanGuide from '../components/plan/PlanGuide';
+import SavePlan from '../components/plan/SavePlan';
 import { guideSeen } from '../lib/planGuide';
 import SplitPicker from '../components/plan/SplitPicker';
 
@@ -61,7 +62,15 @@ function PlanView({ profile }) {
   const [selected, setSelected] = useState(clamp(today));
   const [week, setWeek] = useState(Math.floor(clamp(today) / 7));
   const [guided, setGuided] = useState(false); // guided workout mode open
-  const [guideOpen, setGuideOpen] = useState(() => !guideSeen()); // "How it works" walkthrough, first visit
+  const location = useLocation();
+  // Just built a plan and not logged in: offer to save it to an account first, then the walkthrough.
+  const [savePrompt, setSavePrompt] = useState(() => Boolean(location.state?.justBuilt) && backendEnabled && !user);
+  const [guideOpen, setGuideOpen] = useState(() => !guideSeen() && !savePrompt); // "How it works" walkthrough, first visit
+  const closeSavePrompt = () => {
+    setSavePrompt(false);
+    navigate(location.pathname, { replace: true, state: null }); // don't offer again on reload
+    if (!guideSeen()) setGuideOpen(true);
+  };
   // A gym day the member switched to the home version ("Can't make it to the gym?").
   const dayAt = (i) => {
     const planned = getDay(profile, i);
@@ -321,6 +330,7 @@ function PlanView({ profile }) {
       )}
 
       <PlanGuide profile={profile} open={guideOpen} onClose={() => setGuideOpen(false)} />
+      {savePrompt && <SavePlan open={savePrompt} onClose={closeSavePrompt} />}
 
       <section className="plan-section plan-actions">
         <button className="btn btn-ghost" onClick={() => navigate('/#register', { state: { edit: true } })}>Edit my details</button>

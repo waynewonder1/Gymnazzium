@@ -132,7 +132,8 @@ function Registration() {
     const next = fresh ? { ...profile, firstDayWorkout: true } : profile;
     // On their own routine, the answers only change the week if they switch back to the recommended plan.
     saveProfile(onRoutine && useRecommended ? { ...next, planMode: undefined } : next);
-    navigate('/plan');
+    // A brand-new plan: the plan page offers to save it to an account (SavePlan).
+    navigate('/plan', { state: { justBuilt: !saved } });
   };
 
   // Enter or "Next" moves on a step; the last step builds the plan.
