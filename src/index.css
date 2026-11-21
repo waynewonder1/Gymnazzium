@@ -1343,3 +1343,17 @@ footer a{ display:inline-block; padding:6px 0; }
 .refuel-ideas li > span{ display:flex; flex-direction:column; gap:2px; }
 .refuel-done{ color:var(--steel); font-weight:700; font-size:0.85rem; white-space:nowrap; }
 .chip.chip-food{ border-color:var(--steel); color:var(--text); }
+
+/* Food: portion sizes, exact grams, carbs and fat */
+.food-macros{ display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:6px; }
+.food-macros .food-protein{ margin-top:0; font-size:0.85rem; }
+@media (max-width:420px){ .food-macros{ grid-template-columns:1fr; gap:8px; } }
+.food-portions{ flex-direction:column; align-items:stretch; }
+.food-sizes, .food-qty{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.food-sizes .chip{ min-height:40px; }
+.chip-note{ font-weight:400; margin-left:4px; opacity:0.75; }
+.food-grams{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.food-grams label{ display:inline-flex; align-items:center; gap:8px; }
+.food-grams input{ width:90px; font:inherit; background:var(--bg-raise); color:var(--text); border:1px solid rgba(var(--ink),0.15); border-radius:6px; padding:8px 10px; min-height:40px; }
+.food-grams input:focus{ outline:none; border-color:var(--accent); }
+.food-per100{ margin:0; }

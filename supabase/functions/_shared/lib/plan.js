@@ -162,12 +162,18 @@ export function nutrition(profile) {
   const floor = profile.gender === 'Female' ? 1200 : profile.gender === 'Male' ? 1500 : 1350;
   const round10 = (n) => Math.round(n / 10) * 10;
 
+  const target = round10(Math.max(tdee + adjustment, floor));
+  const protein = Math.round(w * (muscle || toned ? 2 : 1.6));
+  // Fat about a quarter of calories (needed for hormones); carbs fill the rest and fuel training.
+  const fatG = Math.round((target * 0.25) / 9);
   return {
     bmr: round10(bmr),
     maintenance: round10(tdee),
-    target: round10(Math.max(tdee + adjustment, floor)),
+    target,
     adjustment,
-    protein: Math.round(w * (muscle || toned ? 2 : 1.6)),
+    protein,
+    fat: fatG,
+    carbs: Math.max(0, Math.round((target - protein * 4 - fatG * 9) / 4)),
     // 35 ml per kg, kept within the 2–3 L a day we recommend.
     water: Math.min(3, Math.max(2, Math.round(w * 0.035 * 10) / 10)),
     bmi: Math.round((w / (h / 100) ** 2) * 10) / 10,

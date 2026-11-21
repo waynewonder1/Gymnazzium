@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useMember } from '../context/member';
 import { FOOD_CATEGORIES, PORTIONS, foods } from '../data/foods';
 import { FOOD_GOALS } from '../data/meals';
-import { addCustomFood, addFoods, dayKey, foodInfo, recentFoods, removeEntry, totals } from '../lib/food';
+import { addCustomFood, addFoods, addGrams, dayKey, foodInfo, recentFoods, removeEntry, totals } from '../lib/food';
 import { addDays, nutrition } from '../lib/plan';
 import FoodGoalPicker from '../components/food/FoodGoalPicker';
 
@@ -17,7 +17,9 @@ function Food() {
   const [query, setQuery] = useState('');
   const [cat, setCat] = useState('Recent');
   const [picking, setPicking] = useState(null); // food id waiting for a portion
-  const [custom, setCustom] = useState({ name: '', portion: '', kcal: '', p: '' });
+  const [size, setSize] = useState(0); // which portion size of that food
+  const [grams, setGrams] = useState('');
+  const [custom, setCustom] = useState({ name: '', portion: '', kcal: '', p: '', c: '', f: '' });
   const [changingGoal, setChangingGoal] = useState(false);
 
   const date = addDays(new Date(), offset);
@@ -48,8 +50,19 @@ function Food() {
     setChangingGoal(false);
   };
 
+  const pick = (id) => {
+    setPicking(picking === id ? null : id);
+    setSize(0);
+    setGrams('');
+  };
   const add = (id, qty) => {
-    saveProgress(addFoods(progress, day, [[id, qty]]));
+    saveProgress(addFoods(progress, day, [[id, qty, size]]));
+    setPicking(null);
+  };
+  const addExact = (e, id) => {
+    e.preventDefault();
+    if (!(Number(grams) > 0)) return;
+    saveProgress(addGrams(progress, day, id, grams));
     setPicking(null);
   };
   const remove = (entryId) => saveProgress(removeEntry(progress, day, entryId));
@@ -58,7 +71,7 @@ function Food() {
     if (!custom.name.trim() || !custom.kcal) return;
     const { id, progress: next } = addCustomFood(progress, custom);
     saveProgress(addFoods(next, day, [[id, 1]]));
-    setCustom({ name: '', portion: '', kcal: '', p: '' });
+    setCustom({ name: '', portion: '', kcal: '', p: '', c: '', f: '' });
   };
 
   // Which foods to list: a search across everything, or one tab.
@@ -102,9 +115,17 @@ function Food() {
           <div style={{ width: `${pct(eaten.kcal, targets.target)}%` }} />
         </div>
         <p className="muted small">{left >= 0 ? `${left.toLocaleString()} kcal left` : `${(-left).toLocaleString()} kcal over your target`}</p>
-        <div className="food-protein">
-          <span>Protein <strong>{Math.round(eaten.p)} g</strong> / {targets.protein} g</span>
-          <div className="progress-bar thin" aria-hidden="true"><div style={{ width: `${pct(eaten.p, targets.protein)}%` }} /></div>
+        <div className="food-macros">
+          {[
+            ['Protein', eaten.p, targets.protein],
+            ['Carbs', eaten.c, targets.carbs],
+            ['Fat', eaten.f, targets.fat],
+          ].map(([label, got, of]) => (
+            <div className="food-protein" key={label}>
+              <span>{label} <strong>{Math.round(got)} g</strong> / {of} g</span>
+              <div className="progress-bar thin" aria-hidden="true"><div style={{ width: `${pct(got, of)}%` }} /></div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -118,7 +139,7 @@ function Food() {
             <li key={e.id}>
               <span>
                 <strong>{e.name}</strong>
-                <span className="muted small"> × {qtyLabel(e.qty)}</span>
+                <span className="muted small"> · {e.label ?? `× ${qtyLabel(e.qty)}`}</span>
               </span>
               <span className="muted small">{e.kcal} kcal · {Math.round(e.p)} g protein</span>
               <button type="button" className="icon-btn" onClick={() => remove(e.id)} aria-label={`Remove ${e.name}`}>✕</button>
@@ -142,16 +163,42 @@ function Food() {
           const f = foodInfo(id, progress);
           return (
             <li key={id} className={picking === id ? 'open' : ''}>
-              <button type="button" className="food-item" onClick={() => setPicking(picking === id ? null : id)} aria-expanded={picking === id}>
+              <button type="button" className="food-item" onClick={() => pick(id)} aria-expanded={picking === id}>
                 <span><strong>{f.name}</strong><span className="muted small"> · {f.portion}</span></span>
                 <span className="muted small">{f.kcal} kcal · {f.p} g</span>
               </button>
               {picking === id && (
                 <div className="food-portions">
-                  <span className="muted small">How much?</span>
-                  {PORTIONS.map((qty) => (
-                    <button type="button" key={qty} className="chip" onClick={() => add(id, qty)}>{qtyLabel(qty)}</button>
-                  ))}
+                  {f.per100 && f.portions.length > 1 && (
+                    <div className="food-sizes" role="group" aria-label="Portion size">
+                      {f.portions.map((pt, i) => (
+                        <button type="button" key={pt.label} className={`chip ${size === i ? 'active' : ''}`} aria-pressed={size === i} onClick={() => setSize(i)}>
+                          {pt.label} <span className="chip-note">~{pt.g} {f.unit}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <div className="food-qty">
+                    <span className="muted small">How many?</span>
+                    {PORTIONS.map((qty) => (
+                      <button type="button" key={qty} className="chip" onClick={() => add(id, qty)} aria-label={`Log ${qtyLabel(qty)} × ${f.per100 ? f.portions[size].label : f.portion}`}>{qtyLabel(qty)}</button>
+                    ))}
+                  </div>
+                  {f.per100 && (
+                    <>
+                      <form className="food-grams" onSubmit={(e) => addExact(e, id)}>
+                        <label>
+                          <span className="muted small">Or exact amount</span>
+                          <input type="number" inputMode="decimal" min="1" max="5000" value={grams} onChange={(e) => setGrams(e.target.value)} placeholder={String(f.portions[size].g)} aria-label={`Amount of ${f.name} in ${f.unit}`} />
+                          <span className="muted small">{f.unit}</span>
+                        </label>
+                        <button className="btn btn-sm btn-ghost" disabled={!(Number(grams) > 0)}>Log</button>
+                      </form>
+                      <p className="muted small food-per100">
+                        Per 100 {f.unit}: {f.per100.kcal} kcal · {f.per100.p} g protein · {f.per100.c} g carbs · {f.per100.f} g fat
+                      </p>
+                    </>
+                  )}
                 </div>
               )}
             </li>
@@ -166,12 +213,15 @@ function Food() {
           <label>Portion<input maxLength={40} value={custom.portion} onChange={(e) => setCustom({ ...custom, portion: e.target.value })} placeholder="e.g. 1 plate" /></label>
           <label>Calories (kcal)<input required type="number" min="0" max="5000" value={custom.kcal} onChange={(e) => setCustom({ ...custom, kcal: e.target.value })} /></label>
           <label>Protein (g)<input type="number" min="0" max="300" step="0.5" value={custom.p} onChange={(e) => setCustom({ ...custom, p: e.target.value })} /></label>
+          <label>Carbs (g)<input type="number" min="0" max="600" step="0.5" value={custom.c} onChange={(e) => setCustom({ ...custom, c: e.target.value })} /></label>
+          <label>Fat (g)<input type="number" min="0" max="300" step="0.5" value={custom.f} onChange={(e) => setCustom({ ...custom, f: e.target.value })} /></label>
           <button className="btn btn-sm">Add and log it</button>
         </form>
       </details>
 
       <p className="muted small food-note">
-        Calories are estimates for a typical portion: home cooking varies, especially the oil. Use them as a guide, not an exact count.
+        Values are per 100 g of food as eaten (per 100 ml for drinks): estimates that are being checked against the Kenya Food Composition Tables 2018.
+        Home cooking varies, especially the oil, so use them as a guide, not an exact count.
         This isn't medical advice: if you have a health condition, check with a doctor before changing how you eat.
       </p>
     </section>
