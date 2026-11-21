@@ -180,6 +180,11 @@ function PlanView({ profile }) {
   };
 
   const changeTime = (workoutTime) => saveProfile({ ...profile, workoutTime });
+  // Open a folded section before the link scrolls to it.
+  const openFold = (id) => () => {
+    const fold = document.getElementById(id);
+    if (fold) fold.open = true;
+  };
 
   const startOver = async () => {
     if (!window.confirm('Delete your plan and progress and start again?')) return;
@@ -294,8 +299,8 @@ function PlanView({ profile }) {
         <div className="chips plan-nav">
           <Link className="chip" to="/progress">My progress</Link>
           <a className="chip" href="#reminders">Reminders</a>
-          <a className="chip" href="#obstacles">Obstacles</a>
-          <a className="chip" href="#goal">Your goal in depth</a>
+          <a className="chip" href="#obstacles" onClick={openFold('obstacles')}>Obstacles</a>
+          <a className="chip" href="#goal" onClick={openFold('goal')}>Your goal in depth</a>
           {shopConfig.storeOpen && gear.length > 0 && <a className="chip" href="#gear">Gear</a>}
         </div>
       </section>
@@ -306,16 +311,25 @@ function PlanView({ profile }) {
         <Reminders profile={profile} onChangeTime={changeTime} />
       </section>
 
-      <section id="obstacles" className="plan-section">
-        <div className="section-label">Obstacles</div>
-        <h2 className="section-title">What's going to try to stop you, and what to do about it.</h2>
-        <Obstacles profile={profile} today={today} totalDays={total} />
+      {/* Long reads, folded so the page stays short; the chips above open them. */}
+      <section className="plan-section plan-fold-section">
+        <details id="obstacles" className="plan-fold">
+          <summary>
+            <span className="section-label">Obstacles</span>
+            <h2 className="section-title">What's going to try to stop you, and what to do about it.</h2>
+          </summary>
+          <Obstacles profile={profile} today={today} totalDays={total} />
+        </details>
       </section>
 
-      <section id="goal" className="plan-section">
-        <div className="section-label">Your goal in depth</div>
-        <h2 className="section-title">How you'll actually get there.</h2>
-        <DeepDive profile={profile} />
+      <section className="plan-section plan-fold-section">
+        <details id="goal" className="plan-fold">
+          <summary>
+            <span className="section-label">Your goal in depth</span>
+            <h2 className="section-title">How you'll actually get there.</h2>
+          </summary>
+          <DeepDive profile={profile} />
+        </details>
       </section>
 
       {shopConfig.storeOpen && gear.length > 0 && (

@@ -64,6 +64,8 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
               const checked = Boolean(progress.checks[`${day.index}:${j}`]);
               // Gym days are split into muscle groups; show a heading when the group changes.
               const newGroup = item.group && item.group !== day.items[j - 1]?.group;
+              const logs = !locked && isLoggable(item.id);
+              const howTo = item.id !== 'run' && <ExerciseHowTo id={item.id} name={item.name} cue={item.cue} />;
               return (
                 <li key={`${item.group ?? ''}-${item.id}`} className={checked ? 'checked' : ''}>
                   {newGroup && <span className="check-group">{item.group}</span>}
@@ -86,11 +88,13 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
                         {item.cue}
                         {item.note && <em> {item.note}</em>}
                       </span>
-                      {item.id !== 'run' && <ExerciseHowTo id={item.id} name={item.name} cue={item.cue} />}
+                      {/* With a set log, "How to" shares its row (shorter list on phones). */}
+                      {!logs && howTo}
                     </span>
                   </label>
-                  {!locked && isLoggable(item.id) && (
+                  {logs && (
                     <LiftLog
+                      lead={howTo}
                       key={`${day.index}-${j}`}
                       id={item.id}
                       index={day.index}

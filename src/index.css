@@ -1286,3 +1286,23 @@ button.link-btn{ min-height:40px; }
 :root[data-theme="light"] :is(.btn:not(.btn-ghost), .hero .cta, .cta, .chip.active, .carousel-btns button:hover, .cart-count, .ex-num, .ex-media-play, .rt-toggle button.active, .install-btn, .rest-actions button:last-child, .ws-day.done, .coach-q){ color:#fff; }
 .rec-tag{ font-size:0.75rem; }
 footer a{ display:inline-block; padding:6px 0; }
+
+/* UX round 3: shorter Plan and Exercises pages on phones */
+.lift-summary .howto-btn{ margin-top:0; }
+.plan-fold-section{ padding-top:28px; padding-bottom:28px; }
+.plan-fold{ scroll-margin-top:96px; }
+.plan-fold > summary{ list-style:none; cursor:pointer; position:relative; padding-right:48px; display:block; }
+.plan-fold > summary::-webkit-details-marker{ display:none; }
+.plan-fold > summary .section-title{ margin-bottom:0; }
+.plan-fold > summary::after{ content:'+'; position:absolute; right:0; top:50%; transform:translateY(-50%); width:40px; height:40px; display:grid; place-items:center; border:1px solid rgba(var(--ink),0.18); border-radius:50%; font-size:1.4rem; color:var(--text-dim); }
+.plan-fold[open] > summary::after{ content:'−'; }
+.plan-fold[open] > summary{ margin-bottom:28px; }
+.plan-fold > summary:hover::after{ border-color:var(--accent); color:var(--accent); }
+@media (max-width:600px){ .plan-fold > summary .section-title{ font-size:1.5rem; } }
+.ex-fold{ padding:0; }
+.ex-fold > summary{ list-style:none; cursor:pointer; display:flex; flex-direction:column; gap:8px; padding:14px 44px 14px 16px; position:relative; min-height:48px; }
+.ex-fold > summary::-webkit-details-marker{ display:none; }
+.ex-fold > summary::after{ content:'+'; position:absolute; right:14px; top:14px; font-size:1.3rem; color:var(--text-dim); line-height:1; }
+.ex-fold[open] > summary::after{ content:'−'; }
+.ex-fold[open]{ padding-bottom:14px; }
+.ex-fold > :not(summary){ margin-left:16px; margin-right:16px; }
