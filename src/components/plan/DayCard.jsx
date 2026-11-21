@@ -28,6 +28,14 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
         {day.type === 'train' && <span className="pill">~{day.minutes} min</span>}
       </div>
 
+      {/* Start sits right under the title so it's on the first screen of a phone. */}
+      {day.type === 'train' && !locked && onStartGuided && !runOnly && (
+        <button type="button" className="btn guided-start" onClick={onStartGuided}>
+          ▶ {done ? 'Do it again, guided' : 'Start workout'}
+          <span>One set at a time, with rest timer</span>
+        </button>
+      )}
+
       {day.obstacle && (
         <div className="heads-up">
           <strong>Heads-up: {day.obstacle.title}</strong>
@@ -49,12 +57,6 @@ function DayCard({ day, relation, progress, onToggleCheck, onToggleDone, onToggl
 
       {day.type === 'train' && (
         <>
-          {!locked && onStartGuided && !runOnly && (
-            <button type="button" className="btn guided-start" onClick={onStartGuided}>
-              ▶ {done ? 'Do it again, guided' : 'Start workout'}
-              <span>One set at a time, with rest timer</span>
-            </button>
-          )}
           <p className="bookend">{day.warmup}</p>
           {day.phaseNote && <p className="phase-note">{day.phaseNote}</p>}
           <ul className="checklist">

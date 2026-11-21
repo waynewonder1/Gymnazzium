@@ -82,10 +82,18 @@ const runsPerWeek = (profile, restDays) => (wantsRuns(profile) ? Math.max(0, Mat
 // Rest days that become runs, best first: Wednesday, Saturday, Tuesday, Thursday, Monday, Friday, Sunday.
 const RUN_WEEKDAYS = [3, 6, 2, 4, 1, 5, 0];
 
+// Plans built since day one became a workout (profile.firstDayWorkout): if the start date falls on
+// a rest weekday, day 1 still trains, so a new member never starts with "rest". Older plans keep
+// their history as it was.
+const extraFirstDay = (profile, days) =>
+  Boolean(profile.firstDayWorkout) && !days.includes(parseDate(profile.startDate).getDay());
+
 // Whether the plan's own sessions (before any runs) train on this day.
 function trainsOn(profile, index) {
   if (isGym(profile) || splitFor(profile)) {
-    return splitWeekdays(profile).includes(addDays(parseDate(profile.startDate), index).getDay());
+    const days = splitWeekdays(profile);
+    if (index === 0 && extraFirstDay(profile, days)) return true;
+    return days.includes(addDays(parseDate(profile.startDate), index).getDay());
   }
   return (SCHEDULE_OFFSETS[profile.schedule] ?? [0, 2, 4]).includes(index % 7);
 }
@@ -275,13 +283,23 @@ const heavyFrom = (profile) => HEAVY_FROM[profile.level] ?? HEAVY_FROM.Beginner;
 // Which split session falls on this date, or null for a rest day (gymWeek or homeWeek).
 function splitSessionFor(week, profile, date, index) {
   const days = week.days[profile.schedule] ?? week.days['4 days a week'];
-  if (!days.includes(date.getDay())) return null;
+  const byDay = week.byDay && days.length === Object.keys(week.byDay).length;
+  const extra = extraFirstDay(profile, days);
+  if (index === 0 && extra && byDay) {
+    // Day 1 on a rest weekday: the session of the last training weekday before it, so the
+    // next training day's own session doesn't repeat back to back.
+    for (let back = 1; back <= 7; back++) {
+      const wd = (date.getDay() + 7 - back) % 7;
+      if (days.includes(wd)) return week.byDay[wd];
+    }
+  }
+  if (!days.includes(date.getDay()) && !(index === 0 && extra)) return null;
   // Every session has its own weekday: use it.
-  if (week.byDay && days.length === Object.keys(week.byDay).length) return week.byDay[date.getDay()];
+  if (byDay) return week.byDay[date.getDay()];
   // Fewer training days: work through the split in order so every session comes round.
   const start = parseDate(profile.startDate);
   let count = 0;
-  for (let i = 0; i < index; i++) if (days.includes(addDays(start, i).getDay())) count++;
+  for (let i = 0; i < index; i++) if (days.includes(addDays(start, i).getDay()) || (i === 0 && extra)) count++;
   const order = week.orders?.[profile.schedule] ?? week.order;
   return order[count % order.length];
 }

@@ -6,60 +6,28 @@ function stepsFor(profile) {
   const gym = profile.lookingFor === 'Gym work';
   return [
     {
-      title: 'Welcome to your plan 👋',
+      title: 'Your plan is ready 👋',
       body: [
-        "Here's how to use it, in 1 minute. You can open this again any time with the “How it works” button.",
-        'Everything is already planned for you: which days you train, which exercises, and how many.',
+        'Everything is planned for you: which days you train, which exercises, and how many.',
+        'The row of days is your week. Today is highlighted; tap any day to see it. Rest days are part of the plan: your muscles grow while you rest.',
       ],
     },
     {
-      title: '1. Find today',
+      title: 'Reading a workout',
       body: [
-        'The row of days at the top is your week. Today is highlighted. Tap any day to see its workout.',
-        'Rest days are part of the plan, not a day off from it. Your muscles grow while you rest.',
-      ],
-    },
-    {
-      title: '2. Read the workout',
-      body: [
-        '“3 × 8–12 reps” means 3 sets. In each set, do the move 8 to 12 times in a row, then rest about 1–2 minutes.',
-        'Do the exercises from top to bottom. Start with the warm-up at the top of the day.',
+        '“3 × 8–12 reps” means 3 sets. In each set, do the move 8 to 12 times, then rest about 1–2 minutes.',
         gym
-          ? 'Heavy phase later on? “2 × 6–10 heavy” means fewer, harder sets.'
-          : 'Holds like “30 s” mean hold the position for 30 seconds.',
+          ? 'Start light: a weight you can lift 12 times with good form. When every set hits 12, go up a little next time.'
+          : 'Too hard? Do fewer reps or the easier version. Too easy? Slow every rep down. It gets harder every 3 weeks.',
+        'Not sure how a move goes? Tap “How to” for tips, photos or a short clip.',
       ],
     },
     {
-      title: gym ? '3. Pick your weight' : '3. Find your level',
-      body: gym
-        ? [
-            'Start light. Pick a weight you can lift 12 times with good form, where the last 2 reps feel hard.',
-            'When you can do 12 reps on every set, go up a little next time. Too heavy to reach 8? Go lighter.',
-            'Not sure? Your first week is for learning the moves, not for lifting heavy.',
-          ]
-        : [
-            'Too hard? Do fewer reps, or the easier version (like push-ups from your knees). Too easy? Slow every rep down.',
-            'Your plan gets a little harder every 3 weeks, so start where you are.',
-          ],
-    },
-    {
-      title: '4. Not sure how a move goes?',
+      title: 'Start your workout 💪',
       body: [
-        'Tap “How to” next to any exercise. You get the form tips, and photos or a short clip for many moves.',
-      ],
-    },
-    {
-      title: '5. Start your workout',
-      body: [
-        'Tap ▶ Start workout. It takes you through one set at a time, with a rest timer between sets.',
-        'Or tick the exercises off in the list yourself. Either way, your streak and progress are saved.',
-      ],
-    },
-    {
-      title: 'Missed a day? 🤝',
-      body: [
-        "That's normal. Don't try to catch up by doubling up. Just do the next workout on your plan.",
-        'Questions? Tap 💬 Feedback, or DM @wonderrrr on TikTok or Instagram.',
+        'Tap ▶ Start workout. It takes you through one set at a time, with a rest timer in between.',
+        "Missed a day? Don't double up, just do the next workout. Questions? DM @wonderrrr on TikTok or Instagram.",
+        'You can open this again any time with “How it works”.',
       ],
     },
   ];

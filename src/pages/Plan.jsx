@@ -199,7 +199,7 @@ function PlanView({ profile }) {
 
         {backendEnabled && !user && (
           <p className="banner banner-compact">
-            Saved on this device only. <Link to="/login" state={{ next: '/plan' }}>Create a free account</Link> to keep it safe and get reminders.
+            Only saved on this phone. <Link to="/login" state={{ next: '/plan' }}>Create a free account</Link> to keep it.
           </p>
         )}
         {!online && (

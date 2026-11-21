@@ -284,19 +284,24 @@ function GuidedWorkout({ day, progress, onStep, onFinish, onClose }) {
           <div className="guided-log">
             <Stepper label="Reps done" value={entry.r} step={1} onChange={(r) => setEntry({ ...entry, r })} />
             {usesKg(item.id) && (
-              <Stepper label="kg (0 = bodyweight)" value={entry.w === '' ? 0 : entry.w} step={2.5} decimal onChange={(w) => setEntry({ ...entry, w: w || '' })} />
+              <Stepper label={exercises[item.id] ? 'kg' : 'kg (0 = bodyweight)'} value={entry.w === '' ? 0 : entry.w} step={2.5} decimal onChange={(w) => setEntry({ ...entry, w: w || '' })} />
             )}
             <p className="muted small">
               {last ? `Last time: ${last.sets[s] ? `${last.sets[s].w ? `${last.sets[s].w} kg × ` : ''}${last.sets[s].r} reps` : 'not logged'}. ` : ''}
-              Did what it says? Just tap the button below.
+              Tap a number to type it, or use − and +.
             </p>
           </div>
         ) : null}
 
-        <button type="button" className="btn guided-main" onClick={setDone}>✓ {s + 1 >= n ? (j + 1 >= items.length ? 'Finish workout' : 'Done, next exercise') : 'Set done'}</button>
-        <div className="guided-links">
-          <button type="button" className="link-btn" onClick={() => goToExercise(j + 1)}>Skip exercise</button>
-          <button type="button" className="link-btn" onClick={close}>End workout</button>
+      </div>
+      {/* Pinned to the bottom so the main button is always in reach, even on small phones. */}
+      <div className="guided-dock">
+        <div className="guided-dock-inner">
+          <button type="button" className="btn guided-main" onClick={setDone}>✓ {s + 1 >= n ? (j + 1 >= items.length ? 'Finish workout' : 'Done, next exercise') : 'Set done'}</button>
+          <div className="guided-links">
+            <button type="button" className="link-btn" onClick={() => goToExercise(j + 1)}>Skip exercise</button>
+            <button type="button" className="link-btn" onClick={close}>End workout</button>
+          </div>
         </div>
       </div>
     </div>

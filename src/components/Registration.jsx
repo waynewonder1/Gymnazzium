@@ -13,7 +13,15 @@ const levels = [
   { value: 'Advanced', hint: 'Train consistently for a year or more' },
 ];
 
-const STEPS = ['About you', 'Your level', 'Your goals', 'How you train', 'When you train', 'What might get in your way'];
+// New members answer 4 short screens; the rest has sensible defaults (3 months, 06:30, starting
+// today) and can be changed later under "Edit my details", which adds a "More details" screen.
+const STEPS = [
+  { key: 'about', title: 'About you' },
+  { key: 'goals', title: 'Level & goals' },
+  { key: 'how', title: 'How you train' },
+  { key: 'days', title: 'Training days' },
+];
+const MORE = { key: 'more', title: 'More details' };
 
 const emptyProfile = () => ({
   name: '',
@@ -76,6 +84,8 @@ function Registration() {
   const [profile, setProfile] = useState(() => ({ ...emptyProfile(), ...(saved && { gymStyle: 'gymnazzium' }), ...saved, ...prefill }));
   const [editing, setEditing] = useState(() => !saved || location.state?.edit === true || Boolean(location.state?.prefill));
   const [step, setStep] = useState(0);
+  const steps = saved ? [...STEPS, MORE] : STEPS;
+  const at = steps[step]?.key;
   // Members following their own routine (routine editor): their week ignores these answers.
   const onRoutine = saved?.planMode === 'custom' && Boolean(saved?.routine);
   const [useRecommended, setUseRecommended] = useState(true);
@@ -91,11 +101,12 @@ function Registration() {
 
   // What's still missing on a step (the browser also checks that step's required boxes).
   const problemOn = (i) => {
-    if (i === 0 && !(profile.name.trim() && profile.age && profile.weight && profile.height && profile.gender)) return 'Fill in all the boxes about you.';
-    if (i === 2 && profile.goals.length === 0) return 'Pick at least one goal.';
-    if (i === 2 && profile.goals.includes(RUN_GOAL) && !runLevels[profile.runLevel]) return 'Pick how much you run now, so we can set your distance.';
-    if (i === 3 && !profile.lookingFor) return 'Pick how you want to train.';
-    if (i === 4 && !(profile.workoutTime && profile.startDate)) return 'Pick a workout time and a start date.';
+    const k = steps[i]?.key;
+    if (k === 'about' && !(profile.name.trim() && profile.age && profile.weight && profile.height && profile.gender)) return 'Fill in all the boxes about you.';
+    if (k === 'goals' && profile.goals.length === 0) return 'Pick at least one goal.';
+    if (k === 'goals' && profile.goals.includes(RUN_GOAL) && !runLevels[profile.runLevel]) return 'Pick how much you run now, so we can set your distance.';
+    if (k === 'how' && !profile.lookingFor) return 'Pick how you want to train.';
+    if (k === 'more' && !(profile.workoutTime && profile.startDate)) return 'Pick a workout time and a start date.';
     return '';
   };
 
@@ -107,7 +118,7 @@ function Registration() {
 
   const finish = () => {
     // Check every step; jump to the first one that needs attention.
-    for (let i = 0; i < STEPS.length; i++) {
+    for (let i = 0; i < steps.length; i++) {
       const problem = problemOn(i);
       if (problem) {
         goTo(i);
@@ -115,9 +126,12 @@ function Registration() {
       }
     }
     // A fresh plan (or a new start date) starts fresh progress; earned badges stay.
-    if (!saved || saved.startDate !== profile.startDate) saveProgress({ ...emptyProgress, badges: progress.badges ?? {} });
+    const fresh = !saved || saved.startDate !== profile.startDate;
+    if (fresh) saveProgress({ ...emptyProgress, badges: progress.badges ?? {} });
+    // Fresh plans always start with a workout on day 1 (see plan.js → extraFirstDay).
+    const next = fresh ? { ...profile, firstDayWorkout: true } : profile;
     // On their own routine, the answers only change the week if they switch back to the recommended plan.
-    saveProfile(onRoutine && useRecommended ? { ...profile, planMode: undefined } : profile);
+    saveProfile(onRoutine && useRecommended ? { ...next, planMode: undefined } : next);
     navigate('/plan');
   };
 
@@ -126,7 +140,7 @@ function Registration() {
     e.preventDefault();
     const problem = problemOn(step);
     if (problem) return setError(problem);
-    if (step < STEPS.length - 1) goTo(step + 1);
+    if (step < steps.length - 1) goTo(step + 1);
     else finish();
   };
 
@@ -134,6 +148,7 @@ function Registration() {
     if (!window.confirm('Delete your plan and progress and start again?')) return;
     await clearPlan();
     setProfile(emptyProfile());
+    setStep(0);
     setEditing(true);
   };
 
@@ -154,13 +169,13 @@ function Registration() {
     );
   }
 
-  const last = step === STEPS.length - 1;
+  const last = step === steps.length - 1;
   return (
     <form ref={formRef} className="card reg-form reg-steps" onSubmit={handleSubmit}>
       <div className="reg-progress">
-        <span className="muted small">Step {step + 1} of {STEPS.length} · {STEPS[step]}</span>
-        <div className="progress-bar" role="progressbar" aria-label="Plan builder progress" aria-valuenow={step + 1} aria-valuemin="1" aria-valuemax={STEPS.length}>
-          <div style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
+        <span className="muted small">Step {step + 1} of {steps.length} · {steps[step].title}</span>
+        <div className="progress-bar" role="progressbar" aria-label="Plan builder progress" aria-valuenow={step + 1} aria-valuemin="1" aria-valuemax={steps.length}>
+          <div style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
         </div>
       </div>
 
@@ -177,14 +192,17 @@ function Registration() {
         </div>
       )}
 
-      {step === 0 && (
+      {at === 'about' && (
       <fieldset>
         <legend>About you</legend>
         <div className="field-grid">
           <label>Name<input required value={profile.name} onChange={update('name')} /></label>
-          <label>Age<input required type="number" min="13" max="100" value={profile.age} onChange={update('age')} /></label>
-          <label>Weight (kg)<input required type="number" min="30" max="300" step="0.1" value={profile.weight} onChange={update('weight')} /></label>
-          <label>Height (cm)<input required type="number" min="120" max="230" value={profile.height} onChange={update('height')} /></label>
+          {/* Three short numbers side by side, so the whole step fits on a phone screen. */}
+          <div className="field-row-3">
+            <label>Age<input required type="number" inputMode="numeric" min="13" max="100" value={profile.age} onChange={update('age')} /></label>
+            <label>Weight (kg)<input required type="number" inputMode="decimal" min="30" max="300" step="0.1" value={profile.weight} onChange={update('weight')} /></label>
+            <label>Height (cm)<input required type="number" inputMode="numeric" min="120" max="230" value={profile.height} onChange={update('height')} /></label>
+          </div>
           <label>Gender
             <select required value={profile.gender} onChange={update('gender')}>
               <option value="">Select…</option>
@@ -197,7 +215,7 @@ function Registration() {
       </fieldset>
       )}
 
-      {step === 1 && (
+      {at === 'goals' && (
       <fieldset>
         <legend>How fit are you right now?</legend>
         <div className="levels">
@@ -209,12 +227,7 @@ function Registration() {
             </label>
           ))}
         </div>
-      </fieldset>
-      )}
-
-      {step === 2 && (
-      <fieldset>
-        <legend>What are your goals?</legend>
+        <h4 className="reg-sub">What are your goals?</h4>
         <p className="muted small form-hint">Pick as many as you like.</p>
         <Chips options={registration.goals} selected={profile.goals} onToggle={toggle('goals')} />
         {profile.goals.includes(RUN_GOAL) && (
@@ -234,7 +247,7 @@ function Registration() {
       </fieldset>
       )}
 
-      {step === 3 && (
+      {at === 'how' && (
       <fieldset>
         <legend>How do you want to train?</legend>
         <div className="chips">
@@ -247,33 +260,37 @@ function Registration() {
       </fieldset>
       )}
 
-      {step === 4 && (
+      {at === 'days' && (
       <fieldset>
-        <legend>When will you train?</legend>
+        <legend>How many days a week?</legend>
+        <div className="field-grid">
+          <label>Training days
+            <select value={profile.schedule} onChange={update('schedule')}>
+              {registration.schedules.map((o) => <option key={o}>{o}</option>)}
+            </select>
+          </label>
+        </div>
+        {profile.lookingFor === 'Home workout' && ['2 days a week', '3 days a week'].includes(profile.schedule) && (
+          <p className="muted small form-hint">Tip: the home split is built for 4–5 days a week. With fewer days, your plan rotates through the sessions more slowly.</p>
+        )}
+        {profile.lookingFor === 'Gym work' && <SplitChoice profile={profile} onPick={(gymStyle) => setProfile({ ...profile, gymStyle })} />}
+        {!saved && <p className="muted small form-hint">Your plan starts today with a workout, runs for 3 months, and you can change any of this later.</p>}
+      </fieldset>
+      )}
+
+      {at === 'more' && (
+      <fieldset>
+        <legend>More details</legend>
         <div className="field-grid">
           <label>Timeline
             <select value={profile.timeline} onChange={update('timeline')}>
               {registration.timelines.map((o) => <option key={o}>{o}</option>)}
             </select>
           </label>
-          <label>Training days
-            <select value={profile.schedule} onChange={update('schedule')}>
-              {registration.schedules.map((o) => <option key={o}>{o}</option>)}
-            </select>
-          </label>
           <label>Workout time<input type="time" required value={profile.workoutTime} onChange={update('workoutTime')} /></label>
           <label>Start date<input type="date" required value={profile.startDate} onChange={update('startDate')} /></label>
         </div>
-        {profile.lookingFor === 'Home workout' && ['2 days a week', '3 days a week'].includes(profile.schedule) && (
-          <p className="muted small form-hint">Tip: the home split is built for 4–5 days a week. With fewer days, your plan rotates through the sessions more slowly.</p>
-        )}
-        {profile.lookingFor === 'Gym work' && <SplitChoice profile={profile} onPick={(gymStyle) => setProfile({ ...profile, gymStyle })} />}
-      </fieldset>
-      )}
-
-      {step === 5 && (
-      <fieldset>
-        <legend>What might get in your way?</legend>
+        <h4 className="reg-sub">What might get in your way?</h4>
         <p className="muted small form-hint">Optional. Your plan adds tips for whatever you pick.</p>
         <Chips options={Object.keys(challenges)} selected={profile.challenges} onToggle={toggle('challenges')} />
         <textarea
