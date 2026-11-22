@@ -10,6 +10,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import { drop, dropOpen } from '../_shared/data/shop.js';
 import { contactError, makeReference, priceDropOrder } from '../_shared/lib/orders.js';
 import { CURRENCY, chargeToApply, toSubunits } from '../_shared/lib/premium.js';
+import { notifyPaidOrder } from '../_shared/notify-admins.ts';
 
 const SECRET = Deno.env.get('PAYSTACK_SECRET_KEY');
 const APP_URL = Deno.env.get('APP_URL') ?? 'https://gymnazzium.vercel.app';
@@ -101,8 +102,9 @@ Deno.serve(async (req) => {
       if (order.status === 'pending_payment') {
         const charge = chargeToApply(await paystack(`/transaction/verify/${encodeURIComponent(reference)}`));
         if (charge) {
-          const { error } = await admin.rpc('apply_order_payment', { p_reference: charge.reference, p_amount: charge.amount, p_currency: charge.currency, p_channel: charge.channel, p_paid_at: charge.paidAt });
+          const { data: applied, error } = await admin.rpc('apply_order_payment', { p_reference: charge.reference, p_amount: charge.amount, p_currency: charge.currency, p_channel: charge.channel, p_paid_at: charge.paidAt });
           if (error) throw new Error(error.message);
+          if (applied) await notifyPaidOrder(admin, applied); // the webhook may have been first; then it already alerted
         }
       }
       const { data: after } = await admin.from('orders').select('status').eq('paystack_reference', reference).maybeSingle();

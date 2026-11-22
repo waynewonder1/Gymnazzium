@@ -6,6 +6,7 @@
 //   npx supabase functions deploy paystack-webhook --project-ref <ref> --no-verify-jwt
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { chargeToApply, paymentKind, validSignature } from '../_shared/lib/premium.js';
+import { notifyPaidOrder } from '../_shared/notify-admins.ts';
 
 const SECRET = Deno.env.get('PAYSTACK_SECRET_KEY');
 const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
@@ -29,11 +30,13 @@ Deno.serve(async (req) => {
     if (charge) {
       // Premium or a merch pre-order. Applies once; a repeat or a wrong amount changes nothing.
       const fn = paymentKind(charge.reference) === 'order' ? 'apply_order_payment' : 'apply_payment';
-      const { error } = await admin.rpc(fn, { p_reference: charge.reference, p_amount: charge.amount, p_currency: charge.currency, p_channel: charge.channel, p_paid_at: charge.paidAt });
+      const { data: applied, error } = await admin.rpc(fn, { p_reference: charge.reference, p_amount: charge.amount, p_currency: charge.currency, p_channel: charge.channel, p_paid_at: charge.paidAt });
       if (error) {
         console.error(error);
         return new Response('retry', { status: 500 }); // Paystack retries later
       }
+      // Only the call that actually marked the order paid alerts the team (never twice).
+      if (fn === 'apply_order_payment' && applied) await notifyPaidOrder(admin, applied);
     }
   }
   // Every other event (and charges that aren't ours) is acknowledged and ignored.
