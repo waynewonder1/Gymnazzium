@@ -22,6 +22,14 @@ const cors = {
 };
 const reply = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
 
+// Where to send the buyer back after paying: the site they came from, if it's one of ours
+// (the live site, a Vercel preview of this project, or a local copy while testing).
+function returnOrigin(req: Request) {
+  const origin = req.headers.get('Origin') ?? '';
+  const ours = origin === APP_URL || /^http:\/\/localhost:\d+$/.test(origin) || /^https:\/\/gymnazzium-[a-z0-9-]+\.vercel\.app$/.test(origin);
+  return ours ? origin : APP_URL;
+}
+
 async function paystack(path: string, init: RequestInit = {}) {
   const res = await fetch(`https://api.paystack.co${path}`, {
     ...init,
@@ -79,7 +87,7 @@ Deno.serve(async (req) => {
           currency: CURRENCY,
           reference: paystackReference,
           channels: ['mobile_money', 'card'],
-          callback_url: `${APP_URL}/shop?order=${encodeURIComponent(paystackReference)}`,
+          callback_url: `${returnOrigin(req)}/shop?order=${encodeURIComponent(paystackReference)}`,
           metadata: { order: reference, drop: drop.name },
         }),
       });
