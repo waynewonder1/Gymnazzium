@@ -2,7 +2,7 @@ import { createPortal } from 'react-dom';
 
 // A one-off confetti burst for PRs. Mount it with a new `key` to fire again.
 // Positions come from a fixed pattern (not Math.random) so renders stay predictable.
-const COLORS = ['#FF4B3E', '#6FA8A3', '#ECEFEC', '#ffbe50'];
+const COLORS = ['#F21F33', '#6FA8A3', '#ECEFEC', '#ffbe50'];
 const PIECES = Array.from({ length: 36 }, (_, i) => {
   const t = (i * 0.618034) % 1; // golden-ratio spread
   return {

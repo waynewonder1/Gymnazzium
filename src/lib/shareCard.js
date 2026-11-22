@@ -4,7 +4,7 @@
 import { formatPace, formatTime } from './runs.js';
 
 const LOGO = '/brand/gymnazzium-metal.png';
-const RED = '#FF4B3E';
+const RED = '#F21F33';
 const TEXT = '#ECEFEC';
 const DIM = '#9AA39F';
 
@@ -53,11 +53,11 @@ export async function makeShareImage({ kind, data, style = 'card' }) {
   const { headline, sub, stats } = shareStats(kind, data);
 
   if (!sticker) {
-    ctx.fillStyle = '#111217';
+    ctx.fillStyle = '#050506';
     ctx.fillRect(0, 0, W, H);
     const glow = ctx.createRadialGradient(W / 2, 640, 40, W / 2, 640, 900);
-    glow.addColorStop(0, 'rgba(255,75,62,0.30)');
-    glow.addColorStop(1, 'rgba(255,75,62,0)');
+    glow.addColorStop(0, 'rgba(242,31,51,0.30)');
+    glow.addColorStop(1, 'rgba(242,31,51,0)');
     ctx.fillStyle = glow;
     ctx.fillRect(0, 0, W, H);
   }
