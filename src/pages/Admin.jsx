@@ -5,8 +5,10 @@ import { supabase } from '../lib/supabase';
 import { formatPrice } from '../data/shop';
 import AdminNumbers from '../components/admin/AdminNumbers';
 
-const STATUSES = ['new', 'confirmed', 'paid', 'delivered', 'cancelled'];
-const OPEN = ['new', 'confirmed'];
+const STATUSES = ['new', 'confirmed', 'paid', 'delivered', 'cancelled', 'pending_payment'];
+const STATUS_LABEL = { new: 'New', confirmed: 'Confirmed', paid: 'Paid', delivered: 'Delivered', cancelled: 'Cancelled', pending_payment: 'Unpaid (online)' };
+// To do: anything still to confirm, print or deliver. Paid online orders land straight in "Paid".
+const OPEN = ['new', 'confirmed', 'paid'];
 const EARNED = ['paid', 'delivered'];
 
 const fmtDateTime = (iso) =>
@@ -55,7 +57,7 @@ function Admin() {
 async function fetchDashboard() {
   const [s, o] = await Promise.all([
     supabase.rpc('admin_stats'),
-    supabase.from('orders').select('id, reference, customer_name, phone, location, items, total, status, created_at').order('created_at', { ascending: false }),
+    supabase.from('orders').select('id, reference, customer_name, phone, location, email, items, total, status, pay_method, payment_channel, paid_at, created_at').order('created_at', { ascending: false }),
   ]);
   return { stats: s.data ?? null, orders: o.data ?? [], error: (s.error || o.error)?.message ?? '' };
 }
@@ -114,7 +116,7 @@ function Dashboard() {
 
   const filters = [
     ['open', `To do (${count(OPEN)})`],
-    ...STATUSES.map((s) => [s, `${s[0].toUpperCase()}${s.slice(1)} (${count([s])})`]),
+    ...STATUSES.map((s) => [s, `${STATUS_LABEL[s]} (${count([s])})`]),
     ['all', `All (${orders.length})`],
   ];
 
@@ -157,12 +159,18 @@ function Dashboard() {
                   <span className="muted small">{fmtDateTime(o.created_at)}</span>
                 </div>
                 <select value={o.status} disabled={saving === o.id} onChange={(e) => setStatus(o, e.target.value)} aria-label={`Status of ${o.reference}`}>
-                  {STATUSES.map((s) => <option key={s} value={s}>{s[0].toUpperCase() + s.slice(1)}</option>)}
+                  {STATUSES.map((s) => <option key={s} value={s} disabled={s === 'pending_payment'}>{STATUS_LABEL[s]}</option>)}
                 </select>
               </div>
               <div className="admin-customer">
                 <span>{o.customer_name}</span>
                 <span className="muted">{o.location}</span>
+                {o.pay_method === 'online' && (
+                  <span className={`admin-paid ${o.paid_at ? 'yes' : 'no'}`}>
+                    {o.paid_at ? `✓ Paid online${o.payment_channel === 'mobile_money' ? ' · M-Pesa' : o.payment_channel === 'card' ? ' · card' : ''}` : 'Online checkout not completed'}
+                  </span>
+                )}
+                {o.email && <span className="muted small admin-email">{o.email}</span>}
                 <span className="admin-contact">
                   <a href={`tel:${o.phone.replace(/\s/g, '')}`}>{o.phone}</a>
                   <a href={`https://wa.me/${whatsappNumber(o.phone)}?text=${encodeURIComponent(`Hi ${o.customer_name}, this is Gymnazzium about your order ${o.reference}.`)}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>

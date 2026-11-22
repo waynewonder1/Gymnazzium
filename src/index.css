@@ -4,6 +4,7 @@
     --bg-raise: #101013;
     --accent: #F21F33;             /* racing red: the one bold colour */
     --accent-soft: rgba(242,31,51,0.15);
+    --accent-rgb: 242,31,51;
     --steel: #B9C0C7;              /* brushed silver, from the metal logo */
     --steel-rgb: 185,192,199;
     --gold: #D9AE5B;               /* trophies, PRs, badges */
@@ -23,6 +24,7 @@
     --bg-raise: #F7F8FA;
     --accent: #C8102E;            /* darker racing red: 4.9:1 on ice grey, readable as text */
     --accent-soft: rgba(200,16,46,0.12);
+    --accent-rgb: 200,16,46;
     --steel: #59616A;              /* darker metal, readable on ice grey */
     --steel-rgb: 89,97,106;
     --gold: #7A5A14;
@@ -1344,3 +1346,49 @@ nav::after{ content:''; position:absolute; left:0; right:0; bottom:-1px; height:
 .premium-badge{ align-self:flex-start; font-weight:700; font-size:0.8rem; letter-spacing:1px; text-transform:uppercase; padding:4px 10px; border-radius:999px; color:#050506; background:var(--gold); }
 .premium-ok{ border-left-color:var(--gold); }
 @media (max-width:420px){ .premium-plans{ grid-template-columns:1fr; } }
+
+  /* ================= MERCH DROP ================= */
+  .drop-pill{ font-size:0.75rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; text-decoration:none; color:var(--on-accent); background:linear-gradient(135deg, #F21F33, var(--gold)); border-radius:999px; padding:8px 14px; white-space:nowrap; margin-left:0 !important; animation:dropPulse 2.4s ease-in-out infinite; }
+  nav a.drop-pill{ color:var(--on-accent); }
+  @keyframes dropPulse{ 0%, 100%{ box-shadow:0 0 0 0 rgba(var(--accent-rgb),0.5); } 50%{ box-shadow:0 0 0 8px rgba(var(--accent-rgb),0); } }
+  @media (prefers-reduced-motion: reduce){ .drop-pill{ animation:none; } }
+  .merch-mockup, .merch-photo{ display:block; width:100%; aspect-ratio:1; max-width:100%; object-fit:cover; }
+  .drop-section{ padding-top:0; }
+  .drop-teaser{ display:grid; grid-template-columns:1.1fr 1fr; gap:28px; align-items:center; background:linear-gradient(135deg, rgba(var(--accent-rgb),0.12), rgba(var(--gold-rgb),0.06)); border:1px solid rgba(var(--accent-rgb),0.35); border-radius:14px; padding:24px; }
+  @media(max-width:800px){ .drop-teaser{ grid-template-columns:1fr; padding:18px; } }
+  .drop-teaser-art{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .drop-teaser-art .merch-mockup{ background:var(--bg); border-radius:10px; }
+  .drop-teaser-copy{ display:flex; flex-direction:column; gap:12px; align-items:flex-start; }
+  .drop-teaser-copy h2{ font-size:clamp(1.8rem, 5vw, 2.8rem); line-height:1.05; }
+  .drop-teaser.compact h2{ font-size:clamp(1.5rem, 4vw, 2rem); }
+  .drop-badge{ font-size:0.72rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); background:rgba(var(--gold-rgb),0.12); border-radius:999px; padding:6px 12px; }
+  .drop-steps{ list-style:none; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; max-width:960px; margin-bottom:24px; }
+  .drop-steps li{ display:flex; gap:10px; align-items:flex-start; background:var(--bg-raise); border-radius:8px; padding:12px 14px; font-size:0.9rem; color:var(--text-dim); line-height:1.45; }
+  .drop-steps span{ flex-shrink:0; width:24px; height:24px; border-radius:50%; display:grid; place-items:center; background:var(--accent); color:var(--on-accent); font-weight:700; font-size:0.8rem; }
+  .drop-preorder{ display:flex; flex-direction:column; gap:18px; max-width:960px; }
+  .drop-items{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:16px; }
+  @media(max-width:700px){ .drop-items{ grid-template-columns:1fr; } }
+  .drop-item{ background:var(--bg-raise); border:1px solid rgba(var(--ink),0.08); border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+  .drop-item.picked{ border-color:var(--accent); }
+  .drop-item-body{ padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .drop-item-head{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+  .drop-item-head h3{ font-size:1.1rem; }
+  .drop-price{ font-family:'Anton',sans-serif; font-weight:400; font-size:1.3rem; color:var(--gold); white-space:nowrap; }
+  .drop-sizes .chip{ cursor:pointer; min-width:46px; text-align:center; }
+  .drop-qty{ display:flex; align-items:center; gap:14px; }
+  .drop-qty span{ font-family:'Anton',sans-serif; font-size:1.5rem; min-width:24px; text-align:center; }
+  .drop-form{ display:flex; flex-direction:column; gap:12px; }
+  .drop-form h3{ margin:0; }
+  .drop-form label{ display:flex; flex-direction:column; gap:6px; font-size:0.8rem; color:var(--text-dim); font-weight:600; text-transform:uppercase; letter-spacing:1px; }
+  .drop-form input{ font:inherit; font-size:0.95rem; text-transform:none; letter-spacing:0; background:var(--bg); color:var(--text); border:1px solid rgba(255,255,255,0.12); border-radius:4px; padding:12px; width:100%; }
+  .drop-form input:focus{ outline:none; border-color:var(--accent); }
+  .drop-location{ grid-column:1 / -1; }
+  .drop-submit{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .drop-submit strong{ font-family:'Anton',sans-serif; font-weight:400; font-size:1.5rem; }
+  .drop-done{ max-width:640px; border-color:rgba(var(--gold-rgb),0.5); }
+  .drop-done p{ margin-bottom:8px !important; }
+  .shop-catalogue{ padding-top:0; }
+.admin-paid{ align-self:flex-start; font-size:0.75rem; font-weight:700; padding:3px 9px; border-radius:999px; }
+.admin-paid.yes{ background:rgba(var(--gold-rgb),0.15); color:var(--gold); }
+.admin-paid.no{ background:rgba(var(--ink),0.06); color:var(--text-dim); }
+.drop-alt .link-btn{ display:inline; min-height:0; padding:0; }

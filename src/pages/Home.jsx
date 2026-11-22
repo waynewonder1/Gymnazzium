@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { intro, paths, bodyTypes, offers } from '../data/guide';
 import { products, shopConfig } from '../data/shop';
+import DropTeaser from '../components/merch/DropTeaser';
 import { exercises } from '../data/workouts';
 import { bodyTypeLinks, offerLinks, pathLinks } from '../data/links';
 import { useMember } from '../context/member';
@@ -53,6 +54,10 @@ function Home() {
           <a href="#register" className="cta">Build my plan</a>
         )}
       </div>
+
+      <section id="drop" className="drop-section">
+        <DropTeaser />
+      </section>
 
       <section id="how">
         <div className="section-label">How it works</div>

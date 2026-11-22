@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { products, shopConfig } from '../data/shop';
 import { addDays, getDay, homeVersion, parseDate, phaseInfo, streak, todayIndex, totalDays, usesRoutine } from '../lib/plan';
+import DropTeaser from '../components/merch/DropTeaser';
 import { useMember } from '../context/member';
 import DayCard from '../components/plan/DayCard';
 import WeekStrip from '../components/plan/WeekStrip';
@@ -331,6 +332,12 @@ function PlanView({ profile }) {
           <DeepDive profile={profile} />
         </details>
       </section>
+
+      {!shopConfig.storeOpen && (
+        <section id="merch" className="plan-section">
+          <DropTeaser compact />
+        </section>
+      )}
 
       {shopConfig.storeOpen && gear.length > 0 && (
         <section id="gear" className="plan-section">

@@ -3,7 +3,7 @@
 // Run after changing src/lib/plan.js or src/data/{workouts,coaching}.js:  npm run functions:sync
 import { copyFileSync, mkdirSync } from 'node:fs';
 
-const files = ['lib/plan.js', 'data/workouts.js', 'data/coaching.js', 'lib/premium.js'];
+const files = ['lib/plan.js', 'data/workouts.js', 'data/coaching.js', 'lib/premium.js', 'lib/orders.js', 'data/shop.js'];
 for (const file of files) {
   mkdirSync(new URL(`../supabase/functions/_shared/${file.split('/')[0]}`, import.meta.url), { recursive: true });
   copyFileSync(new URL(`../src/${file}`, import.meta.url), new URL(`../supabase/functions/_shared/${file}`, import.meta.url));

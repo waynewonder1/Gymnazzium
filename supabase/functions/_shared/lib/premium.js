@@ -43,12 +43,14 @@ export async function validSignature(rawBody, signature, secretKey) {
   return diff === 0;
 }
 
-// A Paystack transaction (from verify or a charge.success webhook) that may switch Premium on.
+// A Paystack transaction (from verify or a charge.success webhook) that may switch Premium on
+// or mark a merch pre-order paid.
 // The database also checks amount and currency against the checkout (apply_payment), this is
 // the first gate: only successful charges, in our currency, for one of our references.
 export function chargeToApply(tx) {
   if (!tx || tx.status !== 'success' || tx.currency !== CURRENCY) return null;
-  if (typeof tx.reference !== 'string' || !tx.reference.startsWith('gz-')) return null;
+  // gz-… = Premium checkout, GZ-XXXXXX-… = merch pre-order.
+  if (typeof tx.reference !== 'string' || !/^(gz-|GZ-[A-Z0-9]{6}-)/.test(tx.reference)) return null;
   if (!Number.isInteger(tx.amount) || tx.amount <= 0) return null;
   return { reference: tx.reference, amount: tx.amount, currency: tx.currency, channel: tx.channel ?? null, paidAt: tx.paid_at ?? tx.paidAt ?? null };
 }
@@ -60,3 +62,6 @@ export function premiumStatus(subscription, now = new Date()) {
   const daysLeft = Math.max(0, Math.ceil((until - now) / 86400000));
   return { active: until > now, daysLeft, until };
 }
+
+// Which kind of payment a Paystack reference belongs to.
+export const paymentKind = (reference) => (/^GZ-[A-Z0-9]{6}-/.test(reference) ? 'order' : 'premium');
