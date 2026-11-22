@@ -53,7 +53,7 @@ export async function makeShareImage({ kind, data, style = 'card' }) {
   const { headline, sub, stats } = shareStats(kind, data);
 
   if (!sticker) {
-    ctx.fillStyle = '#0A0E0C';
+    ctx.fillStyle = '#16171A';
     ctx.fillRect(0, 0, W, H);
     const glow = ctx.createRadialGradient(W / 2, 640, 40, W / 2, 640, 900);
     glow.addColorStop(0, 'rgba(255,75,62,0.30)');
