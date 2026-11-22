@@ -6,7 +6,7 @@
 // App code in /assets/ has unique file names per build, so it's cache-first.
 // Supabase and other APIs are never cached; the app handles those itself.
 
-const SHELL = 'gz-shell-v3'; // index.html, app code, small icons, and page chunks once opened
+const SHELL = 'gz-shell-v4'; // index.html, app code, small icons, and page chunks once opened
 const RUNTIME = 'gz-runtime-v1'; // Google Fonts
 // Look-ups ignore the Vary header: some servers send "Vary: Origin", which would stop a
 // file saved in the background from matching the page's own request for it.
@@ -46,8 +46,8 @@ async function cacheAppShell(response) {
 }
 
 const OFFLINE_PAGE = `<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gymnazzium</title>
-<body style="margin:0;min-height:100vh;display:grid;place-items:center;background:#16171A;color:#EFEBE3;font-family:sans-serif;text-align:center;padding:24px">
-<div><h1 style="font-size:28px">You're offline</h1><p style="color:#A8A49C">Open Gymnazzium once with internet, and it'll work offline after that.</p></div></body>`;
+<body style="margin:0;min-height:100vh;display:grid;place-items:center;background:#111217;color:#E6E8EC;font-family:sans-serif;text-align:center;padding:24px">
+<div><h1 style="font-size:28px">You're offline</h1><p style="color:#9EA2AB">Open Gymnazzium once with internet, and it'll work offline after that.</p></div></body>`;
 
 self.addEventListener('install', (event) => {
   event.waitUntil(cacheAppShell().catch(() => {}).then(() => self.skipWaiting()));

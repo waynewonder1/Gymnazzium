@@ -1,52 +1,52 @@
  :root{
-    /* Three-colour brand: charcoal, ivory and one bold red, with a metal touch (silver + gold). */
-    --bg: #16171A;                 /* charcoal */
-    --bg-raise: #202226;
+    /* Three-colour brand: obsidian black, ice grey and one bold red, with a metal touch (silver + gold). */
+    --bg: #111217;                 /* obsidian black */
+    --bg-raise: #1A1B21;
     --accent: #FF4B3E;             /* Gymnazzium red: the one bold colour */
     --accent-soft: rgba(255,75,62,0.15);
     --steel: #B9C0C7;              /* brushed silver, from the metal logo */
     --steel-rgb: 185,192,199;
     --gold: #D9AE5B;               /* trophies, PRs, badges */
     --gold-rgb: 217,174,91;
-    --text: #EFEBE3;               /* ivory */
-    --text-dim: #A8A49C;
-    --ink: 239,235,227;            /* tints for borders and subtle surfaces: rgba(var(--ink), a) */
-    --nav-bg: rgba(22,23,26,0.94);
-    --on-accent: #16171A;          /* text on red buttons (light mode switches to white) */
+    --text: #E6E8EC;               /* ice grey */
+    --text-dim: #9EA2AB;
+    --ink: 230,232,236;            /* tints for borders and subtle surfaces: rgba(var(--ink), a) */
+    --nav-bg: rgba(17,18,23,0.94);
+    --on-accent: #111217;          /* text on red buttons (light mode switches to white) */
     --metal: linear-gradient(90deg, rgba(185,192,199,0) 0%, rgba(185,192,199,0.55) 30%, rgba(217,174,91,0.55) 70%, rgba(217,174,91,0) 100%);
     --warn: #D9AE5B;
     color-scheme: dark;
   }
   /* Light theme (☀️ button in the top bar; saved per device). */
   :root[data-theme="light"]{
-    --bg: #F3EFE7;                 /* ivory */
-    --bg-raise: #FBF9F4;
-    --accent: #C4281D;            /* 5.3:1 on ivory, readable as text */
+    --bg: #E9EBEF;                 /* ice grey */
+    --bg-raise: #F7F8FA;
+    --accent: #C4281D;            /* 5.3:1 on ivory, readable as text on ice grey */
     --accent-soft: rgba(196,40,29,0.12);
     --steel: #59616A;              /* darker metal, readable on ivory */
     --steel-rgb: 89,97,106;
     --gold: #7A5A14;
     --gold-rgb: 160,120,40;
-    --text: #16171A;
-    --text-dim: #5C5952;
-    --ink: 22,23,26;
-    --nav-bg: rgba(243,239,231,0.94);
+    --text: #111217;
+    --text-dim: #565A63;
+    --ink: 17,18,23;
+    --nav-bg: rgba(233,235,239,0.94);
     --metal: linear-gradient(90deg, rgba(89,97,106,0) 0%, rgba(89,97,106,0.45) 30%, rgba(160,120,40,0.5) 70%, rgba(160,120,40,0) 100%);
     --warn: #7A5A14;
     color-scheme: light;
   }
   /* The top bar (and the phone menu that drops from it) stays dark in both themes: the brand look. */
   :root[data-theme="light"] nav{
-    --bg: #16171A; --bg-raise: #202226; --text: #EFEBE3; --text-dim: #A8A49C; --ink: 239,235,227;
-    --nav-bg: rgba(22,23,26,0.96); --accent: #FF4B3E; color: var(--text); border-bottom-color: transparent;
+    --bg: #111217; --bg-raise: #1A1B21; --text: #E6E8EC; --text-dim: #9EA2AB; --ink: 230,232,236;
+    --nav-bg: rgba(17,18,23,0.96); --accent: #FF4B3E; color: var(--text); border-bottom-color: transparent;
   }
   /* Photo-style cards stay dark in both themes. */
   :root[data-theme="light"] :is(.slide, .product-art, .ex-media-frame, .share-preview){
-    --text: #EFEBE3; --text-dim: #C9C4BB; --ink: 239,235,227; --bg-raise: #202226; color: var(--text);
+    --text: #E6E8EC; --text-dim: #C3C6CD; --ink: 230,232,236; --bg-raise: #1A1B21; color: var(--text);
   }
   /* The white metal logos turn black on the light background. */
   :root[data-theme="light"] :is(.hero-logo, .welcome-logo){ filter:invert(1) drop-shadow(0 0 24px rgba(229,55,43,0.25)); }
-  :root[data-theme="light"] .card, :root[data-theme="light"] .exercise, :root[data-theme="light"] .day-card{ box-shadow:0 1px 3px rgba(22,23,26,0.06); }
+  :root[data-theme="light"] .card, :root[data-theme="light"] .exercise, :root[data-theme="light"] .day-card{ box-shadow:0 1px 3px rgba(17,18,23,0.06); }
   *{margin:0;padding:0;box-sizing:border-box;}
   /* Long words, emails and handles wrap instead of running off narrow phones. */
   body{ overflow-wrap:break-word; }
@@ -321,8 +321,8 @@
   .product-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:20px; }
   .product{ background:var(--bg-raise); border:1px solid rgba(var(--ink),0.06); border-radius:8px; overflow:hidden; display:flex; flex-direction:column; transition:border-color 0.3s ease, transform 0.3s ease; }
   .product:hover{ border-color:rgba(255,75,62,0.5); transform:translateY(-4px); }
-  .product-art{ aspect-ratio:4/3; display:grid; place-items:center; color:var(--steel); background:linear-gradient(160deg, #25272B, #131417); }
-  .product-art.merch{ color:var(--accent); background:linear-gradient(160deg, #2A1A18, #131417); }
+  .product-art{ aspect-ratio:4/3; display:grid; place-items:center; color:var(--steel); background:linear-gradient(160deg, #1E1F25, #0D0E12); }
+  .product-art.merch{ color:var(--accent); background:linear-gradient(160deg, #2A1A18, #0D0E12); }
   .product-art svg{ width:38%; height:auto; }
   .product-art img{ width:100%; height:100%; object-fit:cover; }
   .product-body{ padding:18px; display:flex; flex-direction:column; gap:8px; flex:1; }
@@ -524,10 +524,10 @@
   a.slide{ color:inherit; text-decoration:none; transition:transform 0.3s ease; }
   a.slide:hover{ transform:translateY(-6px); }
   .slide em.arrow{ position:relative; padding-top:12px; }
-  .slide-v-taper{ background:linear-gradient(160deg, #2a1512, #202226 70%); }
-  .slide-the-morphs{ background:linear-gradient(160deg, #13232a, #202226 70%); }
-  .slide-slim-cut{ background:linear-gradient(160deg, #1b2a20, #202226 70%); }
-  .slide-barbarian{ background:linear-gradient(160deg, #2a2412, #202226 70%); }
+  .slide-v-taper{ background:linear-gradient(160deg, #2a1512, #1A1B21 70%); }
+  .slide-the-morphs{ background:linear-gradient(160deg, #13232a, #1A1B21 70%); }
+  .slide-slim-cut{ background:linear-gradient(160deg, #1b2a20, #1A1B21 70%); }
+  .slide-barbarian{ background:linear-gradient(160deg, #2a2412, #1A1B21 70%); }
   .numbers-band{ padding-top:60px; padding-bottom:60px; border-top:1px solid rgba(var(--ink),0.05); border-bottom:1px solid rgba(var(--ink),0.05); background:var(--bg-raise); }
   .numbers{ display:grid; grid-template-columns:repeat(4, 1fr); gap:32px; }
   @media(max-width:800px){ .numbers{ grid-template-columns:1fr 1fr; gap:24px; } }
@@ -1225,10 +1225,10 @@ button.home-swap:hover{ border-color:var(--accent); }
   .tab-bar{
     display:grid; grid-template-columns:repeat(5, 1fr); position:fixed; left:0; right:0; bottom:0; z-index:230;
     padding:6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
-    background:rgba(22,23,26,0.97); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+    background:rgba(17,18,23,0.97); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
     border-top:1px solid rgba(255,255,255,0.08);
   }
-  .tab-bar .tab{ display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 0; min-height:48px; justify-content:center; font:inherit; font-size:0.75rem; text-transform:none; font-weight:600; letter-spacing:0.3px; color:#A8A49C; text-decoration:none; background:none; border:0; border-radius:10px; cursor:pointer; }
+  .tab-bar .tab{ display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 0; min-height:48px; justify-content:center; font:inherit; font-size:0.75rem; text-transform:none; font-weight:600; letter-spacing:0.3px; color:#9EA2AB; text-decoration:none; background:none; border:0; border-radius:10px; cursor:pointer; }
   .tab-icon{ font-size:1.25rem; line-height:1; filter:grayscale(1) opacity(0.75); }
   .tab-bar .tab.active{ color:#FF4B3E; }
   .tab-bar .tab.active .tab-icon{ filter:none; }
@@ -1320,6 +1320,6 @@ footer a{ display:inline-block; padding:6px 0; }
 /* ---------- Metal touch (silver + gold, from the metal G logo) ---------- */
 nav::after{ content:''; position:absolute; left:0; right:0; bottom:-1px; height:1px; background:var(--metal); pointer-events:none; }
 .tab-bar::before{ content:''; position:absolute; left:0; right:0; top:0; height:1px; background:var(--metal); pointer-events:none; }
-.lift-pr{ background:var(--gold); color:#16171A; }
+.lift-pr{ background:var(--gold); color:#111217; }
 .badge:not(.locked){ border-color:rgba(var(--gold-rgb),0.5); background:linear-gradient(160deg, rgba(var(--gold-rgb),0.08), var(--bg-raise) 60%); }
 .section-label{ letter-spacing:3px; }

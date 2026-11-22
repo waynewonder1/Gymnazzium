@@ -1,7 +1,7 @@
 // Light / dark theme, saved per device. Dark is the default (the Gymnazzium look).
 // index.html applies the saved choice before the page draws; this switches it afterwards.
 const KEY = 'gymnazzium-theme';
-const BAR = { dark: '#16171A', light: '#16171A' }; // browser bar colour on phones: matches the always-dark top bar
+const BAR = { dark: '#111217', light: '#111217' }; // browser bar colour on phones: matches the always-dark top bar
 
 export function currentTheme() {
   return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
