@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { useMember } from '../context/member';
 import { supabase } from '../lib/supabase';
-import { PLANS, PREMIUM_FEATURES, formatKES, premiumStatus } from '../lib/premium';
+import { PLANS, PREMIUM_FEATURES, PREMIUM_OPEN, formatKES, premiumStatus } from '../lib/premium';
 
 const fmtDate = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -47,6 +47,18 @@ function Premium() {
   }, [user, reference, setParams]);
 
   if (!backendEnabled) return <Navigate to="/" replace />;
+  // Switched off (PREMIUM_OPEN): anyone with an old link sees a short note, no checkout.
+  // A payment that's still being confirmed (?reference=) is always allowed through.
+  if (!PREMIUM_OPEN && !reference) {
+    return (
+      <section className="page-top premium-page">
+        <div className="section-label">Premium</div>
+        <h1 className="page-title">Coming soon.</h1>
+        <p className="page-lead">Weekly calorie check-ins, Kenyan meal plans and more are on the way. Everything in Gymnazzium stays free in the meantime.</p>
+        <Link to="/plan" className="btn">Back to my plan</Link>
+      </section>
+    );
+  }
   if (!authReady) return <section className="page-top"><p className="muted">Loading…</p></section>;
 
   const status = premiumStatus(sub);

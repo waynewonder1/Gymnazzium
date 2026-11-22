@@ -40,3 +40,36 @@ export function contactError({ name, phone, location, email }, needEmail = false
   if (needEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email ?? '').trim())) return 'Add your email for the payment receipt.';
   return null;
 }
+
+// What to print for a drop: per item, how many of each size were PAID for (paid or delivered),
+// plus what's reserved but not paid yet (WhatsApp reservations: new or confirmed).
+// Returns [{ id, name, sizes: ['S', …], paid: { S: 3, … }, paidTotal, reserved: { … }, reservedTotal }].
+export function printList(drop, orders) {
+  const rows = drop.items.map((item) => ({
+    id: item.id,
+    name: item.name,
+    sizes: item.sizes,
+    paid: Object.fromEntries(item.sizes.map((s) => [s, 0])),
+    reserved: Object.fromEntries(item.sizes.map((s) => [s, 0])),
+    paidTotal: 0,
+    reservedTotal: 0,
+  }));
+  for (const order of orders ?? []) {
+    const bucket = ['paid', 'delivered'].includes(order.status) ? 'paid' : ['new', 'confirmed'].includes(order.status) ? 'reserved' : null;
+    if (!bucket) continue; // unpaid online checkouts and cancelled orders aren't printed
+    for (const line of order.items ?? []) {
+      const row = rows.find((r) => r.id === line.id);
+      if (!row || !(line.size in row[bucket])) continue;
+      row[bucket][line.size] += line.qty;
+      row[`${bucket}Total`] += line.qty;
+    }
+  }
+  return rows;
+}
+
+// The print list as CSV for the printer: item, size, paid, reserved (not paid yet).
+export function printListCsv(rows) {
+  const lines = ['Item,Size,Paid,Reserved (not paid yet)'];
+  for (const r of rows) for (const s of r.sizes) lines.push(`"${r.name}",${s},${r.paid[s]},${r.reserved[s]}`);
+  return lines.join('\n');
+}

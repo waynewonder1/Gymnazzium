@@ -4,7 +4,7 @@ import { useMember } from '../context/member';
 import { supabase } from '../lib/supabase';
 import { formatPrice } from '../data/shop';
 import { todayIndex, totalDays } from '../lib/plan';
-import { premiumStatus } from '../lib/premium';
+import { PREMIUM_OPEN, premiumStatus } from '../lib/premium';
 import InviteButton from '../components/InviteButton';
 
 function Orders({ userId }) {
@@ -154,7 +154,7 @@ function Account() {
           )}
         </div>
 
-        <PremiumCard userId={user.id} />
+        {PREMIUM_OPEN && <PremiumCard userId={user.id} />}
 
         <div className="card flat">
           <h3>Password</h3>

@@ -2,8 +2,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useMember } from '../context/member';
 import { supabase } from '../lib/supabase';
-import { formatPrice } from '../data/shop';
+import { drop, formatPrice } from '../data/shop';
 import AdminNumbers from '../components/admin/AdminNumbers';
+import PrintList from '../components/admin/PrintList';
 
 const STATUSES = ['new', 'confirmed', 'paid', 'delivered', 'cancelled', 'pending_payment'];
 const STATUS_LABEL = { new: 'New', confirmed: 'Confirmed', paid: 'Paid', delivered: 'Delivered', cancelled: 'Cancelled', pending_payment: 'Unpaid (online)' };
@@ -22,6 +23,14 @@ function whatsappNumber(phone) {
   if (digits.startsWith('0')) return `254${digits.slice(1)}`;
   if (digits.length === 9) return `254${digits}`;
   return digits;
+}
+
+// The WhatsApp message prefilled for an order. Unpaid online checkouts get a friendly reminder.
+function whatsappText(o) {
+  if (o.status === 'pending_payment') {
+    return `Hi ${o.customer_name}, this is Gymnazzium 👋 Your ${drop.name} pre-order (${o.reference}, ${formatPrice(o.total)}) wasn't paid yet, so it isn't reserved. Want to finish it? You can pay with M-Pesa or card here: ${window.location.origin}/shop`;
+  }
+  return `Hi ${o.customer_name}, this is Gymnazzium about your order ${o.reference}.`;
 }
 
 function Admin() {
@@ -100,7 +109,8 @@ function Dashboard() {
 
   const count = (list) => orders.filter((o) => list.includes(o.status)).length;
   const revenue = orders.filter((o) => EARNED.includes(o.status)).reduce((sum, o) => sum + o.total, 0);
-  const shown = filter === 'all' ? orders : filter === 'open' ? orders.filter((o) => OPEN.includes(o.status)) : orders.filter((o) => o.status === filter);
+  // "All" leaves out unpaid online checkouts (people who opened Paystack and left): they have their own chip.
+  const shown = filter === 'all' ? orders.filter((o) => o.status !== 'pending_payment') : filter === 'open' ? orders.filter((o) => OPEN.includes(o.status)) : orders.filter((o) => o.status === filter);
 
   // Best sellers from every order that wasn't cancelled.
   const sellers = {};
@@ -117,7 +127,7 @@ function Dashboard() {
   const filters = [
     ['open', `To do (${count(OPEN)})`],
     ...STATUSES.map((s) => [s, `${STATUS_LABEL[s]} (${count([s])})`]),
-    ['all', `All (${orders.length})`],
+    ['all', `All (${orders.filter((o) => o.status !== 'pending_payment').length})`],
   ];
 
   return (
@@ -141,6 +151,7 @@ function Dashboard() {
       <AdminNumbers />
 
       <h2 className="sub-title">Orders</h2>
+      <PrintList orders={orders} />
       <div className="chips admin-filters">
         {filters.map(([key, label]) => (
           <button key={key} className={`chip ${filter === key ? 'active' : ''}`} aria-pressed={filter === key} onClick={() => setFilter(key)}>{label}</button>
@@ -173,7 +184,7 @@ function Dashboard() {
                 {o.email && <span className="muted small admin-email">{o.email}</span>}
                 <span className="admin-contact">
                   <a href={`tel:${o.phone.replace(/\s/g, '')}`}>{o.phone}</a>
-                  <a href={`https://wa.me/${whatsappNumber(o.phone)}?text=${encodeURIComponent(`Hi ${o.customer_name}, this is Gymnazzium about your order ${o.reference}.`)}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>
+                  <a href={`https://wa.me/${whatsappNumber(o.phone)}?text=${encodeURIComponent(whatsappText(o))}`} target="_blank" rel="noopener noreferrer">{o.status === 'pending_payment' ? 'Remind on WhatsApp' : 'WhatsApp'}</a>
                 </span>
               </div>
               <ul className="admin-items">

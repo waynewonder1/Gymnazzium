@@ -6,7 +6,7 @@
 // SUPABASE_URL, SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY are provided automatically.
 // Deploy: npx supabase functions deploy paystack-checkout --project-ref <ref>
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { CURRENCY, PLANS, chargeToApply, newReference, toSubunits } from '../_shared/lib/premium.js';
+import { CURRENCY, PLANS, PREMIUM_OPEN, chargeToApply, newReference, toSubunits } from '../_shared/lib/premium.js';
 
 const SECRET = Deno.env.get('PAYSTACK_SECRET_KEY');
 const APP_URL = Deno.env.get('APP_URL') ?? 'https://gymnazzium.vercel.app';
@@ -52,6 +52,7 @@ Deno.serve(async (req) => {
   const body = await req.json().catch(() => ({}));
   try {
     if (body.action === 'start') {
+      if (!PREMIUM_OPEN) return reply({ error: 'Premium is coming soon.' }, 403);
       const plan = PLANS[body.plan as keyof typeof PLANS];
       if (!plan) return reply({ error: 'Unknown plan.' }, 400);
       const reference = newReference(user.id);

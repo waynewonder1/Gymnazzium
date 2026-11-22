@@ -15,6 +15,7 @@ import TeamReply from './TeamReply';
 import Welcome from './Welcome';
 import ThemeToggle from './ThemeToggle';
 import TabBar from './TabBar';
+import { PREMIUM_OPEN } from '../lib/premium';
 import { openFeedback } from '../lib/feedbackEvent';
 
 const SITE = 'Gymnazzium';
@@ -93,7 +94,7 @@ function Layout() {
           {profile && <NavLink to="/challenges" onClick={closeMenu}>Challenges</NavLink>}
           {profile && <NavLink to="/coach" onClick={closeMenu}>Coach</NavLink>}
           {backendEnabled && user && <NavLink to="/feed" onClick={closeMenu}>Feed</NavLink>}
-          {backendEnabled && user && <NavLink to="/premium" onClick={closeMenu}>Premium</NavLink>}
+          {PREMIUM_OPEN && backendEnabled && user && <NavLink to="/premium" onClick={closeMenu}>Premium</NavLink>}
           {isAdmin && <NavLink to="/admin" onClick={closeMenu}>Admin</NavLink>}
           {!isStandalone() && <Link to="/#get-the-app" className="nav-install-link" onClick={closeMenu}>Install app</Link>}
           {/* Phones with the tab bar: Feedback lives here instead of the floating bubble. */}
@@ -117,7 +118,7 @@ function Layout() {
             </button>
           )}
           {!shopConfig.storeOpen && dropOpen() && pathname !== '/shop' && (
-            <Link to="/shop" className="drop-pill" onClick={closeMenu}>🔥 {drop.name}</Link>
+            <Link to="/shop" className="drop-pill" onClick={closeMenu} aria-label={`${drop.name} merch`}>🔥 <span className="drop-pill-name">{drop.name}</span></Link>
           )}
           <button className="menu-btn" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="site-menu" aria-label="Menu">
             <span /><span /><span />

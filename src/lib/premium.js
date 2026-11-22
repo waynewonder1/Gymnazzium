@@ -6,6 +6,11 @@
 
 export const CURRENCY = 'KES';
 
+// Premium is switched OFF until its features exist (merch launches first). When false: no menu
+// link, no Account card, /premium shows "coming soon", and the server refuses Premium checkouts.
+// To switch on: set true, run `npm run functions:sync`, redeploy paystack-checkout.
+export const PREMIUM_OPEN = false;
+
 export const PLANS = {
   month: { id: 'month', label: '1 month', days: 30, price: 400 },
   year: { id: 'year', label: '12 months', days: 365, price: 3600, note: 'Save KES 1,200' },

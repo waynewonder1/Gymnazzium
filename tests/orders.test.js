@@ -59,3 +59,35 @@ describe('routing a Paystack payment', () => {
     assert.equal(chargeToApply({ ...tx, reference: 'GZ-7K2M9Q' }), null);
   });
 });
+
+describe('print list', () => {
+  const line = (id, size, qty) => ({ id, size, qty, name: 'x', price: 1 });
+  const orders = [
+    { status: 'paid', items: [line('drop01-tee', 'M', 2), line('drop01-vest', 'L', 1)] },
+    { status: 'delivered', items: [line('drop01-tee', 'M', 1)] },
+    { status: 'new', items: [line('drop01-tee', 'S', 1)] },
+    { status: 'confirmed', items: [line('drop01-vest', 'XL', 2)] },
+    { status: 'pending_payment', items: [line('drop01-tee', 'L', 5)] },
+    { status: 'cancelled', items: [line('drop01-tee', 'L', 9)] },
+    { status: 'paid', items: [line('old-hoodie', 'M', 4)] },
+  ];
+
+  test('counts paid pieces per size, keeps reserved apart, skips unpaid and cancelled', async () => {
+    const { printList } = await import('../src/lib/orders.js');
+    const [teeRow, vestRow] = printList(drop, orders);
+    assert.equal(teeRow.paid.M, 3);
+    assert.equal(teeRow.paid.L, 0, 'unpaid online checkout and cancelled order not printed');
+    assert.equal(teeRow.reserved.S, 1);
+    assert.equal(teeRow.paidTotal, 3);
+    assert.equal(vestRow.paid.L, 1);
+    assert.equal(vestRow.reserved.XL, 2);
+  });
+
+  test('CSV has a line per item and size', async () => {
+    const { printList, printListCsv } = await import('../src/lib/orders.js');
+    const csv = printListCsv(printList(drop, orders)).split('\n');
+    assert.equal(csv[0], 'Item,Size,Paid,Reserved (not paid yet)');
+    assert.ok(csv.includes(`"${tee.name}",M,3,0`));
+    assert.equal(csv.length, 1 + tee.sizes.length + vest.sizes.length);
+  });
+});
