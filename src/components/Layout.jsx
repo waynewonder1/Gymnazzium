@@ -93,6 +93,7 @@ function Layout() {
           {profile && <NavLink to="/challenges" onClick={closeMenu}>Challenges</NavLink>}
           {profile && <NavLink to="/coach" onClick={closeMenu}>Coach</NavLink>}
           {backendEnabled && user && <NavLink to="/feed" onClick={closeMenu}>Feed</NavLink>}
+          {backendEnabled && user && <NavLink to="/premium" onClick={closeMenu}>Premium</NavLink>}
           {isAdmin && <NavLink to="/admin" onClick={closeMenu}>Admin</NavLink>}
           {!isStandalone() && <Link to="/#get-the-app" className="nav-install-link" onClick={closeMenu}>Install app</Link>}
           {/* Phones with the tab bar: Feedback lives here instead of the floating bubble. */}

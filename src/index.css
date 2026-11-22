@@ -1323,3 +1323,24 @@ nav::after{ content:''; position:absolute; left:0; right:0; bottom:-1px; height:
 .lift-pr{ background:var(--gold); color:#050506; }
 .badge:not(.locked){ border-color:rgba(var(--gold-rgb),0.5); background:linear-gradient(160deg, rgba(var(--gold-rgb),0.08), var(--bg-raise) 60%); }
 .section-label{ letter-spacing:3px; }
+
+/* ---------- Premium ---------- */
+.premium-page{ max-width:760px; }
+.premium-features{ list-style:none; display:grid; gap:10px; margin:24px 0; }
+.premium-features li{ display:flex; gap:14px; align-items:flex-start; padding:14px 16px; background:var(--bg-raise); border:1px solid rgba(var(--ink),0.06); border-radius:8px; }
+.premium-features li > span:last-child{ display:flex; flex-direction:column; gap:4px; }
+.premium-icon{ font-size:1.5rem; line-height:1.2; }
+.premium-soon{ align-self:flex-start; }
+.premium-pay{ display:flex; flex-direction:column; gap:14px; padding:22px; }
+.premium-h2{ font-size:1.4rem; }
+.premium-plans{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.premium-plan{ display:flex; flex-direction:column; align-items:flex-start; gap:4px; padding:14px 16px; min-height:44px; font:inherit; text-align:left; color:var(--text); background:var(--bg); border:2px solid rgba(var(--ink),0.12); border-radius:10px; cursor:pointer; }
+.premium-plan strong{ font-family:'Anton',sans-serif; font-weight:400; font-size:1.5rem; }
+.premium-plan.active{ border-color:var(--accent); background:var(--accent-soft); }
+.premium-plan-label{ font-size:0.85rem; color:var(--text-dim); font-weight:600; }
+.premium-plan-note{ font-size:0.75rem; font-weight:700; color:var(--gold); }
+.premium-cta{ width:100%; text-align:center; }
+.premium-status{ display:flex; flex-direction:column; gap:8px; padding:18px; border-color:rgba(var(--gold-rgb),0.5); }
+.premium-badge{ align-self:flex-start; font-weight:700; font-size:0.8rem; letter-spacing:1px; text-transform:uppercase; padding:4px 10px; border-radius:999px; color:#050506; background:var(--gold); }
+.premium-ok{ border-left-color:var(--gold); }
+@media (max-width:420px){ .premium-plans{ grid-template-columns:1fr; } }

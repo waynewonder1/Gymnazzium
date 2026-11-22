@@ -19,6 +19,7 @@ const Feed = lazy(() => import('./pages/Feed'));
 const Coach = lazy(() => import('./pages/Coach'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const Admin = lazy(() => import('./pages/Admin'));
+const Premium = lazy(() => import('./pages/Premium'));
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
         <Route path="login" element={<Login />} />
         <Route path="account" element={<Account />} />
         <Route path="admin" element={<Admin />} />
+        <Route path="premium" element={<Premium />} />
         <Route path="*" element={<Home />} />
       </Route>
     </Routes>

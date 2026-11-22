@@ -31,10 +31,26 @@ function createLightClient(baseUrl, key) {
     return fetch(input, { ...init, headers });
   };
   const rest = new PostgrestClient(new URL('rest/v1', base).href, { headers: {}, fetch: authedFetch });
+  // Our own Edge Functions (e.g. paystack-checkout), called with the member's login.
+  // Returns { data } or { error: message }.
+  const invoke = async (name, body) => {
+    try {
+      const res = await authedFetch(new URL(`functions/v1/${name}`, base).href, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body ?? {}),
+      });
+      const json = await res.json().catch(() => ({}));
+      return res.ok ? { data: json } : { error: json.error ?? `Error ${res.status}` };
+    } catch {
+      return { error: "Couldn't reach the server. Check your connection and try again." };
+    }
+  };
   return {
     auth,
     from: (table) => rest.from(table),
     rpc: (fn, args, options) => rest.rpc(fn, args, options),
+    functions: { invoke },
   };
 }
 

@@ -4,6 +4,7 @@ import { useMember } from '../context/member';
 import { supabase } from '../lib/supabase';
 import { formatPrice } from '../data/shop';
 import { todayIndex, totalDays } from '../lib/plan';
+import { premiumStatus } from '../lib/premium';
 import InviteButton from '../components/InviteButton';
 
 function Orders({ userId }) {
@@ -153,6 +154,8 @@ function Account() {
           )}
         </div>
 
+        <PremiumCard userId={user.id} />
+
         <div className="card flat">
           <h3>Password</h3>
           <p>Change the password you use to log in.</p>
@@ -172,6 +175,32 @@ function Account() {
       <DeleteAccount onDeleted={accountDeleted} />
       <p className="muted small">How we handle your data: <Link to="/privacy">Privacy</Link>.</p>
     </section>
+  );
+}
+
+// Premium status, with a link to pay or add time.
+function PremiumCard({ userId }) {
+  const [sub, setSub] = useState(undefined);
+  useEffect(() => {
+    let cancelled = false;
+    supabase.from('subscriptions').select('premium_until').eq('user_id', userId).maybeSingle().then(({ data }) => !cancelled && setSub(data ?? null));
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+  const status = premiumStatus(sub);
+  return (
+    <div className="card flat">
+      <h3>Premium</h3>
+      {sub === undefined ? (
+        <p className="muted small">Loading…</p>
+      ) : status.active ? (
+        <p>★ Active until {status.until.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}.</p>
+      ) : (
+        <p>Weekly calorie check-ins, Kenyan meal plans and more. Pay with M-Pesa or card.</p>
+      )}
+      <Link to="/premium" className="btn btn-sm">{status.active ? 'Add more time' : 'See Premium'}</Link>
+    </div>
   );
 }
 
