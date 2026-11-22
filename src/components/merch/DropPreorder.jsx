@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMember } from '../../context/member';
 import { drop, dropOpen, formatPrice, shopConfig } from '../../data/shop';
 import { backendEnabled, supabase } from '../../lib/supabase';
@@ -20,7 +20,21 @@ function DropPreorder() {
   const total = priced.total ?? drop.items.reduce((sum, i) => sum + i.price * picks[i.id].qty, 0);
   const pick = (id, change) => setPicks({ ...picks, [id]: { ...picks[id], ...change } });
   const update = (field) => (e) => setForm({ ...form, [field]: e.target.value });
-  const fail = (error) => setState({ busy: null, error, reserved: null });
+  const fail = (error, focus = 'error') => setState({ busy: null, error, reserved: null, focus });
+  const errorRef = useRef(null);
+  const itemsRef = useRef(null);
+  // A problem is always brought into view, so a tap never seems to do nothing.
+  useEffect(() => {
+    if (!state.error) return;
+    const target = state.focus === 'items' ? itemsRef.current : errorRef.current;
+    target?.scrollIntoView({ behavior: 'smooth', block: state.focus === 'items' ? 'start' : 'center' });
+  }, [state.error, state.focus]);
+  // Coming back from Paystack with the Back button can restore the page mid-"Opening checkout…".
+  useEffect(() => {
+    const reset = (e) => e.persisted && setState((s) => ({ ...s, busy: null }));
+    window.addEventListener('pageshow', reset);
+    return () => window.removeEventListener('pageshow', reset);
+  }, []);
 
   // Checks shared by both buttons. Returns an error message or null.
   const problem = (needEmail) => {
@@ -33,6 +47,8 @@ function DropPreorder() {
 
   const payNow = async (e) => {
     e.preventDefault();
+    // Nothing picked yet: take them to the sizes instead of only showing an error.
+    if (chosen.length === 0) return fail('Pick a size for the tee or vest first.', 'items');
     const err = problem(true);
     if (err) return fail(err);
     setState({ busy: 'pay', error: '', reserved: null });
@@ -71,7 +87,7 @@ function DropPreorder() {
 
   return (
     <form className="drop-preorder" onSubmit={payNow} noValidate>
-      <div className="drop-items">
+      <div className="drop-items" ref={itemsRef}>
         {drop.items.map((item) => {
           const p = picks[item.id];
           return (
@@ -116,11 +132,13 @@ function DropPreorder() {
             )}
             <label className="drop-location">Delivery location<input required maxLength={200} placeholder="e.g. Kilimani, Nairobi" value={form.location} onChange={update('location')} /></label>
           </div>
-          {state.error && <p className="form-error small" role="alert">{state.error}</p>}
+          {state.error && <p className="form-error drop-error" role="alert" ref={errorRef}>{state.error}</p>}
           <div className="drop-submit">
             <strong>{total > 0 ? formatPrice(total) : 'Pick a size above'}</strong>
             {shopConfig.payOnline ? (
-              <button className="btn" disabled={Boolean(state.busy)}>{state.busy === 'pay' ? 'Opening checkout…' : 'Pay now: M-Pesa or card'}</button>
+              <button className="btn" disabled={Boolean(state.busy)}>
+                {state.busy === 'pay' ? 'Opening checkout…' : chosen.length === 0 ? 'Pick a size first' : 'Pay now: M-Pesa or card'}
+              </button>
             ) : (
               <button type="button" className="btn" onClick={reserve} disabled={Boolean(state.busy)}>{state.busy === 'reserve' ? 'Reserving…' : 'Reserve my order'}</button>
             )}

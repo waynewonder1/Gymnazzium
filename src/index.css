@@ -1392,3 +1392,4 @@ nav::after{ content:''; position:absolute; left:0; right:0; bottom:-1px; height:
 .admin-paid.yes{ background:rgba(var(--gold-rgb),0.15); color:var(--gold); }
 .admin-paid.no{ background:rgba(var(--ink),0.06); color:var(--text-dim); }
 .drop-alt .link-btn{ display:inline; min-height:0; padding:0; }
+.drop-error{ font-weight:600; padding:10px 12px; border-left:3px solid var(--accent); background:var(--accent-soft); border-radius:0 6px 6px 0; }
