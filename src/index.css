@@ -1357,3 +1357,29 @@ footer a{ display:inline-block; padding:6px 0; }
 .food-grams input{ width:90px; font:inherit; background:var(--bg-raise); color:var(--text); border:1px solid rgba(var(--ink),0.15); border-radius:6px; padding:8px 10px; min-height:40px; }
 .food-grams input:focus{ outline:none; border-color:var(--accent); }
 .food-per100{ margin:0; }
+
+/* My supplements (Food page) */
+.supp-card{ margin:16px 0 4px; padding:18px; display:flex; flex-direction:column; gap:10px; }
+.supp-card:hover{ transform:none; }
+.supp-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
+.supp-h2{ font-size:1.15rem; margin:0; }
+.supp-start{ align-self:flex-start; }
+.supp-list, .supp-options{ list-style:none; display:flex; flex-direction:column; gap:8px; margin:0; padding:0; }
+.supp-row{ padding:10px 12px; border-radius:8px; background:var(--bg-raise); border:1px solid rgba(var(--ink),0.06); display:flex; flex-direction:column; gap:8px; }
+.supp-row.taken{ border-color:rgba(var(--accent-rgb),0.45); }
+.supp-name{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px; }
+.supp-streak{ font-size:0.8rem; color:var(--gold); white-space:nowrap; }
+.supp-caffeine .progress-bar{ margin:0; }
+.progress-bar.over > div{ background:var(--accent); }
+.supp-adds{ flex-wrap:wrap; }
+.supp-pick{ display:flex; flex-direction:column; gap:10px; align-items:flex-start; }
+.supp-options{ width:100%; }
+.supp-option{ width:100%; text-align:left; display:flex; flex-direction:column; gap:4px; padding:12px; border-radius:8px; background:var(--bg-raise); border:1px solid rgba(var(--ink),0.1); color:var(--text); font:inherit; cursor:pointer; }
+.supp-option.on{ border-color:var(--accent); background:rgba(var(--accent-rgb),0.08); }
+.supp-option-top{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.supp-check{ margin-left:auto; width:26px; height:26px; border-radius:50%; display:grid; place-items:center; border:1px solid rgba(var(--ink),0.2); font-weight:700; }
+.supp-option.on .supp-check{ background:var(--accent); color:var(--on-accent); border-color:var(--accent); }
+.supp-level{ font-size:0.72rem; padding:2px 8px; border-radius:999px; background:rgba(var(--ink),0.07); color:var(--text-dim); }
+.supp-level.strong{ background:rgba(var(--gold-rgb),0.16); color:var(--gold); }
+.supp-skip summary{ cursor:pointer; font-size:0.9rem; color:var(--text-dim); }
+.supp-skip ul{ margin:8px 0 0 18px; display:flex; flex-direction:column; gap:4px; font-size:0.9rem; }

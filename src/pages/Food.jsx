@@ -6,6 +6,7 @@ import { FOOD_GOALS } from '../data/meals';
 import { addCustomFood, addFoods, addGrams, dayKey, foodInfo, recentFoods, removeEntry, totals } from '../lib/food';
 import { addDays, nutrition } from '../lib/plan';
 import FoodGoalPicker from '../components/food/FoodGoalPicker';
+import Supplements from '../components/food/Supplements';
 
 const qtyLabel = (q) => (q === 0.5 ? '½' : q === 1.5 ? '1½' : String(q));
 
@@ -147,6 +148,8 @@ function Food() {
           ))}
         </ul>
       )}
+
+      <Supplements profile={profile} progress={progress} day={day} isToday={offset === 0} saveProfile={saveProfile} saveProgress={saveProgress} />
 
       <h2 className="food-h2">Add food</h2>
       <input className="food-search" type="search" placeholder="Search: ugali, eggs, chapati…" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search foods" />

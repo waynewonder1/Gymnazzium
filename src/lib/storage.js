@@ -43,7 +43,7 @@ export function mergeProgress(remote, local) {
   // Start from both copies so fields this function doesn't know about are kept, not dropped.
   const merged = { ...emptyProgress, ...remote, ...local };
   // Per-day maps: this device's value wins for a day/key it has, the account's copy fills the rest.
-  for (const field of ['done', 'checks', 'missions', 'badges', 'runs', 'homeDays', 'meals', 'customFoods']) {
+  for (const field of ['done', 'checks', 'missions', 'badges', 'runs', 'homeDays', 'meals', 'customFoods', 'suppDays']) {
     merged[field] = { ...remote?.[field], ...local?.[field] };
   }
   merged.lifts = { ...remote?.lifts };
